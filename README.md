@@ -1,4 +1,4 @@
-# MyIOSApp
+# BabySteps
 
 Xcodeを使わずに作成されたiOSアプリケーションです。XcodeGenを使用してプロジェクトファイルを生成し、GitHub ActionsでmacOSランナー上でビルド・テストを実行します。
 
@@ -12,7 +12,7 @@ Xcodeを使わずに作成されたiOSアプリケーションです。XcodeGen�
 ## プロジェクト構造
 
 ```
-MyIOSApp/
+BabySteps/
 ├── .github/workflows/     # GitHub Actions設定
 ├── Sources/               # ソースコード
 │   ├── App/              # アプリケーションコード
@@ -48,7 +48,7 @@ xcodegen generate
 ### 3. Xcodeで開く
 
 ```bash
-open MyIOSApp.xcodeproj
+open BabySteps.xcodeproj
 ```
 
 ## 開発
@@ -87,13 +87,13 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 
 ### ターゲット
 
-- **MyIOSApp**: メインアプリケーション
-- **MyIOSAppTests**: ユニットテスト
+- **BabySteps**: メインアプリケーション
+- **BabyStepsTests**: ユニットテスト
 
 ### 設定
 
 - **iOS Deployment Target**: 14.0
-- **Bundle Identifier**: com.example.MyIOSApp
+- **Bundle Identifier**: com.yu1Ro5.BabySteps
 - **Code Signing**: Automatic
 
 ## トラブルシューティング
@@ -121,6 +121,3 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 3. 変更をコミット
 4. プルリクエストを作成
 
-## ライセンス
-
-このプロジェクトはMITライセンスの下で公開されています。
