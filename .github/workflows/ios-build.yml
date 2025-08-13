@@ -3,18 +3,8 @@ name: iOS Build and Test
 on:
   push:
     branches: [ main, develop ]
-    paths:
-      - 'Sources/**'
-      - 'Tests/**'
-      - 'project.yml'
-      - '.github/workflows/**'
   pull_request:
     branches: [ main, develop ]
-    paths:
-      - 'Sources/**'
-      - 'Tests/**'
-      - 'project.yml'
-      - '.github/workflows/**'
 
 jobs:
   build-and-test:
