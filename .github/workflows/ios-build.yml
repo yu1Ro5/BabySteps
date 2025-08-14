@@ -1,0 +1,76 @@
+name: iOS Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+      
+    - name: Install XcodeGen
+      run: |
+        brew install xcodegen
+        
+    - name: List Available Simulators
+      run: |
+        echo "=== Available iOS Simulators ==="
+        xcrun simctl list devices available | grep "iPhone"
+        echo "=== Available iOS Versions ==="
+        xcrun simctl list runtimes | grep "iOS"
+        
+    - name: Generate Xcode Project
+      run: |
+        xcodegen generate
+        ls -la *.xcodeproj
+        
+    - name: Build iOS App
+      run: |
+        xcodebuild -project BabySteps.xcodeproj \
+                   -scheme BabySteps \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
+                   -derivedDataPath build \
+                   -configuration Debug \
+                   CODE_SIGN_STYLE=Automatic \
+                   build \
+                   -verbose
+                   
+    - name: Run Tests
+      run: |
+        xcodebuild -project BabySteps.xcodeproj \
+                   -scheme BabySteps \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
+                   -derivedDataPath build \
+                   -configuration Debug \
+                   CODE_SIGN_STYLE=Automatic \
+                   test \
+                   -verbose
+                   
+    - name: Archive App
+      run: |
+        xcodebuild -project BabySteps.xcodeproj \
+                   -scheme BabySteps \
+                   -destination 'generic/platform=iOS' \
+                   -derivedDataPath build \
+                   -configuration Release \
+                   CODE_SIGN_STYLE=Automatic \
+                   CODE_SIGN_IDENTITY="" \
+                   CODE_SIGNING_REQUIRED=NO \
+                   CODE_SIGNING_ALLOWED=NO \
+                   archive -archivePath build/BabySteps.xcarchive
+                   
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build-artifacts
+        path: build/
+        retention-days: 7
