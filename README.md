@@ -1,12 +1,12 @@
 # BabySteps
 
-Xcodeを使わずに作成されたiOSアプリケーションです。XcodeGenを使用してプロジェクトファイルを生成し、GitHub ActionsでmacOSランナー上でビルド・テストを実行します。
+SwiftUIベースのiOSアプリケーションです。XcodeGenを使用してプロジェクトファイルを生成し、GitHub ActionsでmacOSランナー上でビルド・テストを実行します。
 
 ## 特徴
 
-- 🚀 **Xcode不要**: XcodeGenでプロジェクトファイルを自動生成
+- 🚀 **SwiftUIベース**: モダンなSwiftUIフレームワークを使用
 - 🔄 **CI/CD対応**: GitHub Actionsで自動ビルド・テスト
-- 📱 **iOS 14.0+対応**: 最新のiOS機能をサポート
+- 📱 **iOS 18.0+対応**: 最新のiOS機能をサポート
 - 🧪 **テスト対応**: ユニットテストの実行環境
 
 ## プロジェクト構造
@@ -16,9 +16,9 @@ BabySteps/
 ├── .github/workflows/     # GitHub Actions設定
 ├── Sources/               # ソースコード
 │   ├── App/              # アプリケーションコード
-│   ├── Info.plist        # アプリ情報
-│   ├── Main.storyboard   # メイン画面
-│   └── LaunchScreen.storyboard # 起動画面
+│   │   ├── BabyStepsApp.swift      # メインアプリ
+│   │   └── ContentView.swift       # メイン画面（ToDo管理）
+│   └── Info.plist        # アプリ情報
 ├── Tests/                 # テストコード
 ├── Resources/             # リソースファイル
 ├── project.yml           # XcodeGen設定
@@ -55,9 +55,17 @@ open BabySteps.xcodeproj
 
 ### 新しいファイルの追加
 
-1. `Sources/` ディレクトリにSwiftファイルを追加
+1. `Sources/App/` ディレクトリにSwiftUIファイルを追加
 2. `project.yml` の `sources` セクションにパスを追加
 3. `xcodegen generate` を実行
+
+### SwiftUIビューの追加
+
+新しい画面を追加する場合：
+
+1. `Sources/App/` に新しいViewファイルを作成
+2. `ContentView.swift` にNavigationLinkを追加
+3. 必要に応じてデータモデルを作成
 
 ### 依存関係の追加
 
@@ -83,6 +91,18 @@ dependencies:
 
 GitHubのActionsタブから手動でワークフローを実行できます。
 
+## アプリ機能
+
+### メイン機能
+
+- **シンプルな表示**: Hello Worldの基本的な表示
+- **モダンなUI**: SwiftUIによる美しく直感的なインターフェース
+
+### 画面構成
+
+- **メイン画面**: 基本的なHello World表示
+- **シンプルなレイアウト**: アイコン、タイトル、メッセージの表示
+
 ## ビルド設定
 
 ### ターゲット
@@ -92,9 +112,10 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 
 ### 設定
 
-- **iOS Deployment Target**: 14.0
+- **iOS Deployment Target**: 18.0
 - **Bundle Identifier**: com.yu1Ro5.BabySteps
 - **Code Signing**: Automatic
+- **Framework**: SwiftUI
 
 ## トラブルシューティング
 
