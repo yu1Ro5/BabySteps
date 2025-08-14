@@ -28,7 +28,7 @@
 - `.cursor/settings.json`
 - `.cursor/rules/development-rules.mdc`
 - `.github/workflows/` ディレクトリ
-- MVVM（Service層なし）アーキテクチャ
+- MVVMアーキテクチャ
 
 #### 完了基準
 - 全チームメンバーがCursor環境で開発可能
