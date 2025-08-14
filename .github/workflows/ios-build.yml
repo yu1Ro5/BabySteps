@@ -63,6 +63,9 @@ jobs:
                    -derivedDataPath build \
                    -configuration Release \
                    CODE_SIGN_STYLE=Automatic \
+                   CODE_SIGN_IDENTITY="" \
+                   CODE_SIGNING_REQUIRED=NO \
+                   CODE_SIGNING_ALLOWED=NO \
                    archive -archivePath build/BabySteps.xcarchive
                    
     - name: Upload Build Artifacts
