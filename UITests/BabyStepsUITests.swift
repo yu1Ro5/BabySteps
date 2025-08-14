@@ -7,6 +7,10 @@ final class BabyStepsUITests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launch()
+        
+        // アプリの起動完了を待つ
+        let titleText = app.staticTexts["BabySteps"]
+        XCTAssertTrue(titleText.waitForExistence(timeout: 10), "アプリの起動が完了しませんでした")
     }
     
     override func tearDownWithError() throws {
@@ -90,6 +94,13 @@ final class BabyStepsUITests: XCTestCase {
         
         // サブタイトルがtitle2フォントであることを確認
         XCTAssertEqual(subtitleFont, .title2, "サブタイトルがtitle2フォントではありません")
+        
+        // スクリーンショットを撮影
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "Accessibility Test Screenshot"
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
     
     func testLayoutSpacing() throws {
@@ -163,6 +174,33 @@ final class BabyStepsUITests: XCTestCase {
         let screenshot = XCUIScreen.main.screenshot()
         let attachment = XCTAttachment(screenshot: screenshot)
         attachment.name = "Text Content Screenshot"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+    
+    func testOverallAppearance() throws {
+        // アプリ全体の見た目を確認
+        let titleText = app.staticTexts["BabySteps"]
+        let subtitleText = app.staticTexts["Hello, iOS!"]
+        let checkmarkIcon = app.images["checkmark.circle.fill"]
+        
+        // すべての要素が表示されていることを確認
+        XCTAssertTrue(titleText.exists && subtitleText.exists && checkmarkIcon.exists, 
+                     "すべての主要要素が表示されていません")
+        
+        // 要素の相対的な位置関係を確認
+        let iconFrame = checkmarkIcon.frame
+        let titleFrame = titleText.frame
+        let subtitleFrame = subtitleText.frame
+        
+        // 縦方向の配置順序を確認
+        XCTAssertTrue(iconFrame.maxY < titleFrame.minY, "アイコンがタイトルの上に配置されていません")
+        XCTAssertTrue(titleFrame.maxY < subtitleFrame.minY, "タイトルがサブタイトルの上に配置されていません")
+        
+        // 最終的なスクリーンショットを撮影
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "Overall App Screenshot"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
