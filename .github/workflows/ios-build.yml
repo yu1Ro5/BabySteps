@@ -49,27 +49,14 @@ jobs:
         pwd
         echo "=== Directory contents ==="
         ls -la
-        echo "=== XcodeGen spec file validation ==="
-        xcodegen --spec project.yml --lint || echo "XcodeGen lint failed, but continuing..."
         echo "=== Generating Xcode project ==="
-        if xcodegen --spec project.yml --verbose; then
-          echo "=== Project generated successfully ==="
-        else
-          echo "=== Project generation failed ==="
-          echo "=== Checking XcodeGen version ==="
-          xcodegen --version
-          echo "=== Checking project.yml syntax ==="
-          cat project.yml
-          echo "=== Attempting to generate with debug info ==="
-          xcodegen --spec project.yml --verbose --debug || echo "Debug generation also failed"
-          exit 1
-        fi
+        xcodegen --spec project.yml
         echo "=== Generated project files ==="
-        ls -la *.xcodeproj || echo "No xcodeproj files found"
+        ls -la *.xcodeproj
         echo "=== Project structure ==="
-        find . -name "*.xcodeproj" -exec ls -la {} \; || echo "No xcodeproj files found"
-        echo "=== Checking for errors ==="
-        if [ -f "*.xcodeproj" ]; then
+        find . -name "*.xcodeproj" -exec ls -la {} \;
+        echo "=== Verifying project generation ==="
+        if [ -d "BabySteps.xcodeproj" ]; then
           echo "Project generated successfully"
         else
           echo "Project generation failed"
