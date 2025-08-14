@@ -68,7 +68,6 @@
     ],
     "description": "SwiftUI Model with Codable support"
   },
-
   "SwiftUI List": {
     "prefix": "swiftui-list",
     "body": [
@@ -117,7 +116,7 @@
       "        .disabled(viewModel.isLoading)",
       "    }",
       "}",
-      ".formStyle(.grouped)"
+      ".formStyle(.plain)"
     ],
     "description": "SwiftUI Form with sections"
   },
