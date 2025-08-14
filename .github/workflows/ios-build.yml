@@ -48,7 +48,8 @@ jobs:
                    -scheme BabySteps \
                    -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
                    -derivedDataPath build \
-                   test
+                   test \
+                   -verbose
                    
     - name: Archive App
       run: |
