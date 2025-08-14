@@ -23,7 +23,10 @@ jobs:
         
     - name: List Available Simulators
       run: |
+        echo "=== Available iOS Simulators ==="
         xcrun simctl list devices available | grep "iPhone"
+        echo "=== Available iOS Versions ==="
+        xcrun simctl list runtimes | grep "iOS"
         
     - name: Generate Xcode Project
       run: |
@@ -34,15 +37,16 @@ jobs:
       run: |
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.6' \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
                    -derivedDataPath build \
-                   build
+                   build \
+                   -verbose
                    
     - name: Run Tests
       run: |
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.6' \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
                    -derivedDataPath build \
                    test
                    
