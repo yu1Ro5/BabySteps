@@ -6,7 +6,7 @@
 - **View**: SwiftUI View（状態管理なし、UI表示のみ）
 - **ViewModel**: Observable プロトコル実装、ビジネスロジック担当
 - **Model**: データ構造とビジネスルール
-- **Service**: 外部API、データベース、ファイル操作
+- **Service**: データ永続化、ファイル操作、デバイス機能連携
 
 ### 依存関係の方向
 ```
@@ -30,7 +30,7 @@ View → ViewModel → Model/Service
 ### テストレベル
 - **Unit Tests**: ViewModel、Model、Service
 - **UI Tests**: ユーザーフロー、アクセシビリティ
-- **Integration Tests**: API通信、データ永続化
+- **Integration Tests**: データ永続化、ファイル操作
 
 ### カバレッジ目標
 - 全体: 80%以上
@@ -76,7 +76,7 @@ View → ViewModel → Model/Service
 
 ### セキュリティ
 - 機密情報の暗号化
-- ネットワーク通信のHTTPS必須
+- ローカルデータの保護
 - ユーザー入力の検証
 
 ### アクセシビリティ
@@ -101,7 +101,7 @@ View → ViewModel → Model/Service
 ### プルリクエスト要件
 - テストカバレッジ80%以上
 - 静的解析エラー0件
-- 2名以上のレビュー承認
+- 責任者による承認
 - CI/CDパイプライン成功
 
 ### レビュー項目
