@@ -55,6 +55,11 @@
       ]
     }
   },
+  "observation": {
+    "enabled": true,
+    "preferObservation": true,
+    "avoidCombine": true
+  },
   "git": {
     "autofetch": true,
     "autofetchPeriod": 180,

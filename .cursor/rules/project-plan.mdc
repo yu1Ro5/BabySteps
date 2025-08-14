@@ -4,7 +4,7 @@
 
 **プロジェクト名**: BabySteps iOS アプリケーション  
 **期間**: 19週間（約4.5ヶ月）  
-**目標**: SwiftUI + MVVM + GitHub Actions CI/CD環境での効率的な開発
+**目標**: SwiftUI + MVVM (Observation) + GitHub Actions CI/CD環境での効率的な開発
 
 ## 🎯 プロジェクト目標
 
@@ -42,17 +42,17 @@
 #### タスク
 - [x] プロジェクト構造のSwiftUI対応
 - [x] 主要画面のSwiftUI実装
-- [x] MVVMアーキテクチャ適用
+- [x] MVVM (Observation) アーキテクチャ適用
 - [x] 既存機能の動作確認
 
 #### 成果物
 - SwiftUIベースのアプリ
-- MVVMアーキテクチャ実装
+- MVVM (Observation) アーキテクチャ実装
 - 基本UIコンポーネント
 
 #### 完了基準
 - 全画面がSwiftUIで実装済み
-- MVVMパターンが適用済み
+- MVVM (Observation) パターンが適用済み
 - 既存機能が正常動作
 
 ---

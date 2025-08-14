@@ -5,7 +5,7 @@
       "import SwiftUI",
       "",
       "struct ${1:ViewName}View: View {",
-      "    @StateObject private var viewModel = ${1:ViewName}ViewModel()",
+      "    @State private var viewModel = ${1:ViewName}ViewModel()",
       "    ",
       "    var body: some View {",
       "        ${2:VStack} {",
@@ -22,20 +22,19 @@
       "    ${1:ViewName}View()",
       "}"
     ],
-    "description": "SwiftUI View with MVVM pattern"
+    "description": "SwiftUI View with MVVM (Observation) pattern"
   },
   "SwiftUI ViewModel": {
     "prefix": "swiftui-viewmodel",
     "body": [
       "import Foundation",
-      "import Combine",
+      "import Observation",
       "",
       "@MainActor",
-      "final class ${1:ViewName}ViewModel: ObservableObject {",
-      "    @Published var isLoading = false",
-      "    @Published var errorMessage: String?",
-      "    ",
-      "    private var cancellables = Set<AnyCancellable>()",
+      "@Observable",
+      "final class ${1:ViewName}ViewModel {",
+      "    var isLoading = false",
+      "    var errorMessage: String?",
       "    ",
       "    init() {",
       "        setupBindings()",
@@ -48,13 +47,9 @@
       "    private func setupBindings() {",
       "        // Setup data bindings",
       "    }",
-      "    ",
-      "    deinit {",
-      "        cancellables.removeAll()",
-      "    }",
       "}"
     ],
-    "description": "SwiftUI ViewModel with MVVM pattern"
+    "description": "SwiftUI ViewModel with MVVM (Observation) pattern"
   },
   "SwiftUI Model": {
     "prefix": "swiftui-model",
@@ -85,10 +80,9 @@
     "prefix": "swiftui-service",
     "body": [
       "import Foundation",
-      "import Combine",
       "",
       "protocol ${1:ServiceName}ServiceProtocol {",
-      "    func ${2:fetchData}() -> AnyPublisher<${3:DataType}, Error>",
+      "    func ${2:fetchData}() async throws -> ${3:DataType}",
       "}",
       "",
       "final class ${1:ServiceName}Service: ${1:ServiceName}ServiceProtocol {",
@@ -98,14 +92,13 @@
       "        self.networkManager = networkManager",
       "    }",
       "    ",
-      "    func ${2:fetchData}() -> AnyPublisher<${3:DataType}, Error> {",
+      "    func ${2:fetchData}() async throws -> ${3:DataType} {",
       "        // Implement service logic",
-      "        return networkManager.request(endpoint: ${4:Endpoint})",
-      "            .eraseToAnyPublisher()",
+      "        return try await networkManager.request(endpoint: ${4:Endpoint})",
       "    }",
       "}"
     ],
-    "description": "SwiftUI Service with protocol-oriented design"
+    "description": "SwiftUI Service with async/await pattern"
   },
   "SwiftUI List": {
     "prefix": "swiftui-list",
@@ -293,23 +286,26 @@
   "SwiftUI StateObject": {
     "prefix": "swiftui-stateobject",
     "body": [
-      "@StateObject private var viewModel = ${1:ViewName}ViewModel()"
+      "@State private var viewModel = ${1:ViewName}ViewModel()"
     ],
-    "description": "SwiftUI @StateObject property wrapper"
+    "description": "SwiftUI @State with Observation pattern"
   },
   "SwiftUI ObservedObject": {
     "prefix": "swiftui-observedobject",
     "body": [
-      "@ObservedObject var viewModel: ${1:ViewName}ViewModel"
+      "var viewModel: ${1:ViewName}ViewModel"
     ],
-    "description": "SwiftUI @ObservedObject property wrapper"
+    "description": "SwiftUI ViewModel with Observation pattern (no wrapper needed)"
   },
-  "SwiftUI Published": {
-    "prefix": "swiftui-published",
+  "SwiftUI Observable": {
+    "prefix": "swiftui-observable",
     "body": [
-      "@Published var ${1:propertyName}: ${2:DataType} = ${3:defaultValue}"
+      "@Observable",
+      "final class ${1:ClassName} {",
+      "    var ${2:propertyName}: ${3:DataType} = ${4:defaultValue}",
+      "}"
     ],
-    "description": "SwiftUI @Published property wrapper"
+    "description": "SwiftUI @Observable class with Observation pattern"
   },
   "SwiftUI Binding": {
     "prefix": "swiftui-binding",

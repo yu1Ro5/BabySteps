@@ -4,7 +4,7 @@
 
 ### SwiftUI + MVVM
 - **View**: SwiftUI View（状態管理なし、UI表示のみ）
-- **ViewModel**: ObservableObject プロトコル実装、ビジネスロジック担当
+- **ViewModel**: Observable プロトコル実装、ビジネスロジック担当
 - **Model**: データ構造とビジネスルール
 - **Service**: 外部API、データベース、ファイル操作
 
@@ -57,8 +57,8 @@ View → ViewModel → Model/Service
 - ダークモード対応
 
 ### MVVM
-- ViewModelはObservableObject
-- @Published プロパティで状態管理
+- ViewModelはObservable
+- @Observable プロパティで状態管理
 - メモリリーク防止（weak self使用）
 
 ### 命名規則
