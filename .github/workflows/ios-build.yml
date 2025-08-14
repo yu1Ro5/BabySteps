@@ -21,8 +21,8 @@ jobs:
         ls -la /Applications/ | grep Xcode
         echo "=== Current Xcode path ==="
         xcode-select -p
-        # 最新のXcodeを選択
-        sudo xcode-select -switch /Applications/Xcode.app
+        # Xcode 16.4を選択
+        sudo xcode-select -switch /Applications/Xcode_16.4.app
         echo "=== Selected Xcode path ==="
         xcode-select -p
         echo "=== Xcode version ==="
@@ -49,12 +49,32 @@ jobs:
         pwd
         echo "=== Directory contents ==="
         ls -la
+        echo "=== XcodeGen spec file validation ==="
+        xcodegen --spec project.yml --lint || echo "XcodeGen lint failed, but continuing..."
         echo "=== Generating Xcode project ==="
-        xcodegen generate
+        if xcodegen --spec project.yml --verbose; then
+          echo "=== Project generated successfully ==="
+        else
+          echo "=== Project generation failed ==="
+          echo "=== Checking XcodeGen version ==="
+          xcodegen --version
+          echo "=== Checking project.yml syntax ==="
+          cat project.yml
+          echo "=== Attempting to generate with debug info ==="
+          xcodegen --spec project.yml --verbose --debug || echo "Debug generation also failed"
+          exit 1
+        fi
         echo "=== Generated project files ==="
-        ls -la *.xcodeproj
+        ls -la *.xcodeproj || echo "No xcodeproj files found"
         echo "=== Project structure ==="
-        find . -name "*.xcodeproj" -exec ls -la {} \;
+        find . -name "*.xcodeproj" -exec ls -la {} \; || echo "No xcodeproj files found"
+        echo "=== Checking for errors ==="
+        if [ -f "*.xcodeproj" ]; then
+          echo "Project generated successfully"
+        else
+          echo "Project generation failed"
+          exit 1
+        fi
         
     - name: Build iOS App
       run: |

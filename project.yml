@@ -74,7 +74,7 @@ targets:
         CFBundleShortVersionString: "1.0"
 
   BabyStepsUITests:
-    type: bundle.ui-test
+    type: bundle.ui-testing
     platform: iOS
     deploymentTarget: "18.0"
     sources:
