@@ -61,5 +61,6 @@ targets:
     settings:
       PRODUCT_NAME: "BabyStepsTests"
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsTests"
-      GENERATE_INFOPLIST_FILE: "YES"
+      INFOPLIST_FILE: "Sources/Info.plist"
+      GENERATE_INFOPLIST_FILE: "NO"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
