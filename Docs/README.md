@@ -114,7 +114,7 @@ SwiftDataを使用したデータ構造とデータアクセス層を定義し�
 ## 🤝 開発チーム向け
 
 ### 開発環境
-- Xcode 16.0+
+- Xcode 16.4（GitHub Actions対応）
 - iOS 18.0+ SDK
 - Swift 6.0+
 
