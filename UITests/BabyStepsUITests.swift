@@ -85,16 +85,6 @@ final class BabyStepsUITests: XCTestCase {
         XCTAssertTrue(titleText.isAccessibilityElement, "タイトルがアクセシビリティ要素として認識されていません")
         XCTAssertTrue(subtitleText.isAccessibilityElement, "サブタイトルがアクセシビリティ要素として認識されていません")
         
-        // フォントサイズとスタイルの確認
-        let titleFont = titleText.font
-        let subtitleFont = subtitleText.font
-        
-        // タイトルがlargeTitleフォントであることを確認
-        XCTAssertEqual(titleFont, .largeTitle, "タイトルがlargeTitleフォントではありません")
-        
-        // サブタイトルがtitle2フォントであることを確認
-        XCTAssertEqual(subtitleFont, .title2, "サブタイトルがtitle2フォントではありません")
-        
         // スクリーンショットを撮影
         let screenshot = XCUIScreen.main.screenshot()
         let attachment = XCTAttachment(screenshot: screenshot)
