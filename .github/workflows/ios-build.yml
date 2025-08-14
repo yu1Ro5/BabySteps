@@ -39,6 +39,8 @@ jobs:
                    -scheme BabySteps \
                    -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
                    -derivedDataPath build \
+                   -configuration Debug \
+                   CODE_SIGN_STYLE=Automatic \
                    build \
                    -verbose
                    
@@ -48,6 +50,8 @@ jobs:
                    -scheme BabySteps \
                    -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
                    -derivedDataPath build \
+                   -configuration Debug \
+                   CODE_SIGN_STYLE=Automatic \
                    test \
                    -verbose
                    
@@ -57,6 +61,8 @@ jobs:
                    -scheme BabySteps \
                    -destination 'generic/platform=iOS' \
                    -derivedDataPath build \
+                   -configuration Release \
+                   CODE_SIGN_STYLE=Automatic \
                    archive -archivePath build/BabySteps.xcarchive
                    
     - name: Upload Build Artifacts
