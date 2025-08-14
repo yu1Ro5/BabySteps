@@ -6,11 +6,10 @@
 - **View**: SwiftUI View（状態管理なし、UI表示のみ）
 - **ViewModel**: Observable プロトコル実装、ビジネスロジック担当
 - **Model**: データ構造とビジネスルール
-- **Service**: データ永続化、ファイル操作、デバイス機能連携
 
 ### 依存関係の方向
 ```
-View → ViewModel → Model/Service
+View → ViewModel → Model
 ```
 
 ## 🚀 GitHub Actions CI/CD パイプライン
@@ -28,9 +27,9 @@ View → ViewModel → Model/Service
 ## 🧪 テスト戦略
 
 ### テストレベル
-- **Unit Tests**: ViewModel、Model、Service
+- **Unit Tests**: ViewModel、Model
 - **UI Tests**: ユーザーフロー、アクセシビリティ
-- **Integration Tests**: データ永続化、ファイル操作
+- **Integration Tests**: データ永続化
 
 ### カバレッジ目標
 - 全体: 80%以上
@@ -43,7 +42,6 @@ View → ViewModel → Model/Service
 1. メインブランチマージ
 2. 自動ビルド・テスト
 3. TestFlightアップロード
-4. チーム通知
 
 ### 手動配布
 - 緊急時のみ
@@ -65,7 +63,6 @@ View → ViewModel → Model/Service
 - View: `ViewNameView`
 - ViewModel: `ViewNameViewModel`
 - Model: `ModelName`
-- Service: `ServiceNameService`
 
 ## 🎯 品質目標
 
@@ -90,6 +87,10 @@ View → ViewModel → Model/Service
 - Xcode 16.0以上
 - iOS 18.0以上
 - Swift 6.0以上
+
+### Gitブランチ戦略
+以下のガイドラインに従います：
+https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_branch_standards.html
 
 ### 推奨ツール
 - SwiftLint（コード品質）

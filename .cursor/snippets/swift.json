@@ -68,34 +68,7 @@
     ],
     "description": "SwiftUI Model with Codable support"
   },
-  "SwiftUI Service": {
-    "prefix": "swiftui-service",
-    "body": [
-      "import Foundation",
-      "",
-      "protocol ${1:ServiceName}ServiceProtocol {",
-      "    func ${2:fetchData}() async throws -> ${3:DataType}",
-      "    func ${4:saveData}(_ data: ${3:DataType}) async throws",
-      "}",
-      "",
-      "final class ${1:ServiceName}Service: ${1:ServiceName}ServiceProtocol {",
-      "    private let dataManager: DataManagerProtocol",
-      "    ",
-      "    init(dataManager: DataManagerProtocol = DataManager.shared) {",
-      "        self.dataManager = dataManager",
-      "    }",
-      "    ",
-      "    func ${2:fetchData}() async throws -> ${3:DataType} {",
-      "        return try await dataManager.fetch()",
-      "    }",
-      "    ",
-      "    func ${4:saveData}(_ data: ${3:DataType}) async throws {",
-      "        try await dataManager.save(data)",
-      "    }",
-      "}"
-    ],
-    "description": "SwiftUI Service for local data management"
-  },
+
   "SwiftUI List": {
     "prefix": "swiftui-list",
     "body": [
@@ -114,7 +87,7 @@
   "SwiftUI Navigation": {
     "prefix": "swiftui-navigation",
     "body": [
-      "NavigationView {",
+      "NavigationStack {",
       "    ${1:ContentView}()",
       "        .navigationTitle(\"${2:Title}\")",
       "        .navigationBarTitleDisplayMode(.large)",
@@ -125,10 +98,9 @@
       "                }",
       "            }",
       "        }",
-      "}",
-      ".navigationViewStyle(.stack)"
+      "}"
     ],
-    "description": "SwiftUI Navigation with toolbar"
+    "description": "SwiftUI NavigationStack (iOS 16+) with toolbar"
   },
   "SwiftUI Form": {
     "prefix": "swiftui-form",
