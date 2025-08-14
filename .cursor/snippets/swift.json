@@ -64,14 +64,6 @@
       "        self.id = id",
       "        ${5:// Initialize properties}",
       "    }",
-      "}",
-      "",
-      "// MARK: - Coding Keys",
-      "extension ${1:ModelName} {",
-      "    enum CodingKeys: String, CodingKey {",
-      "        case id",
-      "        ${6:// Add coding keys}",
-      "    }",
       "}"
     ],
     "description": "SwiftUI Model with Codable support"
@@ -94,12 +86,10 @@
       "    }",
       "    ",
       "    func ${2:fetchData}() async throws -> ${3:DataType} {",
-      "        // Implement local data fetching logic",
       "        return try await dataManager.fetch()",
       "    }",
       "    ",
       "    func ${4:saveData}(_ data: ${3:DataType}) async throws {",
-      "        // Implement local data saving logic",
       "        try await dataManager.save(data)",
       "    }",
       "}"
@@ -159,102 +149,6 @@
     ],
     "description": "SwiftUI Form with sections"
   },
-  "SwiftUI Async Image": {
-    "prefix": "swiftui-async-image",
-    "body": [
-      "AsyncImage(url: ${1:imageURL}) { phase in",
-      "    switch phase {",
-      "    case .empty:",
-      "        ProgressView()",
-      "    case .success(let image):",
-      "        image",
-      "            .resizable()",
-      "            .aspectRatio(contentMode: .fit)",
-      "    case .failure(_):",
-      "        Image(systemName: \"photo\")",
-      "            .foregroundColor(.gray)",
-      "    @unknown default:",
-      "        EmptyView()",
-      "    }",
-      "}"
-    ],
-    "description": "SwiftUI AsyncImage with loading states"
-  },
-  "SwiftUI Alert": {
-    "prefix": "swiftui-alert",
-    "body": [
-      ".alert(\"${1:Alert Title}\", isPresented: $viewModel.showAlert) {",
-      "    Button(\"${2:OK}\") {",
-      "        viewModel.${3:dismissAlert}()",
-      "    }",
-      "} message: {",
-      "    Text(viewModel.alertMessage ?? \"${4:Default message}\")",
-      "}"
-    ],
-    "description": "SwiftUI Alert with binding"
-  },
-  "SwiftUI Sheet": {
-    "prefix": "swiftui-sheet",
-    "body": [
-      ".sheet(isPresented: $viewModel.showSheet) {",
-      "    ${1:SheetView}()",
-      "        .presentationDetents([.medium, .large])",
-      "        .presentationDragIndicator(.visible)",
-      "}"
-    ],
-    "description": "SwiftUI Sheet with presentation detents"
-  },
-  "SwiftUI TabView": {
-    "prefix": "swiftui-tabview",
-    "body": [
-      "TabView {",
-      "    ${1:FirstView}()",
-      "        .tabItem {",
-      "            Image(systemName: \"${2:house}\")",
-      "            Text(\"${3:Home}\")",
-      "        }",
-      "    ",
-      "    ${4:SecondView}()",
-      "        .tabItem {",
-      "            Image(systemName: \"${5:person}\")",
-      "            Text(\"${6:Profile}\")",
-      "        }",
-      "}",
-      ".accentColor(.${7:blue})"
-    ],
-    "description": "SwiftUI TabView with multiple tabs"
-  },
-  "SwiftUI LazyVGrid": {
-    "prefix": "swiftui-lazyvgrid",
-    "body": [
-      "LazyVGrid(columns: [",
-      "    GridItem(.flexible()),",
-      "    GridItem(.flexible()),",
-      "    GridItem(.flexible())",
-      "], spacing: 16) {",
-      "    ForEach(${1:items}) { item in",
-      "        ${2:ItemView}(item: item)",
-      "    }",
-      "}",
-      ".padding(.horizontal)"
-    ],
-    "description": "SwiftUI LazyVGrid with flexible columns"
-  },
-  "SwiftUI ScrollView": {
-    "prefix": "swiftui-scrollview",
-    "body": [
-      "ScrollView {",
-      "    LazyVStack(spacing: 16) {",
-      "        ForEach(${1:items}) { item in",
-      "            ${2:ItemView}(item: item)",
-      "        }",
-      "    }",
-      "    .padding()",
-      "}",
-      ".scrollIndicators(.hidden)"
-    ],
-    "description": "SwiftUI ScrollView with LazyVStack"
-  },
   "SwiftUI Button": {
     "prefix": "swiftui-button",
     "body": [
@@ -289,98 +183,14 @@
     ],
     "description": "SwiftUI TextField with common modifiers"
   },
-  "SwiftUI StateObject": {
-    "prefix": "swiftui-stateobject",
-    "body": [
-      "@State private var viewModel = ${1:ViewName}ViewModel()"
-    ],
-    "description": "SwiftUI @State with Observation pattern"
-  },
-  "SwiftUI ObservedObject": {
-    "prefix": "swiftui-observedobject",
-    "body": [
-      "var viewModel: ${1:ViewName}ViewModel"
-    ],
-    "description": "SwiftUI ViewModel with Observation pattern (no wrapper needed)"
-  },
-  "SwiftUI Observable": {
-    "prefix": "swiftui-observable",
-    "body": [
-      "@Observable",
-      "final class ${1:ClassName} {",
-      "    var ${2:propertyName}: ${3:DataType} = ${4:defaultValue}",
-      "}"
-    ],
-    "description": "SwiftUI @Observable class with Observation pattern"
-  },
-  "SwiftUI Binding": {
-    "prefix": "swiftui-binding",
-    "body": [
-      "Binding(",
-      "    get: { viewModel.${1:propertyName} },",
-      "    set: { viewModel.${1:propertyName} = $0 }",
-      ")"
-    ],
-    "description": "SwiftUI Binding with custom getter and setter"
-  },
-  "SwiftUI Environment": {
-    "prefix": "swiftui-environment",
-    "body": [
-      "@Environment(\\.${1:colorScheme}) var colorScheme",
-      "@Environment(\\.${2:sizeCategory}) var sizeCategory"
-    ],
-    "description": "SwiftUI Environment values"
-  },
-  "SwiftUI GeometryReader": {
-    "prefix": "swiftui-geometryreader",
-    "body": [
-      "GeometryReader { geometry in",
-      "    ${1:// Use geometry.size.width, geometry.size.height}",
-      "    ${2:// Content here}",
-      "}"
-    ],
-    "description": "SwiftUI GeometryReader for size-dependent layouts"
-  },
-  "SwiftUI PreferenceKey": {
-    "prefix": "swiftui-preferencekey",
-    "body": [
-      "struct ${1:PreferenceName}PreferenceKey: PreferenceKey {",
-      "    static var defaultValue: ${2:DataType} = ${3:defaultValue}",
-      "    ",
-      "    static func reduce(value: inout ${2:DataType}, nextValue: () -> ${2:DataType}) {",
-      "        value = nextValue()",
-      "    }",
-      "}"
-    ],
-    "description": "SwiftUI PreferenceKey for view communication"
-  },
-  "SwiftUI Custom ViewModifier": {
-    "prefix": "swiftui-viewmodifier",
-    "body": [
-      "struct ${1:ModifierName}Modifier: ViewModifier {",
-      "    func body(content: Content) -> some View {",
-      "        content",
-      "            ${2:// Add modifiers here}",
-      "    }",
-      "}",
-      "",
-      "extension View {",
-      "    func ${3:modifierName}() -> some View {",
-      "        modifier(${1:ModifierName}Modifier())",
-      "    }",
-      "}"
-    ],
-    "description": "SwiftUI Custom ViewModifier with extension"
-  },
   "SwiftUI Preview": {
     "prefix": "swiftui-preview",
     "body": [
       "#Preview {",
       "    ${1:ViewName}()",
-      "        .environmentObject(${2:MockViewModel}())",
-      "        .preferredColorScheme(.${3:light})",
+      "        .preferredColorScheme(.${2:light})",
       "}"
     ],
-    "description": "SwiftUI Preview with environment and color scheme"
+    "description": "SwiftUI Preview with color scheme"
   }
 }

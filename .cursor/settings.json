@@ -1,40 +1,27 @@
 {
   "editor": {
     "formatOnSave": true,
-    "formatOnPaste": true,
     "tabSize": 4,
     "insertSpaces": true,
-    "rulers": [120],
-    "wordWrap": "bounded",
-    "minimap": {
-      "enabled": true,
-      "maxColumn": 120
-    }
+    "rulers": [120]
   },
   "workbench": {
     "colorTheme": "Default Dark+",
-    "iconTheme": "vs-seti",
     "editor": {
       "fontSize": 14,
-      "fontFamily": "SF Mono, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
-      "lineHeight": 1.5
+      "fontFamily": "SF Mono, Monaco, 'Cascadia Code', monospace"
     }
   },
   "files": {
     "associations": {
       "*.swift": "swift",
-      "*.mdc": "markdown",
-      "*.yml": "yaml",
-      "*.yaml": "yaml"
+      "*.mdc": "markdown"
     },
     "exclude": {
       "**/build": true,
       "**/DerivedData": true,
       "**/.git": true,
-      "**/node_modules": true,
-      "**/Pods": true,
-      "**/*.xcworkspace": true,
-      "**/*.xcodeproj": true
+      "**/Pods": true
     },
     "autoSave": "afterDelay",
     "autoSaveDelay": 1000
@@ -45,246 +32,15 @@
       "lineWidth": 120,
       "tabWidth": 4,
       "useTabs": false
-    },
-    "lint": {
-      "enabled": true,
-      "rules": [
-        "trailing_whitespace",
-        "line_length",
-        "indentation_width"
-      ]
     }
+  },
+  "git": {
+    "autofetch": true,
+    "enableSmartCommit": true
   },
   "observation": {
     "enabled": true,
     "preferObservation": true,
     "avoidCombine": true
-  },
-  "git": {
-    "autofetch": true,
-    "autofetchPeriod": 180,
-    "confirmSync": false,
-    "enableSmartCommit": true,
-    "enableCommitSigning": true
-  },
-  "terminal": {
-    "integrated": {
-      "fontSize": 14,
-      "fontFamily": "SF Mono, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace"
-    }
-  },
-  "search": {
-    "exclude": {
-      "**/build": true,
-      "**/DerivedData": true,
-      "**/.git": true,
-      "**/node_modules": true,
-      "**/Pods": true
-    }
-  },
-  "emmet": {
-    "includeLanguages": {
-      "swift": "html"
-    }
-  },
-  "bracketPairColorizer": {
-    "enabled": true,
-    "colors": [
-      "#FF6B6B",
-      "#4ECDC4",
-      "#45B7D1",
-      "#96CEB4",
-      "#FFEAA7",
-      "#DDA0DD",
-      "#98D8C8"
-    ]
-  },
-  "auto-rename-tag": {
-    "enabled": true
-  },
-  "path-intellisense": {
-    "mappings": {
-      "@": "${workspaceRoot}/Sources",
-      "~": "${workspaceRoot}"
-    }
-  },
-  "swift-lang": {
-    "enabled": true,
-    "format": {
-      "enabled": true,
-      "indentWidth": 4,
-      "lineWidth": 120
-    },
-    "lint": {
-      "enabled": true,
-      "rules": [
-        "trailing_whitespace",
-        "line_length",
-        "indentation_width",
-        "empty_count",
-        "empty_string",
-        "empty_collection_literal",
-        "empty_parameters",
-        "empty_parentheses_with_trailing_closure",
-        "empty_enum_arguments",
-        "empty_enum_cases",
-        "empty_initializer",
-        "empty_switch_cases",
-        "empty_tuple_index",
-        "empty_tuple_pattern",
-        "empty_tuple_return_type",
-        "empty_tuple_type",
-        "empty_tuple",
-        "empty_while_statement",
-        "empty_do_catch_statement",
-        "empty_guard_statement",
-        "empty_if_statement",
-        "empty_else_if_statement",
-        "empty_else_statement",
-        "empty_for_statement",
-        "empty_repeat_while_statement",
-        "empty_defer_statement",
-        "empty_do_statement",
-        "empty_catch_statement",
-        "empty_throw_statement",
-        "empty_return_statement",
-        "empty_break_statement",
-        "empty_continue_statement",
-        "empty_fallthrough_statement",
-        "empty_assertion_statement",
-        "empty_precondition_statement",
-        "empty_fatalerror_statement",
-        "empty_availability_condition",
-        "empty_compiler_control_statement",
-        "empty_conditional_compilation_block",
-        "empty_switch_case_label",
-        "empty_catch_pattern",
-        "empty_type_annotation",
-        "empty_type_inheritance_clause",
-        "empty_where_clause",
-        "empty_parameter_list",
-        "empty_argument_list",
-        "empty_tuple_pattern_element_list",
-        "empty_tuple_type_element_list",
-        "empty_array_element_list",
-        "empty_dictionary_element_list",
-        "empty_function_parameter_list",
-        "empty_function_result_list",
-        "empty_subscript_parameter_list",
-        "empty_subscript_result_list",
-        "empty_initializer_parameter_list",
-        "empty_initializer_result_list",
-        "empty_enum_case_parameter_list",
-        "empty_enum_case_result_list",
-        "empty_operator_declaration_parameter_list",
-        "empty_operator_declaration_result_list",
-        "empty_precedence_group_declaration_parameter_list",
-        "empty_precedence_group_declaration_result_list",
-        "empty_associated_type_declaration_parameter_list",
-        "empty_associated_type_declaration_result_list",
-        "empty_protocol_declaration_parameter_list",
-        "empty_protocol_declaration_result_list",
-        "empty_class_declaration_parameter_list",
-        "empty_class_declaration_result_list",
-        "empty_struct_declaration_parameter_list",
-        "empty_struct_declaration_result_list",
-        "empty_enum_declaration_parameter_list",
-        "empty_enum_declaration_result_list",
-        "empty_extension_declaration_parameter_list",
-        "empty_extension_declaration_result_list",
-        "empty_subscript_declaration_parameter_list",
-        "empty_subscript_declaration_result_list",
-        "empty_function_declaration_parameter_list",
-        "empty_function_declaration_result_list",
-        "empty_initializer_declaration_parameter_list",
-        "empty_initializer_declaration_result_list",
-        "empty_deinitializer_declaration_parameter_list",
-        "empty_deinitializer_declaration_result_list",
-        "empty_subscript_declaration_parameter_list",
-        "empty_subscript_declaration_result_list",
-        "empty_variable_declaration_parameter_list",
-        "empty_variable_declaration_result_list",
-        "empty_constant_declaration_parameter_list",
-        "empty_constant_declaration_result_list",
-        "empty_typealias_declaration_parameter_list",
-        "empty_typealias_declaration_result_list",
-        "empty_protocol_declaration_parameter_list",
-        "empty_protocol_declaration_result_list",
-        "empty_operator_declaration_parameter_list",
-        "empty_operator_declaration_result_list",
-        "empty_precedence_group_declaration_parameter_list",
-        "empty_precedence_group_declaration_result_list",
-        "empty_associated_type_declaration_parameter_list",
-        "empty_associated_type_declaration_result_list",
-        "empty_class_declaration_parameter_list",
-        "empty_class_declaration_result_list",
-        "empty_struct_declaration_parameter_list",
-        "empty_struct_declaration_result_list",
-        "empty_enum_declaration_parameter_list",
-        "empty_enum_declaration_result_list",
-        "empty_extension_declaration_parameter_list",
-        "empty_extension_declaration_result_list",
-        "empty_subscript_declaration_parameter_list",
-        "empty_subscript_declaration_result_list",
-        "empty_function_declaration_parameter_list",
-        "empty_function_declaration_result_list",
-        "empty_initializer_declaration_parameter_list",
-        "empty_initializer_declaration_result_list",
-        "empty_deinitializer_declaration_parameter_list",
-        "empty_deinitializer_declaration_result_list",
-        "empty_subscript_declaration_parameter_list",
-        "empty_subscript_declaration_result_list",
-        "empty_variable_declaration_parameter_list",
-        "empty_variable_declaration_result_list",
-        "empty_constant_declaration_parameter_list",
-        "empty_constant_declaration_result_list",
-        "empty_typealias_declaration_parameter_list",
-        "empty_typealias_declaration_result_list"
-      ]
-    }
-  },
-  "swift-format": {
-    "enabled": true,
-    "formatOnSave": true,
-    "formatOnPaste": true,
-    "indentWidth": 4,
-    "lineWidth": 120,
-    "tabWidth": 4,
-    "useTabs": false
-  },
-  "swift-lint": {
-    "enabled": true,
-    "executablePath": "/usr/local/bin/swiftlint",
-    "configFile": ".swiftlint.yml",
-    "runOnSave": true,
-    "runOnPaste": true
-  },
-  "xcode": {
-    "enabled": true,
-    "buildConfiguration": "Debug",
-    "scheme": "BabySteps",
-    "destination": "platform=iOS Simulator,name=iPhone 15,OS=18.0"
-  },
-  "ios-simulator": {
-    "enabled": true,
-    "device": "iPhone 15",
-    "osVersion": "18.0"
-  },
-  "test-explorer": {
-    "enabled": true,
-    "autoRun": {
-      "enabled": false,
-      "delay": 1000
-    }
-  },
-  "coverage-gutters": {
-    "enabled": true,
-    "coverageReportFileName": "coverage.xml",
-    "showLineCoverage": true,
-    "showRulerCoverage": true,
-    "coverageDecorator": {
-      "type": "gutter",
-      "opacity": 0.5
-    }
   }
 }
