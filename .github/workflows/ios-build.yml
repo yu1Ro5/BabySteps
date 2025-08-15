@@ -35,6 +35,24 @@ jobs:
           --configuration .swiftformat \
           --recursive Sources/ Tests/
         
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if [[ -n "$(git status --porcelain)" ]]; then
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git commit -m "Apply swift-format formatting"
+        git push
+        
     - name: List Available Simulators
       run: |
         echo "=== Available iOS Simulators ==="
