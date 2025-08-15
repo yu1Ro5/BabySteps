@@ -15,27 +15,33 @@ BabyStepsは、完了ではなく着手回数を記録するToDoアプリです�
 ## 📚 ドキュメント構成
 
 ### 1. [Functional Design](./functional-design.md)
+
 Defines the overall app concept and functional requirements.
 
 **Main Contents:**
+
 - App overview and concept
 - Core features (task management, attempt recording, completion management)
 - Display and UI features
 - Development phases and success metrics
 
 ### 2. [UI Design](./ui-design.md)
+
 Describes the layout and UI/UX design of each screen in detail.
 
 **Main Contents:**
+
 - Screen composition and navigation
 - Detailed layout for each screen
 - Color themes and animations
 - Responsive design
 
 ### 3. [Database Design](./database-design.md)
+
 Defines the data structure and data access layer using SwiftData.
 
 **Main Contents:**
+
 - Entity design (Task, Attempt)
 - Database schema
 - Data access using Repository pattern
@@ -44,21 +50,25 @@ Defines the data structure and data access layer using SwiftData.
 ## 🚀 主要機能
 
 ### Task Management
+
 - Create, edit, and delete tasks
 - Categorize by type (habit, project, learning, other)
 - Set priority levels (low, medium, high)
 
 ### Attempt Recording
+
 - One-tap attempt recording
 - Count attempt frequency
 - Display attempt history
 
 ### Statistics & Analysis
+
 - Daily, weekly, monthly attempt counts
 - Track consecutive days
 - Category-based statistics
 
 ### Calendar View
+
 - Visualize daily attempt records
 - Track progress status
 
@@ -79,17 +89,20 @@ Defines the data structure and data access layer using SwiftData.
 ## 🔄 Development Phases
 
 ### Phase 1 (MVP)
+
 - Basic task management
 - Attempt recording functionality
 - Completion management
 - Basic statistics display
 
 ### Phase 2
+
 - Calendar display
 - Detailed statistics and analysis
 - UI/UX improvements
 
 ### Phase 3
+
 - iCloud synchronization
 - Notification functionality
 - Data export
@@ -97,16 +110,19 @@ Defines the data structure and data access layer using SwiftData.
 ## 💡 Design Principles
 
 ### Usability
+
 - One-tap attempt recording
 - Intuitive UI/UX
 - Visual feedback to encourage continuation
 
 ### Performance
+
 - Fast data access with SwiftData
 - Efficient query design
 - Proper index configuration
 
 ### Extensibility
+
 - Modular design
 - Consider future feature additions
 - Prepare for iCloud synchronization
@@ -114,23 +130,28 @@ Defines the data structure and data access layer using SwiftData.
 ## 🤝 For Development Team
 
 ### Development Environment
-- Xcode 16.4 (GitHub Actions compatible)
+
+- Xcode 16.4 (GitHub Actions
+  compatible)
 - iOS 18.0+ SDK
 - Swift 6.0+
 
 ### Coding Standards
+
 - SwiftLint compliance
 - Strict MVVM pattern implementation
 - Proper error handling
 
 ### Testing
+
 - Unit tests
 - UI tests
 - Performance tests
 
 ## 📞 Support
 
-For questions about the documentation or improvement suggestions, please contact the development team.
+For questions about the documentation or improvement suggestions,
+please contact the development team.
 
 ---
 
