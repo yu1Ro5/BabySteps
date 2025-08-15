@@ -8,9 +8,9 @@ final class BabyStepsUITests: XCTestCase {
         app = XCUIApplication()
         app.launch()
         
-        // アプリの起動完了を待つ
+        // アプリの起動完了を待つ（タイムアウトを短縮）
         let titleText = app.staticTexts["BabySteps"]
-        XCTAssertTrue(titleText.waitForExistence(timeout: 10), "アプリの起動が完了しませんでした")
+        XCTAssertTrue(titleText.waitForExistence(timeout: 5), "アプリの起動が完了しませんでした")
     }
     
     override func tearDownWithError() throws {

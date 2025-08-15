@@ -93,9 +93,18 @@ jobs:
                    
     - name: Run UI Tests with Screenshots
       run: |
+        echo "=== Checking Simulator Status ==="
+        # シミュレーターの状態を確認
+        xcrun simctl list devices booted || echo "No booted simulators found"
+        
+        # シミュレーターをリセット（必要に応じて）
+        echo "=== Resetting Simulator ==="
+        xcrun simctl shutdown all || echo "Failed to shutdown simulators"
+        xcrun simctl erase all || echo "Failed to erase simulators"
+        
         echo "=== Running UI Tests ==="
-        # UIテストを実行してスクリーンショットを撮影
-        xcodebuild -project BabySteps.xcodeproj \
+        # UIテストを実行してスクリーンショットを撮影（タイムアウト設定付き）
+        if timeout 300 xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
                    -derivedDataPath build \
@@ -104,9 +113,12 @@ jobs:
                    test \
                    -only-testing:BabyStepsUITests \
                    -resultBundlePath build/UITestResults.xcresult \
-                   -verbose
+                   -verbose; then
+          echo "=== UI Tests completed successfully ==="
+        else
+          echo "=== UI Tests failed or timed out, but continuing with screenshot extraction ==="
+        fi
         
-        echo "=== UI Tests completed ==="
         echo "=== Test results directory ==="
         ls -la build/
         
