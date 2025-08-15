@@ -92,6 +92,11 @@ View → ViewModel → Model
 以下のガイドラインに従います：
 https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_branch_standards.html
 
+### リベース後のプッシュ
+- リベース後は強制プッシュが必要
+- `git push --force-with-lease --force-if-includes` を使用
+- これにより、安全な強制プッシュが実行される
+
 ### 推奨ツール
 - SwiftLint（コード品質）
 - SwiftGen（リソース管理）
