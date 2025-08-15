@@ -149,3 +149,8 @@ ${steps.generate-diff.outputs.diff_content}
           # Reset to original state to avoid leaving modified files
           git reset --hard $ORIGINAL_COMMIT
           git clean -fd
+
+      - name: Return
+        run: |
+          echo "Workflow completed successfully"
+          exit 0
