@@ -11,7 +11,7 @@ SwiftUIベースのiOSアプリケーションです。XcodeGenを使用して�
 
 ## プロジェクト構造
 
-```
+```text
 BabySteps/
 ├── .github/workflows/     # GitHub Actions設定
 ├── Sources/               # ソースコード
@@ -122,11 +122,13 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 ### よくある問題
 
 1. **XcodeGenが見つからない**
+
    ```bash
    brew install xcodegen
    ```
 
 2. **プロジェクトの生成に失敗**
+
    ```bash
    xcodegen --spec project.yml
    ```
@@ -141,4 +143,3 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 2. フィーチャーブランチを作成
 3. 変更をコミット
 4. プルリクエストを作成
-
