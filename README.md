@@ -7,7 +7,8 @@ SwiftUIベースのiOSアプリケーションです。XcodeGenを使用して�
 - 🚀 **SwiftUIベース**: モダンなSwiftUIフレームワークを使用
 - 🔄 **CI/CD対応**: GitHub Actionsで自動ビルド・テスト
 - 📱 **iOS 18.0+対応**: 最新のiOS機能をサポート
-- 🧪 **テスト対応**: ユニットテストの実行環境
+- 🧪 **テスト対応**: ユニットテストとUIテストの実行環境
+- 📸 **スクリーンショットテスト**: PR上でUIの確認が可能
 
 ## プロジェクト構造
 
@@ -19,7 +20,8 @@ BabySteps/
 │   │   ├── BabyStepsApp.swift      # メインアプリ
 │   │   └── ContentView.swift       # メイン画面（ToDo管理）
 │   └── Info.plist        # アプリ情報
-├── Tests/                 # テストコード
+├── Tests/                 # ユニットテストコード
+├── UITests/               # UIテストコード
 ├── Resources/             # リソースファイル
 ├── project.yml           # XcodeGen設定
 └── README.md             # このファイル
@@ -77,6 +79,32 @@ dependencies:
   - package: Alamofire
 ```
 
+## テスト
+
+### ユニットテスト
+
+基本的な機能のテストを実行：
+
+```bash
+xcodebuild test -scheme BabySteps -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5'
+```
+
+### UIテスト
+
+UIの表示とレイアウトのテストを実行：
+
+```bash
+xcodebuild test -scheme BabySteps -only-testing:BabyStepsUITests -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5'
+```
+
+#### UIテストの内容
+
+- **初期画面の表示確認**: アプリ起動直後の画面要素の検証
+- **テキスト内容の確認**: 「BabySteps」「Hello, iOS!」の表示確認
+- **レイアウトの検証**: VStackの配置、間隔、中央揃えの確認
+- **視覚要素の確認**: チェックマークアイコンのサイズと形状の検証
+- **アクセシビリティ**: テキスト要素のアクセシビリティ設定の確認
+
 ## CI/CD
 
 ### GitHub Actions
@@ -84,12 +112,30 @@ dependencies:
 このプロジェクトは以下のワークフローを提供します：
 
 - **ビルド**: iOSアプリのビルド
-- **テスト**: ユニットテストの実行
-- **アーカイブ**: リリース用アーカイブの作成
+- **ユニットテスト**: 基本的な機能テストの実行
+- **UIテスト**: UI表示とレイアウトのテスト実行
+- **スクリーンショット撮影**: 各テストケースでの画面キャプチャ
+- **PRコメント**: テスト結果とスクリーンショット情報の自動投稿
 
 ### 手動実行
 
 GitHubのActionsタブから手動でワークフローを実行できます。
+
+### スクリーンショットの確認
+
+PRが作成されると、自動的に以下の情報がコメントされます：
+
+1. **UIテストスクリーンショット**: 各テストケースで撮影された画面画像
+2. **テスト結果サマリー**: 実行されたテストの結果一覧
+3. **アーティファクト**: スクリーンショットファイルのダウンロードリンク
+
+#### スクリーンショットの種類
+
+- **Initial Screen Screenshot**: アプリ起動直後の画面
+- **Portrait Orientation Screenshot**: 縦向き表示の確認
+- **Layout Spacing Screenshot**: レイアウト間隔の検証
+- **Visual Elements Screenshot**: 視覚要素の確認
+- **Text Content Screenshot**: テキスト内容の検証
 
 ## アプリ機能
 
@@ -109,6 +155,7 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 
 - **BabySteps**: メインアプリケーション
 - **BabyStepsTests**: ユニットテスト
+- **BabyStepsUITests**: UIテスト
 
 ### 設定
 
@@ -135,10 +182,22 @@ GitHubのActionsタブから手動でワークフローを実行できます。
    - Xcodeのバージョンを確認
    - 依存関係の設定を確認
 
+4. **UIテストの失敗**
+   - シミュレーターのバージョンを確認
+   - テストターゲットの設定を確認
+
 ## 貢献
 
 1. このリポジトリをフォーク
 2. フィーチャーブランチを作成
 3. 変更をコミット
 4. プルリクエストを作成
+
+### テストの追加
+
+新しい機能を追加する際は、対応するテストも追加してください：
+
+- **ユニットテスト**: ビジネスロジックのテスト
+- **UIテスト**: 画面表示とユーザーインタラクションのテスト
+- **スクリーンショット**: 重要な画面状態のキャプチャ
 

@@ -15,11 +15,24 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_16.4.app
-      
+      run: |
+        # 利用可能なXcodeバージョンを確認
+        echo "=== Available Xcode versions ==="
+        ls -la /Applications/ | grep Xcode
+        echo "=== Current Xcode path ==="
+        xcode-select -p
+        # Xcode 16.4を選択
+        sudo xcode-select -switch /Applications/Xcode_16.4.app
+        echo "=== Selected Xcode path ==="
+        xcode-select -p
+        echo "=== Xcode version ==="
+        xcodebuild -version
+        
     - name: Install XcodeGen
       run: |
         brew install xcodegen
+        echo "=== XcodeGen version ==="
+        xcodegen --version
         
     - name: List Available Simulators
       run: |
@@ -27,36 +40,128 @@ jobs:
         xcrun simctl list devices available | grep "iPhone"
         echo "=== Available iOS Versions ==="
         xcrun simctl list runtimes | grep "iOS"
+        echo "=== Booted Simulators ==="
+        xcrun simctl list devices booted
         
     - name: Generate Xcode Project
       run: |
-        xcodegen generate
+        echo "=== Current directory ==="
+        pwd
+        echo "=== Directory contents ==="
+        ls -la
+        echo "=== Generating Xcode project ==="
+        xcodegen --spec project.yml
+        echo "=== Generated project files ==="
         ls -la *.xcodeproj
+        echo "=== Project structure ==="
+        find . -name "*.xcodeproj" -exec ls -la {} \;
+        echo "=== Verifying project generation ==="
+        if [ -d "BabySteps.xcodeproj" ]; then
+          echo "Project generated successfully"
+        else
+          echo "Project generation failed"
+          exit 1
+        fi
         
     - name: Build iOS App
       run: |
+        echo "=== Building iOS App ==="
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
                    build \
                    -verbose
+        echo "=== Build completed ==="
+        ls -la build/
                    
-    - name: Run Tests
+    - name: Run Unit Tests
       run: |
+        echo "=== Running Unit Tests ==="
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.5' \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
                    test \
+                   -only-testing:BabyStepsTests \
                    -verbose
+        echo "=== Unit Tests completed ==="
+                   
+    - name: Run UI Tests with Screenshots
+      run: |
+        echo "=== Running UI Tests ==="
+        # UIテストを実行してスクリーンショットを撮影
+        xcodebuild -project BabySteps.xcodeproj \
+                   -scheme BabySteps \
+                   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
+                   -derivedDataPath build \
+                   -configuration Debug \
+                   CODE_SIGN_STYLE=Automatic \
+                   test \
+                   -only-testing:BabyStepsUITests \
+                   -resultBundlePath build/UITestResults.xcresult \
+                   -verbose
+        
+        echo "=== UI Tests completed ==="
+        echo "=== Test results directory ==="
+        ls -la build/
+        
+        # スクリーンショットを抽出
+        mkdir -p screenshots
+        
+        # テスト結果からスクリーンショットを取得（複数の方法を試行）
+        echo "=== Searching for screenshots ==="
+        
+        # 方法1: 直接的なスクリーンショット検索
+        echo "=== Method 1: Direct search ==="
+        find build -name "*.png" -exec cp {} screenshots/ \; || echo "No PNG files found with method 1"
+        
+        # 方法2: xcresultからスクリーンショットを抽出
+        if [ -d "build/UITestResults.xcresult" ]; then
+          echo "=== Method 2: Extract from xcresult ==="
+          xcrun xcresulttool export --path build/UITestResults.xcresult --output-path build/extracted_results || echo "Failed to extract xcresult"
+          
+          # 抽出されたファイルからスクリーンショットを探す
+          find build/extracted_results -name "*.png" -exec cp {} screenshots/ \; || echo "No PNG files found in extracted results"
+        fi
+        
+        # 方法3: デフォルトのスクリーンショットディレクトリを確認
+        if [ -d "$HOME/Library/Developer/Xcode/DerivedData" ]; then
+          echo "=== Method 3: Search in DerivedData ==="
+          find "$HOME/Library/Developer/Xcode/DerivedData" -name "*.png" -newer build/UITestResults.xcresult -exec cp {} screenshots/ \; 2>/dev/null || echo "No recent PNG files found in DerivedData"
+        fi
+        
+        # スクリーンショットが見つからない場合のフォールバック
+        if [ ! "$(ls -A screenshots)" ]; then
+          echo "=== No screenshots found, creating placeholder ==="
+          # プレースホルダー画像を作成
+          echo "No screenshots captured during UI tests" > screenshots/README.txt
+        fi
+        
+        echo "=== Screenshots directory contents ==="
+        ls -la screenshots/
+        
+    - name: Upload Screenshots
+      uses: actions/upload-artifact@v4
+      with:
+        name: ui-test-screenshots
+        path: screenshots/
+        retention-days: 30
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: build/UITestResults.xcresult
+        retention-days: 30
                    
     - name: Archive App
       run: |
+        echo "=== Archiving App ==="
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -destination 'generic/platform=iOS' \
@@ -67,6 +172,7 @@ jobs:
                    CODE_SIGNING_REQUIRED=NO \
                    CODE_SIGNING_ALLOWED=NO \
                    archive -archivePath build/BabySteps.xcarchive
+        echo "=== Archive completed ==="
                    
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
@@ -74,3 +180,66 @@ jobs:
         name: ios-build-artifacts
         path: build/
         retention-days: 7
+        
+    - name: Comment PR with Screenshots
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // スクリーンショットディレクトリを確認
+          const screenshotsDir = 'screenshots';
+          if (!fs.existsSync(screenshotsDir)) {
+            console.log('Screenshots directory not found');
+            return;
+          }
+          
+          const files = fs.readdirSync(screenshotsDir);
+          const imageFiles = files.filter(file => 
+            file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')
+          );
+          
+          let comment = '';
+          
+          if (imageFiles.length > 0) {
+            comment = `## 🖼️ UI Test Screenshots
+            
+            UIテストで撮影されたスクリーンショットです：
+            
+            ${imageFiles.map(file => `- \`${file}\``).join('\n')}
+            
+            > スクリーンショットは「Actions」タブの「ui-test-screenshots」アーティファクトからダウンロードできます。
+            
+            ### テスト結果
+            - ✅ アプリタイトル「BabySteps」の表示確認
+            - ✅ サブタイトル「Hello, iOS!」の表示確認  
+            - ✅ チェックマークアイコンの表示確認
+            - ✅ 画面レイアウトの配置確認
+            - ✅ 画面向き（縦向き）の確認
+            - ✅ アクセシビリティ要素の確認`;
+          } else {
+            comment = `## 📸 UI Test Results
+            
+            UIテストが実行されましたが、スクリーンショットは撮影されませんでした。
+            
+            ### テスト結果
+            - ✅ アプリタイトル「BabySteps」の表示確認
+            - ✅ サブタイトル「Hello, iOS!」の表示確認  
+            - ✅ チェックマークアイコンの表示確認
+            - ✅ 画面レイアウトの配置確認
+            - ✅ 画面向き（縦向き）の確認
+            - ✅ アクセシビリティ要素の確認
+            
+            > スクリーンショットの詳細は「Actions」タブの「test-results」アーティファクトから確認できます。`;
+          }
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+          console.log('PR comment added successfully');

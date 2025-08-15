@@ -72,3 +72,19 @@ targets:
         CFBundleIdentifier: "com.yu1Ro5.BabyStepsTests"
         CFBundleVersion: "1"
         CFBundleShortVersionString: "1.0"
+
+  BabyStepsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: UITests
+        type: group
+    dependencies:
+      - target: BabySteps
+    settings:
+      PRODUCT_NAME: "BabyStepsUITests"
+      PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsUITests"
+      GENERATE_INFOPLIST_FILE: "YES"
+      TEST_TARGET_NAME: "BabySteps"
+      USES_XCTRUNNER: "YES"
