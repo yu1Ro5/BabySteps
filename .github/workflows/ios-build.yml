@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build-and-test:
     runs-on: macos-latest
@@ -52,6 +56,48 @@ jobs:
         else
           echo "✅  All Swift files are properly formatted."
         fi
+        
+    - name: Create PR comment for formatting issues
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: files } = await github.rest.pulls.listFiles({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number,
+          });
+          
+          const swiftFiles = files.filter(file => file.filename.endsWith('.swift'));
+          
+          if (swiftFiles.length > 0) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🔍 Swift Format Check
+
+このPRにはSwiftファイルが含まれています。コードスタイルの一貫性を保つため、以下のコマンドをローカルで実行してください：
+
+\`\`\`bash
+# swift-formatのインストール（Xcode 16.4以降は不要）
+xcrun swift-format --help
+
+# コードスタイルチェック
+xcrun swift-format lint --recursive Sources/ Tests/
+
+# 自動フォーマット
+xcrun swift-format format --in-place --recursive Sources/ Tests/
+
+# 変更をコミット
+git add -A
+git commit -m "Apply swift-format formatting"
+git push
+\`\`\`
+
+**注意**: フォーマットの変更は自動でコミットされません。ローカルで適用してからコミットしてください。`
+            });
+          }
         
     - name: List Available Simulators
       run: |
