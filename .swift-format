@@ -1,54 +1,32 @@
-{
-  "version": 1,
-  "lineLength": 120,
-  "indentation": {
-    "style": "spaces",
-    "count": 4
-  },
-  "maximumBlankLines": 1,
-  "respectsExistingLineBreaks": true,
-  "lineBreakBeforeControlFlowKeywords": true,
-  "lineBreakBeforeEachArgument": false,
-  "prioritizeKeepingFunctionOutputTogether": true,
-  "indentConditionalCompilationBlocks": true,
-  "lineBreakAroundMultilineExpressionChainComponents": true,
-  "fileHeader": "",
-  "rules": {
-    "AllPublicDeclarationsHaveDocumentation": "enabled",
-    "AlwaysUseLowerCamelCase": "enabled",
-    "AmbiguousTrailingClosureOverload": "enabled",
-    "BeginDocumentationCommentWithOneLineSummary": "enabled",
-    "DoNotUseSemicolons": "enabled",
-    "DontRepeatTypeInStaticProperties": "enabled",
-    "FileHeader": "enabled",
-    "FullyIndirectEnum": "enabled",
-    "GroupNumericLiterals": "enabled",
-    "IdentifiersMustBeASCII": "enabled",
-    "NeverForceUnwrap": "enabled",
-    "NeverUseForceTry": "enabled",
-    "NeverUseImplicitlyUnwrappedOptionals": "enabled",
-    "NoAccessLevelOnExtensionDeclaration": "enabled",
-    "NoBlockComments": "enabled",
-    "NoCasesWithOnlyFallthrough": "enabled",
-    "NoEmptyTrailingClosureParentheses": "enabled",
-    "NoLabelsInCasePatterns": "enabled",
-    "NoLeadingUnderscores": "enabled",
-    "NoParensAroundConditions": "enabled",
-    "NoTrailingCommas": "enabled",
-    "NoTrailingWhitespace": "enabled",
-    "NoUnusedImports": "enabled",
-    "OneCasePerLine": "enabled",
-    "OneVariableDeclarationPerLine": "enabled",
-    "OnlyOneTrailingClosureArgument": "enabled",
-    "OrderedImports": "enabled",
-    "ReturnVoidInsteadOfEmptyTuple": "enabled",
-    "UseLetInEveryBoundCaseVariable": "enabled",
-    "UseShorthandArraySyntax": "enabled",
-    "UseShorthandDictionarySyntax": "enabled",
-    "UseSingleLinePropertyGetter": "enabled",
-    "UseSynthesizedInitializer": "enabled",
-    "UseTripleSlashForDocumentationComments": "enabled",
-    "UseWhereClauseInForEach": "enabled",
-    "ValidateDocumentationComments": "enabled"
-  }
-}
+--indent 4
+--maxwidth 120
+--trimwhitespace always
+--insertlines enabled
+--removelines enabled
+--allman false
+--header strip
+--lineaftermarks false
+--linebeforemarks false
+--braces oneline
+--braces oneline-empty
+--braces oneline-else
+--braces oneline-let
+--braces oneline-var
+--operatorfunc spaced
+--ranges spaced
+--spacedoperators +, -, *, /, %, =, ==, !=, <, >, <=, >=, +=, -=, *=, /=, %=, &&, ||
+--commas always
+--decimalgrouping 3,4
+--exponentgrouping 3,4
+--fractiongrouping enabled
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--octalgrouping 4,8
+--binarygrouping 4,8
+--semicolons never
+--trailingcommas always
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--wraptypealiases before-first
