@@ -1,0 +1,102 @@
+name: Swift Format Patch
+
+on:
+  pull_request:
+    paths:
+      - '**/*.swift'
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  swift-format-patch:
+    runs-on: macos-latest
+    name: swift-format-patch
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for diff generation
+      
+      - name: Install swift-format
+        run: brew install swift-format
+      
+      - name: Check current Swift formatting
+        id: check-format
+        run: |
+          # Store the current state before formatting
+          git add .
+          git diff --cached --name-only | grep '\.swift$' > /tmp/changed_swift_files.txt || true
+          
+          # Check if there are any Swift files to format
+          if [ -s /tmp/changed_swift_files.txt ]; then
+            echo "has_swift_files=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_swift_files=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run swift-format
+        if: steps.check-format.outputs.has_swift_files == 'true'
+        run: |
+          # Run swift-format on all Swift files in the repository
+          swift-format format --in-place .
+          
+          # Check if any files were actually changed
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "formatting_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "formatting_changes=false" >> $GITHUB_OUTPUT
+          fi
+        id: format
+      
+      - name: Generate diff
+        if: steps.format.outputs.formatting_changes == 'true'
+        run: |
+          # Generate a unified diff of all changes
+          git diff > /tmp/swift_format_diff.patch
+          
+          # Store diff content for the comment
+          cat /tmp/swift_format_diff.patch > $GITHUB_WORKSPACE/swift_format_diff.patch
+      
+      - name: Post formatting patch comment
+        if: steps.format.outputs.formatting_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const diffContent = fs.readFileSync('swift_format_diff.patch', 'utf8');
+            
+            const comment = `## 🎨 Swift Formatting Changes Detected
+
+            The following formatting changes were automatically applied by \`swift-format\`:
+
+            \`\`\`diff
+            ${diffContent}
+            \`\`\`
+
+            ### 📋 How to Apply These Changes Locally
+
+            To apply these formatting changes to your local branch, run:
+
+            \`\`\`bash
+            # Install swift-format (if not already installed)
+            brew install swift-format
+            
+            # Apply formatting to all Swift files
+            swift-format format --in-place .
+            
+            # Or apply the specific diff from above
+            git apply swift_format_diff.patch
+            \`\`\`
+
+            **Note:** These changes are formatting-only and don't affect functionality.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
