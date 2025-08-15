@@ -25,7 +25,6 @@ jobs:
       run: |
         xcrun swift-format lint \
           --recursive \
-          --configuration .swift-format \
           Sources/ Tests/
         
     - name: Format Swift code
@@ -33,7 +32,6 @@ jobs:
         xcrun swift-format format \
           --in-place \
           --recursive \
-          --configuration .swift-format \
           Sources/ Tests/
         
     - name: Check for changes
