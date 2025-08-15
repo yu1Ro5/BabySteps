@@ -25,5 +25,19 @@ jobs:
       - name: Install markdownlint-cli
         run: npm install -g markdownlint-cli
 
-      - name: Run markdownlint
+      - name: Run markdownlint check
         run: markdownlint '**/*.md' '**/*.mdc'
+
+      - name: Auto-fix markdownlint issues
+        run: markdownlint '**/*.md' '**/*.mdc' --fix
+
+      - name: Commit and push fixes
+        if: always()
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add .
+            git commit -m "Auto-fix markdownlint issues [skip ci]"
+            git push
+          fi
