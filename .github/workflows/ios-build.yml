@@ -25,6 +25,7 @@ jobs:
       run: |
         xcrun swift-format format \
           --lint \
+          --recursive \
           --configuration .swiftformat \
           Sources/ Tests/
         
@@ -32,6 +33,7 @@ jobs:
       run: |
         xcrun swift-format format \
           --in-place \
+          --recursive \
           --configuration .swiftformat \
           Sources/ Tests/
         
