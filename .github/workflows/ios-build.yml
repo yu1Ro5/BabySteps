@@ -21,6 +21,27 @@ jobs:
       run: |
         brew install xcodegen
         
+    - name: Install swift-format
+      run: |
+        git clone https://github.com/apple/swift-format.git
+        cd swift-format
+        swift build -c release
+        sudo cp .build/release/swift-format /usr/local/bin/
+        
+    - name: Check Swift formatting
+      run: |
+        swift-format format \
+          --mode lint \
+          --configuration .swiftformat \
+          --recursive Sources/ Tests/
+        
+    - name: Format Swift code
+      run: |
+        swift-format format \
+          --mode inplace \
+          --configuration .swiftformat \
+          --recursive Sources/ Tests/
+        
     - name: List Available Simulators
       run: |
         echo "=== Available iOS Simulators ==="
