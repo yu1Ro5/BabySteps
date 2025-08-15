@@ -1,0 +1,47 @@
+{
+  "editor": {
+    "formatOnSave": true,
+    "tabSize": 4,
+    "insertSpaces": true,
+    "rulers": [120]
+  },
+  "workbench": {
+    "colorTheme": "Default Dark+",
+    "editor": {
+      "fontSize": 14,
+      "fontFamily": "SF Mono, Monaco, 'Cascadia Code', monospace"
+    }
+  },
+  "files": {
+    "associations": {
+      "*.swift": "swift",
+      "*.mdc": "markdown"
+    },
+    "exclude": {
+      "**/build": true,
+      "**/DerivedData": true,
+      "**/.git": true,
+      "**/Pods": true
+    },
+    "autoSave": "afterDelay",
+    "autoSaveDelay": 1000
+  },
+  "swift": {
+    "format": {
+      "indentWidth": 4,
+      "lineWidth": 120,
+      "tabWidth": 4,
+      "useTabs": false
+    }
+  },
+  "git": {
+    "autofetch": true,
+    "enableSmartCommit": true
+  },
+  "observation": {
+    "enabled": true,
+    "preferObservation": true,
+    "avoidCombine": true
+  }
+}
+

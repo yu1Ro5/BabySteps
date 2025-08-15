@@ -1,0 +1,168 @@
+{
+  "SwiftUI View": {
+    "prefix": "swiftui-view",
+    "body": [
+      "import SwiftUI",
+      "",
+      "struct ${1:ViewName}View: View {",
+      "    @State private var viewModel = ${1:ViewName}ViewModel()",
+      "    ",
+      "    var body: some View {",
+      "        ${2:VStack} {",
+      "            ${3:// Content here}",
+      "        }",
+      "        .navigationTitle(\"${4:Title}\")",
+      "        .onAppear {",
+      "            viewModel.onAppear()",
+      "        }",
+      "    }",
+      "}",
+      "",
+      "#Preview {",
+      "    ${1:ViewName}View()",
+      "}"
+    ],
+    "description": "SwiftUI View with MVVM (Observation) pattern"
+  },
+  "SwiftUI ViewModel": {
+    "prefix": "swiftui-viewmodel",
+    "body": [
+      "import Foundation",
+      "import Observation",
+      "",
+      "@MainActor",
+      "@Observable",
+      "final class ${1:ViewName}ViewModel {",
+      "    var isLoading = false",
+      "    var errorMessage: String?",
+      "    ",
+      "    init() {",
+      "        setupBindings()",
+      "    }",
+      "    ",
+      "    func onAppear() {",
+      "        // Handle view appearance",
+      "    }",
+      "    ",
+      "    private func setupBindings() {",
+      "        // Setup data bindings",
+      "    }",
+      "}"
+    ],
+    "description": "SwiftUI ViewModel with MVVM (Observation) pattern"
+  },
+  "SwiftUI Model": {
+    "prefix": "swiftui-model",
+    "body": [
+      "import Foundation",
+      "",
+      "struct ${1:ModelName}: Codable, Identifiable, Equatable {",
+      "    let id: ${2:UUID}",
+      "    ${3:// Add properties here}",
+      "    ",
+      "    init(id: ${2:UUID} = ${2:UUID}(), ${4:// parameters}) {",
+      "        self.id = id",
+      "        ${5:// Initialize properties}",
+      "    }",
+      "}"
+    ],
+    "description": "SwiftUI Model with Codable support"
+  },
+  "SwiftUI List": {
+    "prefix": "swiftui-list",
+    "body": [
+      "List(${1:items}) { item in",
+      "    ${2:ItemRowView}(item: item)",
+      "        .listRowSeparator(.hidden)",
+      "        .listRowBackground(Color.clear)",
+      "}",
+      ".listStyle(.plain)",
+      ".refreshable {",
+      "    await viewModel.refreshData()",
+      "}"
+    ],
+    "description": "SwiftUI List with refreshable support"
+  },
+  "SwiftUI Navigation": {
+    "prefix": "swiftui-navigation",
+    "body": [
+      "NavigationStack {",
+      "    ${1:ContentView}()",
+      "        .navigationTitle(\"${2:Title}\")",
+      "        .navigationBarTitleDisplayMode(.large)",
+      "        .toolbar {",
+      "            ToolbarItem(placement: .navigationBarTrailing) {",
+      "                Button(\"${3:Action}\") {",
+      "                    viewModel.${4:performAction}()",
+      "                }",
+      "            }",
+      "        }",
+      "}"
+    ],
+    "description": "SwiftUI NavigationStack (iOS 16+) with toolbar"
+  },
+  "SwiftUI Form": {
+    "prefix": "swiftui-form",
+    "body": [
+      "Form {",
+      "    Section(\"${1:Section Title}\") {",
+      "        ${2:// Form fields here}",
+      "    }",
+      "    ",
+      "    Section {",
+      "        Button(\"${3:Submit}\") {",
+      "            viewModel.${4:submit}()",
+      "        }",
+      "        .disabled(viewModel.isLoading)",
+      "    }",
+      "}",
+      ".formStyle(.plain)"
+    ],
+    "description": "SwiftUI Form with sections"
+  },
+  "SwiftUI Button": {
+    "prefix": "swiftui-button",
+    "body": [
+      "Button {",
+      "    viewModel.${1:performAction}()",
+      "} label: {",
+      "    HStack {",
+      "        Image(systemName: \"${2:plus}\")",
+      "        Text(\"${3:Button Text}\")",
+      "    }",
+      "    .font(.headline)",
+      "    .foregroundColor(.white)",
+      "    .frame(maxWidth: .infinity)",
+      "    .padding()",
+      "    .background(Color.${4:blue})",
+      "    .cornerRadius(10)",
+      "}",
+      ".disabled(viewModel.isLoading)"
+    ],
+    "description": "SwiftUI Button with custom styling"
+  },
+  "SwiftUI TextField": {
+    "prefix": "swiftui-textfield",
+    "body": [
+      "TextField(\"${1:Placeholder}\", text: $viewModel.${2:text})",
+      "    .textFieldStyle(.roundedBorder)",
+      "    .autocapitalization(.none)",
+      "    .disableAutocorrection(true)",
+      "    .onSubmit {",
+      "        viewModel.${3:onSubmit}()",
+      "    }"
+    ],
+    "description": "SwiftUI TextField with common modifiers"
+  },
+  "SwiftUI Preview": {
+    "prefix": "swiftui-preview",
+    "body": [
+      "#Preview {",
+      "    ${1:ViewName}()",
+      "        .preferredColorScheme(.${2:light})",
+      "}"
+    ],
+    "description": "SwiftUI Preview with color scheme"
+  }
+}
+
