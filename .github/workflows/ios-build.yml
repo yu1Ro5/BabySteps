@@ -23,8 +23,7 @@ jobs:
         
     - name: Check Swift formatting
       run: |
-        xcrun swift-format format \
-          --lint \
+        xcrun swift-format lint \
           --recursive \
           --configuration .swiftformat \
           Sources/ Tests/
