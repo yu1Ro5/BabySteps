@@ -24,16 +24,16 @@ jobs:
     - name: Check Swift formatting
       run: |
         xcrun swift-format format \
-          --mode lint \
+          --lint \
           --configuration .swiftformat \
-          --recursive Sources/ Tests/
+          Sources/ Tests/
         
     - name: Format Swift code
       run: |
         xcrun swift-format format \
-          --mode inplace \
+          --in-place \
           --configuration .swiftformat \
-          --recursive Sources/ Tests/
+          Sources/ Tests/
         
     - name: Check for changes
       id: check_changes
