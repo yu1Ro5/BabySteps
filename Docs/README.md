@@ -14,123 +14,123 @@ BabyStepsは、完了ではなく着手回数を記録するToDoアプリです�
 
 ## 📚 ドキュメント構成
 
-### 1. [機能設計書](./機能設計書.md)
-アプリの全体像と機能要件を定義しています。
+### 1. [Functional Design](./functional-design.md)
+Defines the overall app concept and functional requirements.
 
-**主な内容：**
-- アプリ概要とコンセプト
-- 基本機能（タスク管理、着手記録、完了管理）
-- 表示・UI機能
-- 開発フェーズと成功指標
+**Main Contents:**
+- App overview and concept
+- Core features (task management, attempt recording, completion management)
+- Display and UI features
+- Development phases and success metrics
 
-### 2. [画面設計書](./画面設計書.md)
-各画面のレイアウトとUI/UX設計を詳細に記述しています。
+### 2. [UI Design](./ui-design.md)
+Describes the layout and UI/UX design of each screen in detail.
 
-**主な内容：**
-- 画面構成とナビゲーション
-- 各画面のレイアウト詳細
-- カラーテーマとアニメーション
-- レスポンシブ対応
+**Main Contents:**
+- Screen composition and navigation
+- Detailed layout for each screen
+- Color themes and animations
+- Responsive design
 
-### 3. [データベース設計書](./データベース設計書.md)
-SwiftDataを使用したデータ構造とデータアクセス層を定義しています。
+### 3. [Database Design](./database-design.md)
+Defines the data structure and data access layer using SwiftData.
 
-**主な内容：**
-- エンティティ設計（Task、Attempt）
-- データベーススキーマ
-- Repositoryパターンによるデータアクセス
-- パフォーマンス最適化
+**Main Contents:**
+- Entity design (Task, Attempt)
+- Database schema
+- Data access using Repository pattern
+- Performance optimization
 
 ## 🚀 主要機能
 
-### タスク管理
-- タスクの作成・編集・削除
-- カテゴリ別分類（習慣、プロジェクト、学習、その他）
-- 優先度設定（低・中・高）
+### Task Management
+- Create, edit, and delete tasks
+- Categorize by type (habit, project, learning, other)
+- Set priority levels (low, medium, high)
 
-### 着手記録
-- ワンタップで着手記録
-- 着手回数のカウント
-- 着手履歴の表示
+### Attempt Recording
+- One-tap attempt recording
+- Count attempt frequency
+- Display attempt history
 
-### 統計・分析
-- 日別・週別・月別の着手回数
-- 継続日数の記録
-- カテゴリ別の統計
+### Statistics & Analysis
+- Daily, weekly, monthly attempt counts
+- Track consecutive days
+- Category-based statistics
 
-### カレンダー表示
-- 日別の着手記録を視覚化
-- 継続状況の把握
+### Calendar View
+- Visualize daily attempt records
+- Track progress status
 
-## 🛠 技術仕様
+## 🛠 Technical Specifications
 
-- **プラットフォーム**: iOS 18.0+
-- **フレームワーク**: SwiftUI + SwiftData
-- **アーキテクチャ**: MVVM
-- **データ保存**: ローカル完結（SwiftData）
+- **Platform**: iOS 18.0+
+- **Framework**: SwiftUI + SwiftData
+- **Architecture**: MVVM
+- **Data Storage**: Local only (SwiftData)
 
-## 📱 画面構成
+## 📱 Screen Structure
 
-1. **タスク一覧**（メイン画面）
-2. **統計・分析**
-3. **カレンダー**
-4. **設定**
+1. **Task List** (Main screen)
+2. **Statistics & Analysis**
+3. **Calendar**
+4. **Settings**
 
-## 🔄 開発フェーズ
+## 🔄 Development Phases
 
-### Phase 1（MVP）
-- 基本的なタスク管理
-- 着手記録機能
-- 完了管理
-- 基本的な統計表示
+### Phase 1 (MVP)
+- Basic task management
+- Attempt recording functionality
+- Completion management
+- Basic statistics display
 
 ### Phase 2
-- カレンダー表示
-- 詳細な統計・分析
-- UI/UXの改善
+- Calendar display
+- Detailed statistics and analysis
+- UI/UX improvements
 
 ### Phase 3
-- iCloud同期
-- 通知機能
-- データエクスポート
+- iCloud synchronization
+- Notification functionality
+- Data export
 
-## 💡 設計のポイント
+## 💡 Design Principles
 
-### ユーザビリティ
-- ワンタップで着手記録
-- 直感的なUI/UX
-- 継続を促す視覚的フィードバック
+### Usability
+- One-tap attempt recording
+- Intuitive UI/UX
+- Visual feedback to encourage continuation
 
-### パフォーマンス
-- SwiftDataによる高速なデータアクセス
-- 効率的なクエリ設計
-- 適切なインデックス設定
+### Performance
+- Fast data access with SwiftData
+- Efficient query design
+- Proper index configuration
 
-### 拡張性
-- モジュラー設計
-- 将来の機能追加を考慮
-- iCloud同期への対応準備
+### Extensibility
+- Modular design
+- Consider future feature additions
+- Prepare for iCloud synchronization
 
-## 🤝 開発チーム向け
+## 🤝 For Development Team
 
-### 開発環境
-- Xcode 16.4（GitHub Actions対応）
+### Development Environment
+- Xcode 16.4 (GitHub Actions compatible)
 - iOS 18.0+ SDK
 - Swift 6.0+
 
-### コーディング規約
-- SwiftLint準拠
-- MVVMパターンの徹底
-- 適切なエラーハンドリング
+### Coding Standards
+- SwiftLint compliance
+- Strict MVVM pattern implementation
+- Proper error handling
 
-### テスト
-- ユニットテスト
-- UIテスト
-- パフォーマンステスト
+### Testing
+- Unit tests
+- UI tests
+- Performance tests
 
-## 📞 サポート
+## 📞 Support
 
-ドキュメントに関する質問や改善提案がある場合は、開発チームまでお問い合わせください。
+For questions about the documentation or improvement suggestions, please contact the development team.
 
 ---
 
