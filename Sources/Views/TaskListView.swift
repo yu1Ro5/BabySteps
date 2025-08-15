@@ -3,6 +3,7 @@ import SwiftData
 
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Query private var tasks: [Task]
     @State private var viewModel: TaskViewModel
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
@@ -16,7 +17,7 @@ struct TaskListView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 // 全体進捗表示
                 overallProgressView
@@ -54,11 +55,11 @@ struct TaskListView: View {
                 .foregroundColor(.secondary)
             
             HStack {
-                ProgressView(value: (try? viewModel.getOverallProgress()) ?? 0.0)
+                ProgressView(value: calculateOverallProgress())
                     .progressViewStyle(LinearProgressViewStyle())
                     .frame(height: 8)
                 
-                Text("\(Int(((try? viewModel.getOverallProgress()) ?? 0.0) * 100))%")
+                Text("\(Int(calculateOverallProgress() * 100))%")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -74,7 +75,7 @@ struct TaskListView: View {
     
     private var taskList: some View {
         List {
-            ForEach(try! viewModel.fetchTasks(), id: \.id) { task in
+            ForEach(tasks, id: \.id) { task in
                 TaskRowView(
                     task: task,
                     viewModel: viewModel,
@@ -88,7 +89,7 @@ struct TaskListView: View {
     // MARK: - Add Task Sheet
     
     private var addTaskSheet: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("新しいタスクを作成")
                     .font(.title2)
@@ -127,7 +128,7 @@ struct TaskListView: View {
     // MARK: - Add Step Sheet
     
     private var addStepSheet: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 if let task = selectedTask {
                     Text("「\(task.title)」にステップを追加")
@@ -169,10 +170,15 @@ struct TaskListView: View {
     // MARK: - Helper Methods
     
     private func deleteTasks(offsets: IndexSet) {
-        let tasks = try! viewModel.fetchTasks()
         for index in offsets {
             viewModel.deleteTask(tasks[index])
         }
+    }
+    
+    private func calculateOverallProgress() -> Double {
+        guard !tasks.isEmpty else { return 0.0 }
+        let totalProgress = tasks.reduce(0.0) { $0 + $1.progress }
+        return totalProgress / Double(tasks.count)
     }
 }
 
