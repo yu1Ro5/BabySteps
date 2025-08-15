@@ -1,0 +1,94 @@
+name: iOS Build & TestFlight Auto
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 手動トリガーも可能
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      EXPORT_OPTIONS_PLIST: ./ExportOptions.plist
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate
+          ls -la *.xcodeproj
+
+      - name: Set version and build number
+        run: |
+          VERSION=$(date +'%y.%m.%d.%H%M')
+          echo "Setting version: $VERSION"
+          
+          # Info.plistのパスを動的に検索
+          INFO_PLIST=$(find . -name "Info.plist" -path "*/BabySteps/*" | head -1)
+          if [ -z "$INFO_PLIST" ]; then
+            echo "Error: Info.plist not found"
+            exit 1
+          fi
+          
+          echo "Updating Info.plist: $INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$INFO_PLIST"
+          
+          echo "Version updated successfully"
+
+      - name: Build archive
+        run: |
+          xcodebuild -project BabySteps.xcodeproj \
+                     -scheme BabySteps \
+                     -configuration Release \
+                     -archivePath ./build/BabySteps.xcarchive \
+                     CODE_SIGN_STYLE=Automatic \
+                     CODE_SIGN_IDENTITY="iPhone Distribution" \
+                     CODE_SIGNING_REQUIRED=YES \
+                     CODE_SIGNING_ALLOWED=YES \
+                     archive
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+                     -archivePath ./build/BabySteps.xcarchive \
+                     -exportOptionsPlist $EXPORT_OPTIONS_PLIST \
+                     -exportPath ./build
+          
+          ls -la ./build/
+
+      - name: Upload to TestFlight
+        run: |
+          # IPAファイルの存在確認
+          if [ ! -f "./build/BabySteps.ipa" ]; then
+            echo "Error: IPA file not found"
+            ls -la ./build/
+            exit 1
+          fi
+          
+          echo "Uploading to TestFlight..."
+          xcrun altool --upload-app \
+                        -f ./build/BabySteps.ipa \
+                        --apiKey $APP_STORE_CONNECT_KEY_ID \
+                        --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
+                        --type ios
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-artifacts
+          path: build/
+          retention-days: 30
