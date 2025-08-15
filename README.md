@@ -77,6 +77,27 @@ dependencies:
   - package: Alamofire
 ```
 
+### Markdown Lint
+
+このリポジトリでは、Markdownファイル（`.md`と`.mdc`）の一貫性を保つためにmarkdownlintを使用しています。
+
+#### ローカルでの実行
+
+Markdownファイルをローカルでチェックするには：
+
+```bash
+npm install -g markdownlint-cli
+markdownlint '**/*.md' '**/*.mdc'
+```
+
+#### 設定ファイル
+
+markdownlintの設定は `.markdownlint.json` ファイルでカスタマイズできます。現在の設定：
+
+- `default: true`: デフォルトルールを有効化
+- `MD013: false`: 行の長さ制限を無効化
+- `MD033: false`: HTMLタグの使用を許可
+
 ## CI/CD
 
 ### GitHub Actions
@@ -86,6 +107,7 @@ dependencies:
 - **ビルド**: iOSアプリのビルド
 - **テスト**: ユニットテストの実行
 - **アーカイブ**: リリース用アーカイブの作成
+- **Markdown Lint**: Markdownファイル（`.md`と`.mdc`）のフォーマットチェック
 
 ### 手動実行
 
