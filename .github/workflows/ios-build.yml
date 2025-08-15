@@ -37,25 +37,21 @@ jobs:
           --recursive \
           Sources/ Tests/
         
-    - name: Check for changes
-      id: check_changes
+    - name: Check formatting compliance
       run: |
-        if [[ -n "$(git status --porcelain)" ]]; then
-          echo "has_changes=true" >> $GITHUB_OUTPUT
-        else
-          echo "has_changes=false" >> $GITHUB_OUTPUT
-        fi
+        # フォーマット後のコードが正しいかチェック
+        xcrun swift-format lint \
+          --recursive \
+          Sources/ Tests/
         
-    - name: Commit and push changes
-      if: steps.check_changes.outputs.has_changes == 'true'
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add -A
-        git commit -m "Apply swift-format formatting"
-        git branch --show-current
-        git remote -v
-        git push origin HEAD:${{ github.ref_name }}
+        # 変更がある場合は警告を表示（ビルドは継続）
+        if [[ -n "$(git status --porcelain)" ]]; then
+          echo "⚠️  Code formatting changes detected. Please run 'swift-format format' locally and commit changes."
+          echo "Changed files:"
+          git status --porcelain
+        else
+          echo "✅  All Swift files are properly formatted."
+        fi
         
     - name: List Available Simulators
       run: |
