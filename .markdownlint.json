@@ -1,5 +1,8 @@
 {
+<<<<<<< HEAD
   "default": true,
+=======
+>>>>>>> 5373cbd (Update documentation with improved formatting and content structure)
   "MD013": {
     "line_length": 120,
     "code_blocks": false,
@@ -11,4 +14,8 @@
   "MD029": {
     "style": "ordered"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 5373cbd (Update documentation with improved formatting and content structure)
