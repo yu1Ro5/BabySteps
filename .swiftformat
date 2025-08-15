@@ -1,0 +1,59 @@
+# SwiftFormat Configuration File
+# https://github.com/nicklockwood/SwiftFormat
+
+# Indentation
+--indent 4
+--tabwidth 4
+--smarttabs enabled
+
+# Line wrapping
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--wraptypealiases before-first
+
+# Spacing
+--trimwhitespace always
+--insertlines enabled
+--removelines enabled
+--allman false
+--header strip
+--lineaftermarks false
+--linebeforemarks false
+
+# Braces
+--braces oneline
+--braces oneline-empty
+--braces oneline-else
+--braces oneline-let
+--braces oneline-var
+
+# Operators
+--operatorfunc spaced
+--ranges spaced
+--spacedoperators +, -, *, /, %, =, ==, !=, <, >, <=, >=, +=, -=, *=, /=, %=, &&, ||
+
+# Other
+--commas always
+--decimalgrouping 3,4
+--exponentgrouping 3,4
+--fractiongrouping enabled
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--octalgrouping 4,8
+--binarygrouping 4,8
+--exponentgrouping 3,4
+--fractiongrouping enabled
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--octalgrouping 4,8
+--binarygrouping 4,8
+--semicolons never
+--trailingcommas always
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--wraptypealiases before-first
