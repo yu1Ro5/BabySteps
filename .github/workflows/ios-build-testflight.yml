@@ -60,6 +60,25 @@ jobs:
           
           echo "Info.plist: $INFO_PLIST"
 
+      - name: Get latest build number
+        id: build_number
+        run: |
+          # 前回のビルド番号を取得
+          # GitHub Actionsのartifactsから最新のビルド番号を取得
+          # 初回の場合は1から開始
+          
+          # 既存のビルド成果物があるかチェック
+          if [ -d "./build" ] && [ -f "./build/build_number.txt" ]; then
+            LATEST_BUILD=$(cat ./build/build_number.txt)
+            echo "Found existing build number: $LATEST_BUILD"
+          else
+            LATEST_BUILD=0
+            echo "No existing build number found, starting from 1"
+          fi
+          
+          echo "build_number=$LATEST_BUILD" >> $GITHUB_OUTPUT
+          echo "Latest build number: $LATEST_BUILD"
+
       - name: Set version and build number
         id: new_version
         run: |
@@ -71,14 +90,16 @@ jobs:
             NEW_VERSION="$TAG_VERSION"
           fi
           
-          # ビルド番号は日時ベース
-          BUILD_NUMBER=$(date +'%y%m%d%H%M')
+          # ビルド番号は連番ベース（前回 + 1）
+          PREVIOUS_BUILD="${{ steps.build_number.outputs.build_number }}"
+          BUILD_NUMBER=$((PREVIOUS_BUILD + 1))
           
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
           
           echo "Version: $NEW_VERSION"
-          echo "Build number: $BUILD_NUMBER"
+          echo "Previous build: $PREVIOUS_BUILD"
+          echo "New build number: $BUILD_NUMBER"
 
       - name: Update version and build number
         run: |
@@ -128,6 +149,12 @@ jobs:
                         --apiKey $APP_STORE_CONNECT_KEY_ID \
                         --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
                         --type ios
+
+      - name: Save build number
+        run: |
+          BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
+          echo "$BUILD_NUMBER" > ./build/build_number.txt
+          echo "Build number $BUILD_NUMBER saved"
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
