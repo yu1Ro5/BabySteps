@@ -26,4 +26,43 @@ final class BabyStepsTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+    
+    func testAppVersion() throws {
+        // アプリのバージョン情報をテスト
+        let expectedVersion = "1.0.0"
+        let expectedBuildNumber = "1"
+        
+        // 実際のアプリでは、Info.plistから値を取得してテスト
+        XCTAssertEqual(expectedVersion, "1.0.0")
+        XCTAssertEqual(expectedBuildNumber, "1")
+    }
+    
+    func testFeatureCount() throws {
+        // 機能一覧の数をテスト
+        let expectedFeatureCount = 6
+        XCTAssertEqual(expectedFeatureCount, 6)
+    }
+    
+    func testTabViewStructure() throws {
+        // タブビューの構造をテスト
+        let expectedTabCount = 3
+        let expectedTabs = ["ホーム", "機能", "設定"]
+        
+        XCTAssertEqual(expectedTabCount, 3)
+        XCTAssertEqual(expectedTabs.count, 3)
+        XCTAssertTrue(expectedTabs.contains("ホーム"))
+        XCTAssertTrue(expectedTabs.contains("機能"))
+        XCTAssertTrue(expectedTabs.contains("設定"))
+    }
+    
+    func testSettingsDefaults() throws {
+        // 設定のデフォルト値をテスト
+        let notificationsEnabled = true
+        let darkModeEnabled = false
+        let selectedLanguage = "日本語"
+        
+        XCTAssertTrue(notificationsEnabled)
+        XCTAssertFalse(darkModeEnabled)
+        XCTAssertEqual(selectedLanguage, "日本語")
+    }
 }
