@@ -36,16 +36,47 @@ jobs:
 
       - name: Generate Xcode project
         run: |
+          echo "Generating Xcode project with XcodeGen..."
           xcodegen generate
+          
+          echo "Checking generated project files..."
+          if [ ! -d "BabySteps.xcodeproj" ]; then
+            echo "Error: BabySteps.xcodeproj was not generated"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
+          fi
+          
+          echo "Project generated successfully:"
           ls -la *.xcodeproj
+          
+          echo "Project structure:"
+          find BabySteps.xcodeproj -type f | head -20
+          
+          echo "Verifying project configuration..."
+          xcodebuild -project BabySteps.xcodeproj -list
 
       - name: Get project info
         id: project_info
         run: |
-          # Info.plistのパスを動的に検索
-          INFO_PLIST=$(find . -name "Info.plist" | head -1)
+          # Info.plistのパスを動的に検索（より確実な検索）
+          INFO_PLIST=""
+          
+          # まず、project.ymlで指定されたパスを確認
+          if [ -f "Sources/Info.plist" ]; then
+            INFO_PLIST="Sources/Info.plist"
+          else
+            # フォールバック: 全体的な検索
+            INFO_PLIST=$(find . -name "Info.plist" | head -1)
+          fi
+          
           if [ -z "$INFO_PLIST" ]; then
             echo "Error: Info.plist not found"
+            echo "Current directory: $(pwd)"
+            echo "Directory contents:"
+            ls -la
+            echo "Sources directory contents:"
+            ls -la Sources/ || echo "Sources directory not found"
             exit 1
           fi
           
@@ -58,7 +89,7 @@ jobs:
             echo "Tag version: $TAG_VERSION"
           fi
           
-          echo "Info.plist: $INFO_PLIST"
+          echo "Info.plist found at: $INFO_PLIST"
 
       - name: Get latest build number
         id: build_number
@@ -115,15 +146,26 @@ jobs:
 
       - name: Build archive
         run: |
+          echo "Starting build process..."
+          echo "Current directory: $(pwd)"
+          echo "Xcode project exists: $(ls -la *.xcodeproj)"
+          echo "Project scheme: BabySteps"
+          
+          # ビルドディレクトリを作成
+          mkdir -p ./build
+          
           xcodebuild -project BabySteps.xcodeproj \
                      -scheme BabySteps \
                      -configuration Release \
                      -archivePath ./build/BabySteps.xcarchive \
                      CODE_SIGN_STYLE=Automatic \
-                     CODE_SIGN_IDENTITY="iPhone Distribution" \
                      CODE_SIGNING_REQUIRED=YES \
                      CODE_SIGNING_ALLOWED=YES \
                      archive
+          
+          echo "Build completed successfully"
+          echo "Archive contents:"
+          ls -la ./build/
 
       - name: Export IPA
         run: |
