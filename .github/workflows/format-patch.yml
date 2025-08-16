@@ -69,8 +69,8 @@ jobs:
       - name: Format Swift files
         if: steps.detect-changes.outputs.has_swift == 'true'
         run: |
-          echo "Running swift-format --in-place on swift files..."
-          swift-format --in-place . || true
+          echo "Running swift-format format --in-place on swift files..."
+          swift-format format --in-place . || true
       
       - name: Generate diff
         id: generate-diff
@@ -116,11 +116,14 @@ jobs:
             if ('${{ steps.detect-changes.outputs.has_swift }}' === 'true') {
               commentBody += '**For Swift files:**\n';
               commentBody += '```bash\n';
-              commentBody += 'swift-format --in-place .\n';
+              commentBody += '# Install swift-format (if not already installed)\n';
+              commentBody += 'brew install swift-format\n\n';
+              commentBody += '# Apply formatting to all Swift files\n';
+              commentBody += 'swift-format format --in-place .\n';
               commentBody += '```\n\n';
             }
             
-            commentBody += '> **Note:** These changes are automatically generated and not pushed to the repository. Apply them locally and commit if desired.';
+            commentBody += '> **Note:** These changes are formatting-only and don\'t affect functionality. They are automatically generated and not pushed to the repository. Apply them locally and commit if desired.';
             
             // Post the comment
             await github.rest.issues.createComment({
