@@ -9,10 +9,19 @@
 
 ## 参考URL一覧
 
-<!-- ここに参考にしたURLを記録していきます -->
+### .NET MAUI / iOS開発
+- **2024-01-XX**: [Apple アカウント管理 - .NET MAUI](https://learn.microsoft.com/ja-jp/dotnet/maui/ios/apple-account-management?view=net-maui-9.0) - .NET MAUIでのiOSアプリ開発時のAppleアカウント管理について
 
-### 例
-- **2024-01-XX**: [サイト名](URL) - 参考にした内容の説明
+### Git / 開発フロー
+- **2024-01-XX**: [Gitブランチ戦略ガイドライン](https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_branch_standards.html) - Gitブランチの命名規則と運用ルール
+
+### Swift開発
+- **2024-01-XX**: [Swift Format](https://github.com/swiftlang/swift-format) - Swiftコードの自動フォーマットツール
+- **2024-01-XX**: [Swift Style Guide](https://google.github.io/swift/swift/) - GoogleによるSwiftコーディング規約
+
+### 技術記事
+- **2024-01-XX**: [記事タイトル](https://zenn.dev/treastrain/articles/8f461a75731562) - Zennでの技術記事
+- **2024-01-XX**: [記事タイトル](https://zenn.dev/kyome/articles/a2dad672c0a65c) - Zennでの技術記事
 
 ---
-*最終更新: 作成日*
+*最終更新: 2024-01-XX*
