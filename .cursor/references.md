@@ -17,8 +17,6 @@
 
 ### Swift開発
 - **2025-08-16**: [Swift Format](https://github.com/swiftlang/swift-format) - Swiftコードの自動フォーマットツール
-  - Xcodeに内蔵されたswift-formatの使用方法
-  - swift-formatのConfiguration設定について
 - **2025-08-16**: [Swift Style Guide](https://google.github.io/swift/swift/) - GoogleによるSwiftコーディング規約
 
 ### 技術記事
