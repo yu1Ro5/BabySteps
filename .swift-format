@@ -1,0 +1,83 @@
+{
+    "version": 1,
+    "lineLength": 120,
+    "indentation": {
+        "spaces": 4
+    },
+    "maximumBlankLines": 1,
+    "respectsExistingLineBreaks": true,
+    "lineBreakBeforeControlFlowKeywords": true,
+    "lineBreakBeforeEachArgument": false,
+    "lineBreakBeforeEachGenericRequirement": false,
+    "lineBreakBetweenDeclarationAttributes": false,
+    "indentConditionalCompilationBlocks": true,
+    "indentSwitchCaseLabels": false,
+    "lineBreakAroundMultilineExpressionChainComponents": false,
+    "prioritizeKeepingFunctionOutputTogether": true,
+    "spacesAroundRangeFormationOperators": false,
+    "spacesBeforeEndOfLineComments": 2,
+    "multiElementCollectionTrailingCommas": true,
+    "noAssignmentInExpressions": {
+        "allowedFunctions": [
+            "XCTAssertNoThrow"
+        ]
+    },
+    "reflowMultilineStringLiterals": {
+        "never": {}
+    },
+    "fileScopedDeclarationPrivacy": {
+        "accessLevel": "private"
+    },
+    "rules": {
+        "AllPublicDeclarationsHaveDocumentation": true,
+        "AlwaysUseLiteralForEmptyCollectionInit": true,
+        "AlwaysUseLowerCamelCase": true,
+        "AmbiguousTrailingClosureOverload": true,
+        "BeginDocumentationCommentWithOneLineSummary": true,
+        "DoNotUseSemicolons": true,
+        "DontRepeatTypeInStaticProperties": true,
+        "FileScopedDeclarationPrivacy": true,
+        "FullyIndirectEnum": true,
+        "FullyIndentedCaseStatements": true,
+        "GroupNumericLiterals": true,
+        "IdentifiersMustBeASCII": true,
+        "NeverForceUnwrap": true,
+        "NeverUseForceTry": true,
+        "NeverUseImplicitlyUnwrappedOptionals": true,
+        "NoAccessLevelOnExtensionDeclaration": true,
+        "NoAssignmentInExpressions": true,
+        "NoBlockComments": true,
+        "NoCasesWithOnlyFallthrough": true,
+        "NoEmptyTrailingClosureParentheses": true,
+        "NoLabelsInCasePatterns": true,
+        "NoLeadingUnderscores": true,
+        "NoParensAroundConditions": true,
+        "NoPlaygroundLiterals": true,
+        "NoPreambleComments": true,
+        "NoTrailingCommas": false,
+        "NoTrailingWhitespace": true,
+        "NoUnnecessaryBreakInSwitch": true,
+        "NoUnnecessaryImport": true,
+        "NoUnnecessaryReturn": true,
+        "NoVoidReturnOnFunctionSignature": true,
+        "OmitExplicitReturns": false,
+        "OneCasePerLine": true,
+        "OneVariableDeclarationPerLine": true,
+        "OnlyOneTrailingClosureArgument": true,
+        "OrderedImports": true,
+        "ReplaceForEachWithForLoop": true,
+        "ReturnVoidInsteadOfEmptyTuple": true,
+        "TypeNamesShouldBeCapitalized": true,
+        "UseEarlyExits": true,
+        "UseExplicitNilCheckInConditions": true,
+        "UseLetInEveryBoundCaseVariable": true,
+        "UseShorthandArraySyntax": true,
+        "UseShorthandDictionarySyntax": true,
+        "UseShorthandTypeNames": true,
+        "UseSingleLinePropertyGetter": true,
+        "UseSynthesizedInitializer": true,
+        "UseTripleSlashForDocumentationComments": true,
+        "UseWhereClausesInForLoops": true,
+        "ValidateDocumentationComments": true
+    }
+}

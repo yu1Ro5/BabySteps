@@ -1,0 +1,146 @@
+name: Format Patch
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '**/*.mdc'
+      - '**/*.swift'
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  format-patch:
+    name: format-patch
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for diff generation
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install markdownlint-cli2
+        run: npm install -g markdownlint-cli2
+      
+      - name: Install swift-format
+        run: |
+          brew install swift-format
+      
+      - name: Detect changed file types
+        id: detect-changes
+        run: |
+          # Get list of changed files
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          
+          # Check for markdown files (including .md and .mdc)
+          if echo "$CHANGED_FILES" | grep -q '\.md$\|\.mdc$'; then
+            echo "has_markdown=true" >> $GITHUB_OUTPUT
+            echo "Markdown files (.md/.mdc) detected"
+          else
+            echo "has_markdown=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for swift files
+          if echo "$CHANGED_FILES" | grep -q '\.swift$'; then
+            echo "has_swift=true" >> $GITHUB_OUTPUT
+            echo "Swift files detected"
+          else
+            echo "has_swift=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+      
+      - name: Format Markdown files
+        if: steps.detect-changes.outputs.has_markdown == 'true'
+        run: |
+          echo "Running markdownlint-cli2 --fix on all markdown files (.md/.mdc)..."
+          markdownlint-cli2 --fix "**/*.md" "**/*.mdc" || true
+      
+      - name: Format Swift files
+        if: steps.detect-changes.outputs.has_swift == 'true'
+        run: |
+          echo "Running swift-format format --in-place on all Swift files with configuration..."
+          # Check if .swift-format configuration file exists
+          if [ -f ".swift-format" ]; then
+            echo "Using .swift-format configuration file"
+            swift-format format --in-place . --configuration .swift-format || true
+          else
+            echo "No .swift-format configuration file found, using default settings"
+            swift-format format --in-place . || true
+          fi
+      
+      - name: Generate diff
+        id: generate-diff
+        run: |
+          # Check if there are any changes
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No formatting changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            # Generate diff and save to file
+            git diff > formatting-changes.diff
+            echo "Formatting changes detected, diff saved"
+          fi
+      
+      - name: Post formatting patch comment
+        if: steps.generate-diff.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read the diff file
+            const diffContent = fs.readFileSync('formatting-changes.diff', 'utf8');
+            
+            // Build the comment content
+            let commentBody = '## 🔧 Auto-formatting Changes Detected\n\n';
+            commentBody += 'The following formatting changes were automatically applied:\n\n';
+            commentBody += '```diff\n';
+            commentBody += diffContent;
+            commentBody += '\n```\n\n';
+            
+            commentBody += '## 📋 Apply These Changes Locally\n\n';
+            
+            // Add instructions based on what was formatted
+            if ('${{ steps.detect-changes.outputs.has_markdown }}' === 'true') {
+              commentBody += '**For Markdown files (.md/.mdc):**\n';
+              commentBody += '```bash\n';
+              commentBody += 'markdownlint-cli2 --fix "**/*.md" "**/*.mdc"\n';
+              commentBody += '```\n\n';
+            }
+            
+            if ('${{ steps.detect-changes.outputs.has_swift }}' === 'true') {
+              commentBody += '**For Swift files:**\n';
+              commentBody += '```bash\n';
+              commentBody += '# Install swift-format (if not already installed)\n';
+              commentBody += 'brew install swift-format\n\n';
+              commentBody += '# Apply formatting to all Swift files with configuration\n';
+              commentBody += 'swift-format format --in-place . --configuration .swift-format\n\n';
+              commentBody += '# Or without configuration file (uses default settings)\n';
+              commentBody += 'swift-format format --in-place .\n';
+              commentBody += '```\n\n';
+            }
+            
+            commentBody += '> **Note:** These changes are formatting-only and don\'t affect functionality. They are automatically generated and not pushed to the repository. Apply them locally and commit if desired.';
+            
+            // Post the comment
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+            
+            console.log('Formatting patch comment posted successfully');
