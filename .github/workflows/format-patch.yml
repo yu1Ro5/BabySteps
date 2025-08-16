@@ -70,8 +70,15 @@ jobs:
       - name: Format Swift files
         if: steps.detect-changes.outputs.has_swift == 'true'
         run: |
-          echo "Running swift-format format --in-place on swift files..."
-          swift-format format --in-place . || true
+          echo "Running swift-format format --in-place on changed Swift files..."
+          # Get list of changed Swift files and format only those
+          CHANGED_SWIFT_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep '\.swift$')
+          if [ -n "$CHANGED_SWIFT_FILES" ]; then
+            echo "Changed Swift files: $CHANGED_SWIFT_FILES"
+            echo "$CHANGED_SWIFT_FILES" | xargs -I {} swift-format format --in-place {} || true
+          else
+            echo "No Swift files to format"
+          fi
       
       - name: Generate diff
         id: generate-diff
@@ -119,7 +126,9 @@ jobs:
               commentBody += '```bash\n';
               commentBody += '# Install swift-format (if not already installed)\n';
               commentBody += 'brew install swift-format\n\n';
-              commentBody += '# Apply formatting to all Swift files\n';
+              commentBody += '# Apply formatting to changed Swift files only\n';
+              commentBody += 'git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep "\\.swift$" | xargs -I {} swift-format format --in-place {}\n\n';
+              commentBody += '# Or format all Swift files in the repository\n';
               commentBody += 'swift-format format --in-place .\n';
               commentBody += '```\n\n';
             }
