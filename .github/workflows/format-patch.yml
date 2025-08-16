@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '**/*.md'
+      - '**/*.mdc'
       - '**/*.swift'
     types: [opened, synchronize, reopened]
 
@@ -41,10 +42,10 @@ jobs:
           # Get list of changed files
           CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
           
-          # Check for markdown files
-          if echo "$CHANGED_FILES" | grep -q '\.md$'; then
+          # Check for markdown files (including .md and .mdc)
+          if echo "$CHANGED_FILES" | grep -q '\.md$\|\.mdc$'; then
             echo "has_markdown=true" >> $GITHUB_OUTPUT
-            echo "Markdown files detected"
+            echo "Markdown files (.md/.mdc) detected"
           else
             echo "has_markdown=false" >> $GITHUB_OUTPUT
           fi
@@ -63,8 +64,8 @@ jobs:
       - name: Format Markdown files
         if: steps.detect-changes.outputs.has_markdown == 'true'
         run: |
-          echo "Running markdownlint-cli2 --fix on markdown files..."
-          markdownlint-cli2 --fix "**/*.md" || true
+          echo "Running markdownlint-cli2 --fix on markdown files (.md/.mdc)..."
+          markdownlint-cli2 --fix "**/*.md" "**/*.mdc" || true
       
       - name: Format Swift files
         if: steps.detect-changes.outputs.has_swift == 'true'
@@ -107,9 +108,9 @@ jobs:
             
             // Add instructions based on what was formatted
             if ('${{ steps.detect-changes.outputs.has_markdown }}' === 'true') {
-              commentBody += '**For Markdown files:**\n';
+              commentBody += '**For Markdown files (.md/.mdc):**\n';
               commentBody += '```bash\n';
-              commentBody += 'markdownlint-cli2 --fix "**/*.md"\n';
+              commentBody += 'markdownlint-cli2 --fix "**/*.md" "**/*.mdc"\n';
               commentBody += '```\n\n';
             }
             
