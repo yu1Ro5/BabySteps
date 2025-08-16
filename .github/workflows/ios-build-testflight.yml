@@ -43,7 +43,7 @@ jobs:
         id: project_info
         run: |
           # Info.plistのパスを動的に検索
-          INFO_PLIST=$(find . -name "Info.plist" -path "*/BabySteps/*" | head -1)
+          INFO_PLIST=$(find . -name "Info.plist" | head -1)
           if [ -z "$INFO_PLIST" ]; then
             echo "Error: Info.plist not found"
             exit 1
