@@ -3,7 +3,7 @@ options:
   bundleIdPrefix: com.yu1Ro5
   deploymentTarget:
     iOS: "18.0"
-  xcodeVersion: "16.4"
+  xcodeVersion: "14.0"
   generateEmptyDirectories: true
   groupSortPosition: top
 
@@ -23,7 +23,7 @@ targets:
       - path: Sources
         type: group
     resources:
-      - path: Resources
+      - path: Sources/Resources
         type: group
     settings:
       PRODUCT_NAME: "BabySteps"
@@ -62,5 +62,13 @@ targets:
     settings:
       PRODUCT_NAME: "BabyStepsTests"
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsTests"
-      GENERATE_INFOPLIST_FILE: "YES"
+      INFOPLIST_FILE: "Sources/Info.plist"
+      GENERATE_INFOPLIST_FILE: "NO"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: "BabyStepsTests"
+        CFBundleIdentifier: "com.yu1Ro5.BabyStepsTests"
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "1.0"
