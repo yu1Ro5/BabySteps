@@ -70,8 +70,15 @@ jobs:
       - name: Format Swift files
         if: steps.detect-changes.outputs.has_swift == 'true'
         run: |
-          echo "Running swift-format format --in-place on all Swift files..."
-          swift-format format --in-place . || true
+          echo "Running swift-format format --in-place on all Swift files with configuration..."
+          # Check if .swift-format configuration file exists
+          if [ -f ".swift-format" ]; then
+            echo "Using .swift-format configuration file"
+            swift-format format --in-place . --configuration .swift-format || true
+          else
+            echo "No .swift-format configuration file found, using default settings"
+            swift-format format --in-place . || true
+          fi
       
       - name: Generate diff
         id: generate-diff
@@ -119,7 +126,9 @@ jobs:
               commentBody += '```bash\n';
               commentBody += '# Install swift-format (if not already installed)\n';
               commentBody += 'brew install swift-format\n\n';
-              commentBody += '# Apply formatting to all Swift files in the repository\n';
+              commentBody += '# Apply formatting to all Swift files with configuration\n';
+              commentBody += 'swift-format format --in-place . --configuration .swift-format\n\n';
+              commentBody += '# Or without configuration file (uses default settings)\n';
               commentBody += 'swift-format format --in-place .\n';
               commentBody += '```\n\n';
             }
