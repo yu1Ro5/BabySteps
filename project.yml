@@ -25,6 +25,8 @@ targets:
     resources:
       - path: Resources
         type: group
+      - path: Sources/PrivacyInfo.xcprivacy
+        type: file
     settings:
       PRODUCT_NAME: "BabySteps"
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabySteps"
@@ -33,6 +35,7 @@ targets:
       ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: "AccentColor"
       SWIFT_EMIT_LOC_STRINGS: "YES"
+      PRIVACY_MANIFEST_PATH: "Sources/PrivacyInfo.xcprivacy"
     info:
       path: Sources/Info.plist
       properties:
