@@ -1,0 +1,206 @@
+name: iOS Build & TestFlight Auto (SemVer)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: # 手動トリガーも可能
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - custom
+      custom_version:
+        description: 'Custom version (e.g., 1.0.0)'
+        required: false
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      EXPORT_OPTIONS_PLIST: ./ExportOptions.plist
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 全履歴を取得してタグを確認
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate
+          ls -la *.xcodeproj
+
+      - name: Get current version
+        id: current_version
+        run: |
+          # Info.plistのパスを動的に検索
+          INFO_PLIST=$(find . -name "Info.plist" -path "*/BabySteps/*" | head -1)
+          if [ -z "$INFO_PLIST" ]; then
+            echo "Error: Info.plist not found"
+            exit 1
+          fi
+          
+          CURRENT_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")
+          CURRENT_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST")
+          
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "current_build=$CURRENT_BUILD" >> $GITHUB_OUTPUT
+          echo "info_plist=$INFO_PLIST" >> $GITHUB_OUTPUT
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "Current build: $CURRENT_BUILD"
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current_version }}"
+          VERSION_TYPE="${{ github.event.inputs.version_type || 'patch' }}"
+          CUSTOM_VERSION="${{ github.event.inputs.custom_version }}"
+          
+          if [ "$VERSION_TYPE" = "custom" ] && [ -n "$CUSTOM_VERSION" ]; then
+            NEW_VERSION="$CUSTOM_VERSION"
+          else
+            # セマンティックバージョニングの計算
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MAJOR="${VERSION_PARTS[0]:-0}"
+            MINOR="${VERSION_PARTS[1]:-0}"
+            PATCH="${VERSION_PARTS[2]:-0}"
+            
+            case "$VERSION_TYPE" in
+              "major")
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              "minor")
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              "patch")
+                PATCH=$((PATCH + 1))
+                ;;
+            esac
+            
+            NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          fi
+          
+          # ビルド番号は日時ベース
+          BUILD_NUMBER=$(date +'%y%m%d%H%M')
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          
+          echo "New version: $NEW_VERSION"
+          echo "Build number: $BUILD_NUMBER"
+
+      - name: Update version and build number
+        run: |
+          INFO_PLIST="${{ steps.current_version.outputs.info_plist }}"
+          NEW_VERSION="${{ steps.new_version.outputs.new_version }}"
+          BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
+          
+          echo "Updating Info.plist: $INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $NEW_VERSION" "$INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST"
+          
+          echo "Version updated successfully: $NEW_VERSION ($BUILD_NUMBER)"
+
+      - name: Create Git tag
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.new_version }}"
+          BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
+          
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add .
+          git commit -m "Bump version to $NEW_VERSION ($BUILD_NUMBER)"
+          
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+          git push origin HEAD:${{ github.ref }}
+          git push origin "v$NEW_VERSION"
+
+      - name: Build archive
+        run: |
+          xcodebuild -project BabySteps.xcodeproj \
+                     -scheme BabySteps \
+                     -configuration Release \
+                     -archivePath ./build/BabySteps.xcarchive \
+                     CODE_SIGN_STYLE=Automatic \
+                     CODE_SIGN_IDENTITY="iPhone Distribution" \
+                     CODE_SIGNING_REQUIRED=YES \
+                     CODE_SIGNING_ALLOWED=YES \
+                     archive
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+                     -archivePath ./build/BabySteps.xcarchive \
+                     -exportOptionsPlist $EXPORT_OPTIONS_PLIST \
+                     -exportPath ./build
+          
+          ls -la ./build/
+
+      - name: Upload to TestFlight
+        run: |
+          # IPAファイルの存在確認
+          if [ ! -f "./build/BabySteps.ipa" ]; then
+            echo "Error: IPA file not found"
+            ls -la ./build/
+            exit 1
+          fi
+          
+          echo "Uploading to TestFlight..."
+          xcrun altool --upload-app \
+                        -f ./build/BabySteps.ipa \
+                        --apiKey $APP_STORE_CONNECT_KEY_ID \
+                        --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
+                        --type ios
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-artifacts-v${{ steps.new_version.outputs.new_version }}
+          path: build/
+          retention-days: 30
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.new_version.outputs.new_version }}
+          release_name: Release v${{ steps.new_version.outputs.new_version }}
+          body: |
+            ## What's Changed
+            
+            Automated release for version ${{ steps.new_version.outputs.new_version }}
+            
+            ### Version Info
+            - **Version**: ${{ steps.new_version.outputs.new_version }}
+            - **Build**: ${{ steps.new_version.outputs.build_number }}
+            - **Date**: $(date -u +'%Y-%m-%d %H:%M UTC')
+            
+            ### Build Artifacts
+            IPA file and build artifacts are available in the Actions tab.
+          draft: false
+          prerelease: false
