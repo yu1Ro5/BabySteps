@@ -31,8 +31,8 @@
 
 ### 2. App Store Connect API Key の取得手順
 1. [App Store Connect](https://appstoreconnect.apple.com/) にログイン
-2. Users and Access > Keys に移動
-3. Generate API Key をクリック
+2. **統合** > **キー** に移動
+3. **APIキーを生成** をクリック
 4. キー名を入力し、Admin権限を付与
 5. 生成されたキーID、Issuer ID、API Keyをコピー
 
