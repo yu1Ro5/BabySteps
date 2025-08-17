@@ -8,6 +8,22 @@ SwiftUIベースのiOSアプリケーションです。XcodeGenを使用して�
 - 🔄 **CI/CD対応**: GitHub Actionsで自動ビルド・テスト
 - 📱 **iOS 18.0+対応**: 最新のiOS機能をサポート
 - 🧪 **テスト対応**: ユニットテストの実行環境
+- 🔒 **自動コード署名**: 一貫したコード署名設定でビルドエラーを防止
+
+## 最近の修正
+
+### ✅ コード署名とビルド問題の解決
+
+**問題**: GitHub Actionsワークフローでコード署名の競合とビルド失敗（エラー65）が発生
+
+**修正内容**:
+- `project.yml`でコード署名設定を統一（自動署名）
+- 手動署名設定の競合を解消
+- GitHub Actionsワークフローに明示的な署名設定を追加
+- ビルドエラーの詳細ログ出力を改善
+- `ExportOptions.plist`の設定を最適化
+
+**詳細**: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) を参照
 
 ## プロジェクト構造
 
@@ -22,6 +38,8 @@ BabySteps/
 ├── Tests/                 # テストコード
 ├── Resources/             # リソースファイル
 ├── project.yml           # XcodeGen設定
+├── ExportOptions.plist   # IPA出力設定
+├── TROUBLESHOOTING.md    # トラブルシューティングガイド
 └── README.md             # このファイル
 ```
 

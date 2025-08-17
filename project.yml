@@ -13,6 +13,13 @@ settings:
   DEVELOPMENT_TEAM: "58Y7Q3D4A7"
   CODE_SIGN_STYLE: "Automatic"
   PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabySteps"
+  # Fix code signing conflicts
+  CODE_SIGN_IDENTITY: "iPhone Developer"
+  CODE_SIGN_IDENTITY[sdk=iphoneos*]: "iPhone Developer"
+  CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: "iPhone Developer"
+  PROVISIONING_PROFILE_SPECIFIER: ""
+  PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]: ""
+  PROVISIONING_PROFILE_SPECIFIER[sdk=iphonesimulator*]: ""
 
 targets:
   BabySteps:
@@ -36,6 +43,14 @@ targets:
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: "AccentColor"
       SWIFT_EMIT_LOC_STRINGS: "YES"
       PRIVACY_MANIFEST_PATH: "Sources/PrivacyInfo.xcprivacy"
+      # Ensure consistent code signing for this target
+      CODE_SIGN_STYLE: "Automatic"
+      CODE_SIGN_IDENTITY: "iPhone Developer"
+      CODE_SIGN_IDENTITY[sdk=iphoneos*]: "iPhone Developer"
+      CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: "iPhone Developer"
+      PROVISIONING_PROFILE_SPECIFIER: ""
+      PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]: ""
+      PROVISIONING_PROFILE_SPECIFIER[sdk=iphonesimulator*]: ""
     info:
       path: Sources/Info.plist
       properties:
@@ -68,6 +83,14 @@ targets:
       INFOPLIST_FILE: "Sources/Info.plist"
       GENERATE_INFOPLIST_FILE: "NO"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+      # Ensure consistent code signing for test target
+      CODE_SIGN_STYLE: "Automatic"
+      CODE_SIGN_IDENTITY: "iPhone Developer"
+      CODE_SIGN_IDENTITY[sdk=iphoneos*]: "iPhone Developer"
+      CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: "iPhone Developer"
+      PROVISIONING_PROFILE_SPECIFIER: ""
+      PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]: ""
+      PROVISIONING_PROFILE_SPECIFIER[sdk=iphonesimulator*]: ""
     info:
       path: Sources/Info.plist
       properties:

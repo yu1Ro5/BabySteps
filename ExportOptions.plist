@@ -18,5 +18,15 @@
 	<false/>
 	<key>thinning</key>
 	<string>&lt;none&gt;</string>
+	<!-- Additional settings to prevent code signing conflicts -->
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.yu1Ro5.BabySteps</key>
+		<string></string>
+	</dict>
+	<key>signingCertificate</key>
+	<string>iPhone Distribution</string>
+	<key>distributionBundleIdentifier</key>
+	<string>com.yu1Ro5.BabySteps</string>
 </dict>
 </plist>
