@@ -46,6 +46,8 @@ jobs:
           echo "iOS SDK: $(xcodebuild -showsdks | grep iOS)"
           echo "Info.plist exists: $(test -f "Sources/Info.plist" && echo "Yes" || echo "No")"
           echo "Project files: $(ls -la *.xcodeproj 2>/dev/null || echo "No .xcodeproj found")"
+          echo "Available schemes: $(xcodebuild -list -project BabySteps.xcodeproj 2>/dev/null | grep -A 10 'Schemes:' || echo 'No schemes found')"
+          echo "Available configurations: $(xcodebuild -list -project BabySteps.xcodeproj 2>/dev/null | grep -A 5 'Configurations:' || echo 'No configurations found')"
           echo "=================================="
 
       - name: Get project info
@@ -121,6 +123,24 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST"
           
           echo "Version updated successfully: $NEW_VERSION ($BUILD_NUMBER)"
+          
+          # 更新後のInfo.plistの内容を確認
+          echo "Updated Info.plist contents:"
+          /usr/libexec/PlistBuddy -c "Print" "$INFO_PLIST"
+
+      - name: Verify project configuration
+        run: |
+          echo "=== Project Configuration Verification ==="
+          echo "Checking project settings..."
+          
+          # プロジェクトの設定を確認
+          xcodebuild -project BabySteps.xcodeproj \
+                     -scheme BabySteps \
+                     -showBuildSettings \
+                     -configuration Release \
+                     | grep -E "(PRODUCT_BUNDLE_IDENTIFIER|CODE_SIGN_STYLE|DEVELOPMENT_TEAM|PRODUCT_NAME)" || true
+          
+          echo "========================================="
 
       - name: Build archive
         run: |
@@ -135,15 +155,37 @@ jobs:
           
           xcodebuild -project BabySteps.xcodeproj \
                      -scheme BabySteps \
+                     -destination 'generic/platform=iOS' \
+                     -derivedDataPath build \
                      -configuration Release \
                      -archivePath ./build/BabySteps.xcarchive \
+                     CODE_SIGN_STYLE=Automatic \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO \
                      archive
           
           if [ $? -eq 0 ]; then
             echo "Archive build completed successfully"
+            echo "Archive contents:"
             ls -la ./build/
+            echo "Archive structure:"
+            find ./build/BabySteps.xcarchive -type f -name "*.app" -exec echo "App bundle: {}" \;
           else
             echo "Archive build failed"
+            echo "Build logs:"
+            # ビルドログの詳細を確認
+            xcodebuild -project BabySteps.xcodeproj \
+                       -scheme BabySteps \
+                       -destination 'generic/platform=iOS' \
+                       -derivedDataPath build \
+                       -configuration Release \
+                       -archivePath ./build/BabySteps.xcarchive \
+                       CODE_SIGN_STYLE=Automatic \
+                       CODE_SIGN_IDENTITY="" \
+                       CODE_SIGNING_REQUIRED=NO \
+                       CODE_SIGNING_ALLOWED=NO \
+                       archive -verbose 2>&1 | tail -50
             exit 1
           fi
 
