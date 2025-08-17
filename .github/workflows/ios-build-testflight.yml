@@ -44,7 +44,13 @@ jobs:
           echo "=== Build Environment Validation ==="
           echo "Xcode version: $(xcodebuild -version)"
           echo "iOS SDK: $(xcodebuild -showsdks | grep iOS)"
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "Sources directory contents:"
+          ls -la Sources/
           echo "Info.plist exists: $(test -f "Sources/Info.plist" && echo "Yes" || echo "No")"
+          echo "Info.plist path: $(realpath Sources/Info.plist 2>/dev/null || echo "Path not found")"
           echo "Project files: $(ls -la *.xcodeproj 2>/dev/null || echo "No .xcodeproj found")"
           echo "=================================="
 
@@ -53,8 +59,22 @@ jobs:
         run: |
           # Use explicit Info.plist path from project configuration
           INFO_PLIST="Sources/Info.plist"
+          
+          # Verify Info.plist exists and is readable
           if [ ! -f "$INFO_PLIST" ]; then
             echo "Error: Info.plist not found at $INFO_PLIST"
+            echo "Current directory: $(pwd)"
+            echo "Directory contents:"
+            ls -la
+            echo "Sources directory contents:"
+            ls -la Sources/
+            exit 1
+          fi
+          
+          # Verify Info.plist is readable
+          if [ ! -r "$INFO_PLIST" ]; then
+            echo "Error: Info.plist is not readable at $INFO_PLIST"
+            ls -la "$INFO_PLIST"
             exit 1
           fi
           
@@ -68,6 +88,8 @@ jobs:
           fi
           
           echo "Info.plist: $INFO_PLIST"
+          echo "Info.plist contents (first few lines):"
+          head -10 "$INFO_PLIST"
 
       - name: Get latest build number
         id: build_number
@@ -117,10 +139,22 @@ jobs:
           BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
           
           echo "Updating Info.plist: $INFO_PLIST"
+          echo "New version: $NEW_VERSION"
+          echo "New build number: $BUILD_NUMBER"
+          
+          # Verify Info.plist before updating
+          if [ ! -f "$INFO_PLIST" ]; then
+            echo "Error: Info.plist not found at $INFO_PLIST"
+            exit 1
+          fi
+          
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $NEW_VERSION" "$INFO_PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST"
           
           echo "Version updated successfully: $NEW_VERSION ($BUILD_NUMBER)"
+          echo "Updated Info.plist contents:"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST"
 
       - name: Verify code signing configuration
         run: |
@@ -130,12 +164,32 @@ jobs:
           # Verify the generated project has correct signing settings
           if [ -f "BabySteps.xcodeproj/project.pbxproj" ]; then
             echo "Project file found, checking signing configuration..."
-            grep -i "CODE_SIGN_STYLE\|CODE_SIGN_IDENTITY\|PROVISIONING_PROFILE" BabySteps.xcodeproj/project.pbxproj | head -10
+            echo "Code signing settings in project:"
+            grep -i "CODE_SIGN_STYLE\|CODE_SIGN_IDENTITY\|PROVISIONING_PROFILE\|DEVELOPMENT_TEAM" BabySteps.xcodeproj/project.pbxproj | head -15
           else
             echo "Warning: Project file not found, this might cause build issues"
           fi
           
           echo "=================================="
+
+      - name: Setup code signing environment
+        run: |
+          echo "=== Setting up code signing environment ==="
+          
+          # Create a temporary keychain for build signing
+          security create-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          
+          # Set keychain search list
+          security list-keychains -s build.keychain login.keychain
+          
+          # Set keychain timeout to prevent signing issues
+          security set-keychain-settings build.keychain
+          
+          echo "Code signing environment setup completed"
+          echo "=========================================="
 
       - name: Build archive
         run: |
@@ -159,6 +213,7 @@ jobs:
                      CODE_SIGN_STYLE=Automatic \
                      CODE_SIGN_IDENTITY="iPhone Developer" \
                      DEVELOPMENT_TEAM="58Y7Q3D4A7" \
+                     PROVISIONING_PROFILE_SPECIFIER="" \
                      archive
           
           if [ $? -eq 0 ]; then
@@ -175,7 +230,8 @@ jobs:
                        CODE_SIGN_STYLE=Automatic \
                        CODE_SIGN_IDENTITY="iPhone Developer" \
                        DEVELOPMENT_TEAM="58Y7Q3D4A7" \
-                       archive 2>&1 | tail -50
+                       PROVISIONING_PROFILE_SPECIFIER="" \
+                       archive 2>&1 | tail -100
             echo "=========================="
             exit 1
           fi
@@ -208,7 +264,7 @@ jobs:
             xcodebuild -exportArchive \
                        -archivePath ./build/BabySteps.xcarchive \
                        -exportOptionsPlist $EXPORT_OPTIONS_PLIST \
-                       -exportPath ./build 2>&1 | tail -50
+                       -exportPath ./build 2>&1 | tail -100
             echo "==========================="
             exit 1
           fi

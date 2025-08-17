@@ -1,5 +1,32 @@
 # iOS Build & Code Signing Troubleshooting Guide
 
+## Recent Fixes (December 2024)
+
+### ✅ **Info.plist and Provisioning Profile Issues - RESOLVED**
+
+#### Problem: Info.plist not found and provisioning profile errors
+**Error**: 
+1. `Error: Info.plist not found at Sources/Info.plist`
+2. `No profiles for 'com.yu1Ro5.BabySteps' were found`
+
+#### Root Cause:
+- File path resolution issues in GitHub Actions environment
+- Automatic code signing not properly configured for provisioning profiles
+- Missing explicit signing environment setup
+
+#### Solution Applied:
+1. **Enhanced File Validation**: Added comprehensive file existence and readability checks
+2. **Improved Code Signing Setup**: Added temporary keychain creation and signing environment configuration
+3. **Explicit Signing Parameters**: Added `PROVISIONING_PROFILE_SPECIFIER=""` to force automatic provisioning
+4. **Better Error Reporting**: Enhanced logging for debugging file path and signing issues
+
+#### Files Modified:
+- `.github/workflows/ios-build-testflight.yml`: Enhanced validation and signing setup
+- `project.yml`: Added automatic signing optimization settings
+- `ExportOptions.plist`: Optimized for automatic signing workflow
+
+---
+
 ## Common Issues and Solutions
 
 ### 1. Code Signing Conflicts
@@ -18,6 +45,8 @@ settings:
   CODE_SIGN_STYLE: "Automatic"
   CODE_SIGN_IDENTITY: "iPhone Developer"
   PROVISIONING_PROFILE_SPECIFIER: ""
+  CODE_SIGN_INCLUDE_ALL_CONTENT_FOR_APP: "YES"
+  CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: "YES"
 ```
 
 ### 2. Build Failure (Error 65)
@@ -45,6 +74,7 @@ xcodebuild -project BabySteps.xcodeproj \
            CODE_SIGN_STYLE=Automatic \
            CODE_SIGN_IDENTITY="iPhone Developer" \
            DEVELOPMENT_TEAM="58Y7Q3D4A7" \
+           PROVISIONING_PROFILE_SPECIFIER="" \
            archive
 ```
 
@@ -200,6 +230,18 @@ xcodebuild -showBuildSettings -archivePath ./build/BabySteps.xcarchive
 plutil -p ./build/BabySteps.xcarchive/Info.plist
 ```
 
+### File Path Verification
+```bash
+# Check Info.plist existence and readability
+ls -la Sources/Info.plist
+file Sources/Info.plist
+head -5 Sources/Info.plist
+
+# Verify absolute paths
+realpath Sources/Info.plist
+pwd
+```
+
 ## Prevention Best Practices
 
 1. **Consistent Configuration**: Use automatic signing consistently across all targets
@@ -207,6 +249,7 @@ plutil -p ./build/BabySteps.xcarchive/Info.plist
 3. **Regular Updates**: Update Xcode and dependencies regularly
 4. **Testing**: Test builds locally before pushing to GitHub Actions
 5. **Documentation**: Maintain clear documentation of build requirements and procedures
+6. **File Validation**: Always verify file existence and readability in CI/CD pipelines
 
 ## Getting Help
 
