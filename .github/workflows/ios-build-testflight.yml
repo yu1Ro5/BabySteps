@@ -43,7 +43,7 @@ jobs:
       - name: Restore API private key (p8)
         run: |
           mkdir -p private_keys
-          echo -n '${{ secrets.APPLE_API_KEY_BASE64 }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          echo -n '${{ secrets.APP_STORE_CONNECT_API_KEY }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
       # 4) ここで自動署名を有効化して .ipa をエクスポート
       - name: Export IPA (auto-sign via App Store Connect API)
@@ -53,9 +53,9 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath BabySteps.ipa \
             -allowProvisioningUpdates \
-            -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8 \
-            -authenticationKeyID ${{ secrets.APPLE_API_KEY_ID }} \
-            -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }}
+            -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.APP_STORE_CONNECT_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
 
       # 5) TestFlight へアップロード（altool + アプリ用パスワード）
       - name: Upload to TestFlight (altool)
