@@ -36,22 +36,6 @@ targets:
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: "AccentColor"
       SWIFT_EMIT_LOC_STRINGS: "YES"
       PRIVACY_MANIFEST_PATH: "Sources/PrivacyInfo.xcprivacy"
-    info:
-      path: Sources/Info.plist
-      properties:
-        CFBundleDisplayName: "BabySteps"
-        CFBundleIdentifier: "com.yu1Ro5.BabySteps"
-        CFBundleVersion: "1"
-        CFBundleShortVersionString: "1.0"
-        UILaunchStoryboardName: ""
-        UIMainStoryboardFile: ""
-        UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
-        UISupportedInterfaceOrientations~ipad:
-          - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationPortraitUpsideDown
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
 
   BabyStepsTests:
     type: bundle.unit-test
@@ -68,10 +52,3 @@ targets:
       INFOPLIST_FILE: "Sources/Info.plist"
       GENERATE_INFOPLIST_FILE: "NO"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
-    info:
-      path: Sources/Info.plist
-      properties:
-        CFBundleDisplayName: "BabyStepsTests"
-        CFBundleIdentifier: "com.yu1Ro5.BabyStepsTests"
-        CFBundleVersion: "1"
-        CFBundleShortVersionString: "1.0"
