@@ -12,7 +12,6 @@ settings:
   CURRENT_PROJECT_VERSION: "1"
   DEVELOPMENT_TEAM: "58Y7Q3D4A7"
   CODE_SIGN_STYLE: "Automatic"
-  PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabySteps"
 
 targets:
   BabySteps:
@@ -29,7 +28,6 @@ targets:
         type: file
     settings:
       PRODUCT_NAME: "BabySteps"
-      PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabySteps"
       INFOPLIST_FILE: "Sources/Info.plist"
       GENERATE_INFOPLIST_FILE: "NO"
       ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
