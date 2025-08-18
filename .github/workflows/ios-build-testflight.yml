@@ -51,7 +51,7 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath BabySteps.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath ./export \
+            -exportPath ./export/BabySteps.ipa \
             -allowProvisioningUpdates \
             -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8 \
             -authenticationKeyID ${{ secrets.APP_STORE_CONNECT_KEY_ID }} \
