@@ -22,8 +22,8 @@ targets:
       - path: Sources
         type: group
     resources:
-      - path: Sources/AppIcon.png
-        type: file
+      - path: Sources/Assets.xcassets
+        type: folder
       - path: Sources/PrivacyInfo.xcprivacy
         type: file
     settings:
