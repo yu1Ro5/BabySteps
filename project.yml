@@ -47,6 +47,7 @@ targets:
     settings:
       PRODUCT_NAME: "BabyStepsTests"
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsTests"
-      INFOPLIST_FILE: "Sources/Info.plist"
-      GENERATE_INFOPLIST_FILE: "NO"
+      GENERATE_INFOPLIST_FILE: "YES"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+      CODE_SIGNING_ALLOWED: "NO"
+      SKIP_INSTALL: "YES"
