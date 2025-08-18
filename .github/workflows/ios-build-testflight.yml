@@ -1,226 +1,72 @@
-name: iOS Build & TestFlight Auto
+name: iOS Build → TestFlight (Auto-Sign on Export)
 
 on:
-  push:
-    tags:
-      - 'v*'  # v1.0.0, v2.1.3 などのタグで発火
-  workflow_dispatch: # 手動トリガーも可能
-    inputs:
-      custom_version:
-        description: 'Version to build (e.g., 1.0.0)'
-        required: true
-        type: string
-        default: '1.0.0'
+  workflow_dispatch:
 
 jobs:
-  build-and-release:
-    runs-on: macos-latest
-    env:
-      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-      APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-      EXPORT_OPTIONS_PLIST: ./ExportOptions.plist
+  release:
+    runs-on: macos-15   # macOS 15 (Xcode 16.1が利用可能)
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # 全履歴を取得してタグを確認
 
-      - name: Select Xcode
+      # Xcode 16.4を明示的に選択
+      - name: Select Xcode 16.4
         run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
+      # 利用可能なSDKを表示
+      - name: Show available SDKs
+        run: xcodebuild -showsdks
+
+      # （任意）XcodeGenを使う場合だけ
       - name: Install XcodeGen
-        run: |
-          brew install xcodegen
+        run: brew install xcodegen
 
-      - name: Generate Xcode project
-        run: |
-          xcodegen generate
-          ls -la *.xcodeproj
+      - name: Generate Xcode Project
+        run: xcodegen generate
 
-      - name: Validate build environment
+      # 1) 未署名のままアーカイブ（記事と同じ思想）
+      - name: Archive (unsigned)
         run: |
-          echo "=== Build Environment Validation ==="
-          echo "Xcode version: $(xcodebuild -version)"
-          echo "iOS SDK: $(xcodebuild -showsdks | grep iOS)"
-          echo "Info.plist exists: $(test -f "Sources/Info.plist" && echo "Yes" || echo "No")"
-          echo "Project files: $(ls -la *.xcodeproj 2>/dev/null || echo "No .xcodeproj found")"
-          echo "=================================="
+          xcodebuild archive \
+            -project BabySteps.xcodeproj \
+            -scheme BabySteps \
+            -sdk iphoneos18.5 \
+            -configuration Release \
+            -archivePath BabySteps.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO
 
-      - name: Get project info
-        id: project_info
+      # 2) ExportOptions.plist は Secrets から生成
+      - name: Create ExportOptions.plist
         run: |
-          # Use explicit Info.plist path from project configuration
-          INFO_PLIST="Sources/Info.plist"
-          if [ ! -f "$INFO_PLIST" ]; then
-            echo "Error: Info.plist not found at $INFO_PLIST"
-            exit 1
-          fi
-          
-          echo "info_plist=$INFO_PLIST" >> $GITHUB_OUTPUT
-          
-          # タグからバージョンを抽出 (v1.2.3 -> 1.2.3)
-          if [ "${{ github.event_name }}" = "push" ]; then
-            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
-            echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
-            echo "Tag version: $TAG_VERSION"
-          fi
-          
-          echo "Info.plist: $INFO_PLIST"
+          echo "${{ secrets.EXPORT_OPTIONS }}" > ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Print" ExportOptions.plist
 
-      - name: Get latest build number
-        id: build_number
+      # 3) App Store Connect API Key（p8）をSecretsから復元
+      - name: Restore API private key (p8)
         run: |
-          # 前回のビルド番号を取得
-          # GitHub Actionsのartifactsから最新のビルド番号を取得
-          # 初回の場合は1から開始
-          
-          # 既存のビルド成果物があるかチェック
-          if [ -d "./build" ] && [ -f "./build/build_number.txt" ]; then
-            LATEST_BUILD=$(cat ./build/build_number.txt)
-            echo "Found existing build number: $LATEST_BUILD"
-          else
-            LATEST_BUILD=0
-            echo "No existing build number found, starting from 1"
-          fi
-          
-          echo "build_number=$LATEST_BUILD" >> $GITHUB_OUTPUT
-          echo "Latest build number: $LATEST_BUILD"
+          mkdir -p private_keys
+          echo -n '${{ secrets.APP_STORE_CONNECT_API_KEY }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Set version and build number
-        id: new_version
+      # 4) ここで自動署名を有効化して .ipa をエクスポート
+      - name: Export IPA (auto-sign via App Store Connect API)
         run: |
-          # タグからバージョンを取得、または手動入力から取得
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            NEW_VERSION="${{ github.event.inputs.custom_version }}"
-          else
-            TAG_VERSION="${{ steps.project_info.outputs.tag_version }}"
-            NEW_VERSION="$TAG_VERSION"
-          fi
-          
-          # ビルド番号は連番ベース（前回 + 1）
-          PREVIOUS_BUILD="${{ steps.build_number.outputs.build_number }}"
-          BUILD_NUMBER=$((PREVIOUS_BUILD + 1))
-          
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-          
-          echo "Version: $NEW_VERSION"
-          echo "Previous build: $PREVIOUS_BUILD"
-          echo "New build number: $BUILD_NUMBER"
-
-      - name: Update version and build number
-        run: |
-          INFO_PLIST="${{ steps.project_info.outputs.info_plist }}"
-          NEW_VERSION="${{ steps.new_version.outputs.new_version }}"
-          BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
-          
-          echo "Updating Info.plist: $INFO_PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $NEW_VERSION" "$INFO_PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST"
-          
-          echo "Version updated successfully: $NEW_VERSION ($BUILD_NUMBER)"
-
-      - name: Build archive
-        run: |
-          echo "Starting archive build..."
-          echo "Project: BabySteps.xcodeproj"
-          echo "Scheme: BabySteps"
-          echo "Configuration: Release"
-          echo "Archive path: ./build/BabySteps.xcarchive"
-          
-          # Create build directory
-          mkdir -p ./build
-          
-          xcodebuild -project BabySteps.xcodeproj \
-                     -scheme BabySteps \
-                     -configuration Release \
-                     -archivePath ./build/BabySteps.xcarchive \
-                     archive
-          
-          if [ $? -eq 0 ]; then
-            echo "Archive build completed successfully"
-            ls -la ./build/
-          else
-            echo "Archive build failed"
-            exit 1
-          fi
-
-      - name: Export IPA
-        run: |
-          echo "Starting IPA export..."
-          echo "Archive path: ./build/BabySteps.xcarchive"
-          echo "Export options: $EXPORT_OPTIONS_PLIST"
-          echo "Export path: ./build"
-          
-          # Verify archive exists
-          if [ ! -d "./build/BabySteps.xcarchive" ]; then
-            echo "Error: Archive not found at ./build/BabySteps.xcarchive"
-            ls -la ./build/
-            exit 1
-          fi
-          
           xcodebuild -exportArchive \
-                     -archivePath ./build/BabySteps.xcarchive \
-                     -exportOptionsPlist $EXPORT_OPTIONS_PLIST \
-                     -exportPath ./build
-          
-          if [ $? -eq 0 ]; then
-            echo "IPA export completed successfully"
-            ls -la ./build/
-          else
-            echo "IPA export failed"
-            exit 1
-          fi
+            -archivePath BabySteps.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath ./export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.APP_STORE_CONNECT_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
 
-      - name: Upload to TestFlight
+      # 5) TestFlight へアップロード（altool + アプリ用パスワード）
+      - name: Upload to TestFlight (altool)
         run: |
-          # IPAファイルの存在確認
-          if [ ! -f "./build/BabySteps.ipa" ]; then
-            echo "Error: IPA file not found"
-            ls -la ./build/
-            exit 1
-          fi
-          
-          echo "Uploading to TestFlight..."
           xcrun altool --upload-app \
-                        -f ./build/BabySteps.ipa \
-                        --apiKey $APP_STORE_CONNECT_KEY_ID \
-                        --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
-                        --type ios
-
-      - name: Save build number
-        run: |
-          BUILD_NUMBER="${{ steps.new_version.outputs.build_number }}"
-          echo "$BUILD_NUMBER" > ./build/build_number.txt
-          echo "Build number $BUILD_NUMBER saved"
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-artifacts-v${{ steps.new_version.outputs.new_version }}
-          path: build/
-          retention-days: 30
-
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.new_version.outputs.new_version }}
-          release_name: Release v${{ steps.new_version.outputs.new_version }}
-          body: |
-            ## What's Changed
-            
-            Automated release for version ${{ steps.new_version.outputs.new_version }}
-            
-            ### Version Info
-            - **Version**: ${{ steps.new_version.outputs.new_version }}
-            - **Build**: ${{ steps.new_version.outputs.build_number }}
-            - **Date**: $(date -u +'%Y-%m-%d %H:%M UTC')
-            
-            ### Build Artifacts
-            IPA file and build artifacts are available in the Actions tab.
-          draft: false
-          prerelease: false
+            -f ./export/BabySteps.ipa \
+            -t ios \
+            -u ${{ secrets.APPLE_ACCOUNT }} \
+            -p ${{ secrets.APP_SPECIFIC_PASSWORD }}
