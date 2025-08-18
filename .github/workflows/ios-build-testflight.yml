@@ -36,7 +36,7 @@ jobs:
           xcodebuild archive \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -sdk iphoneos18.1 \
+            -sdk iphoneos18.5 \
             -configuration Release \
             -archivePath BabySteps.xcarchive \
             -destination "generic/platform=iOS" \
