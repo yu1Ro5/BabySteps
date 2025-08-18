@@ -30,17 +30,17 @@ jobs:
       - name: Generate Xcode Project
         run: xcodegen generate
 
-              # 1) 未署名のままアーカイブ（記事と同じ思想）
-        - name: Archive (unsigned)
-          run: |
-            xcodebuild archive \
-              -project BabySteps.xcodeproj \
-              -scheme BabySteps \
-              -sdk iphoneos18.1 \
-              -configuration Release \
-              -archivePath BabySteps.xcarchive \
-              -destination "generic/platform=iOS" \
-              CODE_SIGNING_ALLOWED=NO
+      # 1) 未署名のままアーカイブ（記事と同じ思想）
+      - name: Archive (unsigned)
+        run: |
+          xcodebuild archive \
+            -project BabySteps.xcodeproj \
+            -scheme BabySteps \
+            -sdk iphoneos18.1 \
+            -configuration Release \
+            -archivePath BabySteps.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO
 
       # 2) ExportOptions.plist は Secrets から生成
       - name: Create ExportOptions.plist
