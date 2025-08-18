@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    runs-on: macos-15   # バージョンを明示（記事の推奨）
+    runs-on: macos-16.1   # バージョンを明示（記事の推奨）
 
     steps:
       - name: Checkout
