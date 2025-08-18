@@ -9,11 +9,15 @@ on:
 
 jobs:
   release:
-    runs-on: macos-16.1   # バージョンを明示（記事の推奨）
+    runs-on: macos-15   # macOS 15 (Xcode 16.1が利用可能)
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Xcode 16.1を明示的に選択
+      - name: Select Xcode 16.1
+        run: sudo xcode-select -switch /Applications/Xcode_16.1.app
 
       # （任意）XcodeGenを使う場合だけ
       - name: Install XcodeGen
