@@ -23,8 +23,8 @@ targets:
       - path: Sources
         type: group
     resources:
-      - path: Sources/AppIcon.png
-        type: file
+      - path: Sources/AppIcon.appiconset
+        type: group
       - path: Sources/PrivacyInfo.xcprivacy
         type: file
     settings:
