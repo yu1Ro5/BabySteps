@@ -19,6 +19,10 @@ jobs:
       - name: Select Xcode 16.1
         run: sudo xcode-select -switch /Applications/Xcode_16.1.app
 
+      # 利用可能なSDKを表示
+      - name: Show available SDKs
+        run: xcodebuild -showsdks
+
       # （任意）XcodeGenを使う場合だけ
       - name: Install XcodeGen
         run: brew install xcodegen
