@@ -31,7 +31,7 @@
 以下のシークレットをGitHubリポジトリのSettings > Secrets and variables > Actions で設定してください：
 
 - `APP_STORE_CONNECT_KEY_ID`: App Store Connect API Key ID
-- `APP_STORE_CONNECT_ISSUER_ID`: App Store Connect Issuer ID  
+- `APP_STORE_CONNECT_ISSUER_ID`: App Store Connect Issuer ID
 - `APP_STORE_CONNECT_API_KEY`: App Store Connect API Key (Base64エンコードされた.p8ファイルの内容)
 
 ### 2. App Store Connect API Key の取得手順
