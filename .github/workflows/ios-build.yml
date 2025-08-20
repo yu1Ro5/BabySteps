@@ -9,14 +9,14 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-15   # macOS 15 (Xcode 16.4が利用可能)
+    runs-on: macos-15   # macOS 15 (Xcode 16.3が利用可能)
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Select Xcode 16.4
-      run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+    - name: Select Xcode 16.3
+      run: sudo xcode-select -switch /Applications/Xcode_16.3.app
       
     - name: Show available SDKs
       run: xcodebuild -showsdks
@@ -41,7 +41,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
@@ -54,7 +54,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
                    -derivedDataPath build \
                    -configuration Release \
                    CODE_SIGN_STYLE=Automatic \
@@ -68,7 +68,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
@@ -80,7 +80,7 @@ jobs:
       run: |
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -sdk iphoneos18.5 \
+                   -sdk iphoneos18.4 \
                    -destination 'generic/platform=iOS' \
                    -derivedDataPath build \
                    -configuration Release \
