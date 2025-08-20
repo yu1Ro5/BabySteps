@@ -28,7 +28,8 @@
 
 ### 1. GitHub Secrets の設定
 
-以下のシークレットをGitHubリポジトリのSettings > Secrets and variables > Actions で設定してください：
+以下のシークレットをGitHubリポジトリのSettings > Secrets and variables >
+Actions で設定してください：
 
 - `APP_STORE_CONNECT_KEY_ID`: App Store Connect API Key ID
 - `APP_STORE_CONNECT_ISSUER_ID`: App Store Connect Issuer ID
