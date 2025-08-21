@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class TaskViewModel {
-    private var modelContext: ModelContext
+    let modelContext: ModelContext
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
