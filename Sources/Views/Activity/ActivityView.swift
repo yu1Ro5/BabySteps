@@ -2,13 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct ActivityView: View {
-    @Environment(\.modelContext) private var modelContext  // 環境から取得
-    @State private var viewModel: ActivityViewModel
-    
-    init() {  // ModelContextを引数にしない
-        // 初期化時にViewModelを作成（後でModelContextを注入）
-        self._viewModel = State(initialValue: ActivityViewModel(modelContext: ModelContext(try! ModelContainer(for: Task.self))))
-    }
+    @Environment(\.modelContext) private var modelContext
+    @State private var viewModel: ActivityViewModel?
     
     var body: some View {
         NavigationStack {
@@ -17,16 +12,18 @@ struct ActivityView: View {
                 monthHeaderView
                 
                 // カレンダーグリッド
-                CalendarGridView(activities: viewModel.dailyActivities)
+                if let viewModel = viewModel {
+                    CalendarGridView(activities: viewModel.dailyActivities)
+                }
                 
                 // ローディング表示
-                if viewModel.isLoading {
+                if viewModel?.isLoading == true {
                     ProgressView("アクティビティを読み込み中...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 
                 // エラー表示
-                if let errorMessage = viewModel.errorMessage {
+                if let errorMessage = viewModel?.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .padding()
@@ -36,9 +33,13 @@ struct ActivityView: View {
             }
             .navigationTitle("アクティビティ")
             .onAppear {
-                // ModelContextを注入
+                // ModelContextを使用してViewModelを作成
                 viewModel = ActivityViewModel(modelContext: modelContext)
-                viewModel.loadDailyActivities()
+                viewModel?.loadDailyActivities()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                // データベースの変更を検知してアクティビティを再読み込み
+                viewModel?.loadDailyActivities()
             }
         }
     }
