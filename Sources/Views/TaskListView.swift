@@ -42,6 +42,9 @@ struct TaskListView: View {
             .onAppear {
                 // ModelContextを注入
                 viewModel = TaskViewModel(modelContext: modelContext)
+                
+                // 既存の完了済みステップにcompletedAtを設定
+                initializeCompletedSteps()
             }
         }
     }
@@ -179,6 +182,18 @@ struct TaskListView: View {
         guard !tasks.isEmpty else { return 0.0 }
         let totalProgress = tasks.reduce(0.0) { $0 + $1.progress }
         return totalProgress / Double(tasks.count)
+    }
+    
+    // 既存の完了済みステップにcompletedAtを設定
+    private func initializeCompletedSteps() {
+        for task in tasks {
+            for step in task.steps {
+                if step.isCompleted && step.completedAt == nil {
+                    step.completedAt = Date()
+                }
+            }
+        }
+        try? viewModel.modelContext.save()
     }
 }
 

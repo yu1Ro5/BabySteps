@@ -11,14 +11,14 @@ struct BabyStepsApp: App {
                         Image(systemName: "list.bullet")
                         Text("タスク")
                     }
-                    .modelContainer(for: [Task.self, TaskStep.self])
                 
-                SecondTabView()
+                ActivityView(modelContext: ModelContext(try! ModelContainer(for: Task.self, TaskStep.self)))
                     .tabItem {
-                        Image(systemName: "star")
-                        Text("機能予定")
+                        Image(systemName: "chart.bar.fill")
+                        Text("アクティビティ")
                     }
             }
+            .modelContainer(for: [Task.self, TaskStep.self])
         }
     }
 }
