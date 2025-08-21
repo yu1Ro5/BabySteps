@@ -2,10 +2,12 @@ import SwiftUI
 import SwiftData
 
 struct ActivityView: View {
+    @Environment(\.modelContext) private var modelContext  // 環境から取得
     @State private var viewModel: ActivityViewModel
     
-    init(modelContext: ModelContext) {
-        self._viewModel = State(initialValue: ActivityViewModel(modelContext: modelContext))
+    init() {  // ModelContextを引数にしない
+        // 初期化時にViewModelを作成（後でModelContextを注入）
+        self._viewModel = State(initialValue: ActivityViewModel(modelContext: ModelContext(try! ModelContainer(for: Task.self))))
     }
     
     var body: some View {
@@ -34,6 +36,8 @@ struct ActivityView: View {
             }
             .navigationTitle("アクティビティ")
             .onAppear {
+                // ModelContextを注入
+                viewModel = ActivityViewModel(modelContext: modelContext)
                 viewModel.loadDailyActivities()
             }
         }
