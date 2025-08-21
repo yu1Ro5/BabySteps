@@ -3,23 +3,27 @@
 ## 🏗️ アーキテクチャ
 
 ### SwiftUI + MVVM
+
 - **View**: SwiftUI View（状態管理なし、UI表示のみ）
 - **ViewModel**: Observable プロトコル実装、ビジネスロジック担当
 - **Model**: データ構造とビジネスルール
 
 ### 依存関係の方向
-```
+
+```mermaid
 View → ViewModel → Model
 ```
 
 ## 🚀 GitHub Actions CI/CD パイプライン
 
 ### 必須ワークフロー
+
 1. **Build & Test**: プルリクエスト時
 2. **TestFlight Distribution**: メインブランチマージ時
 3. **Code Quality**: コードカバレッジ、静的解析
 
 ### 品質ゲート
+
 - テストカバレッジ: 80%以上
 - ビルド成功必須
 - 静的解析エラー0件
@@ -27,11 +31,13 @@ View → ViewModel → Model
 ## 🧪 テスト戦略
 
 ### テストレベル
+
 - **Unit Tests**: ViewModel、Model
 - **UI Tests**: ユーザーフロー、アクセシビリティ
 - **Integration Tests**: データ永続化
 
 ### カバレッジ目標
+
 - 全体: 80%以上
 - ビジネスロジック: 90%以上
 - UI層: 60%以上
@@ -39,27 +45,32 @@ View → ViewModel → Model
 ## 📱 TestFlight配布ワークフロー
 
 ### 自動化
+
 1. メインブランチマージ
 2. 自動ビルド・テスト
 3. TestFlightアップロード
 
 ### 手動配布
+
 - 緊急時のみ
 - レビュー必須
 
 ## 📝 コーディング規約
 
 ### SwiftUI
+
 - プレビュー必須
 - アクセシビリティ対応
 - ダークモード対応
 
 ### MVVM
+
 - ViewModelはObservable
 - @Observable プロパティで状態管理
 - メモリリーク防止（weak self使用）
 
 ### 命名規則
+
 - View: `ViewNameView`
 - ViewModel: `ViewNameViewModel`
 - Model: `ModelName`
@@ -67,16 +78,19 @@ View → ViewModel → Model
 ## 🎯 品質目標
 
 ### パフォーマンス
+
 - アプリ起動: 3秒以内
 - 画面遷移: 0.5秒以内
 - メモリ使用量: 100MB以下
 
 ### セキュリティ
+
 - 機密情報の暗号化
 - ローカルデータの保護
 - ユーザー入力の検証
 
 ### アクセシビリティ
+
 - VoiceOver対応
 - Dynamic Type対応
 - コントラスト比4.5:1以上
@@ -84,20 +98,24 @@ View → ViewModel → Model
 ## 🔧 開発環境
 
 ### 必須ツール
+
 - Xcode 16.0以上
 - iOS 18.0以上
 - Swift 6.0以上
 
 ### Gitブランチ戦略
+
 以下のガイドラインに従います：
-https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_branch_standards.html
+[Gitブランチ戦略ガイドライン](https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_branch_standards.html)
 
 ### リベース後のプッシュ
+
 - リベース後は強制プッシュが必要
 - `git push --force-with-lease --force-if-includes` を使用
 - これにより、安全な強制プッシュが実行される
 
 ### 推奨ツール
+
 - SwiftLint（コード品質）
 - SwiftGen（リソース管理）
 - Fastlane（自動化）
@@ -105,12 +123,14 @@ https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_br
 ## 📋 レビュープロセス
 
 ### プルリクエスト要件
+
 - テストカバレッジ80%以上
 - 静的解析エラー0件
 - 責任者による承認
 - CI/CDパイプライン成功
 
 ### レビュー項目
+
 - コード品質
 - テストカバレッジ
 - パフォーマンス
@@ -120,6 +140,7 @@ https://future-architect.github.io/arch-guidelines/documents/forGitBranch/git_br
 ## 📋 ファイル管理ルール
 
 ### ファイル末尾の改行
+
 - すべてのファイルの末尾には改行を追加する
 - 改行なしのファイルは許可しない
 - これにより、Gitでの差分表示が適切に動作する

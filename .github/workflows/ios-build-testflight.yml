@@ -1,0 +1,72 @@
+name: iOS Build → TestFlight (Auto-Sign on Export)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: macos-15   # macOS 15 (Xcode 16.1が利用可能)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Xcode 16.4を明示的に選択
+      - name: Select Xcode 16.4
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+
+      # 利用可能なSDKを表示
+      - name: Show available SDKs
+        run: xcodebuild -showsdks
+
+      # （任意）XcodeGenを使う場合だけ
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      # 1) 未署名のままアーカイブ（記事と同じ思想）
+      - name: Archive (unsigned)
+        run: |
+          xcodebuild archive \
+            -project BabySteps.xcodeproj \
+            -scheme BabySteps \
+            -sdk iphoneos18.5 \
+            -configuration Release \
+            -archivePath BabySteps.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO
+
+      # 2) ExportOptions.plist は Secrets から生成
+      - name: Create ExportOptions.plist
+        run: |
+          echo "${{ secrets.EXPORT_OPTIONS }}" > ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Print" ExportOptions.plist
+
+      # 3) App Store Connect API Key（p8）をSecretsから復元
+      - name: Restore API private key (p8)
+        run: |
+          mkdir -p private_keys
+          echo -n '${{ secrets.APP_STORE_CONNECT_API_KEY }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+
+      # 4) ここで自動署名を有効化して .ipa をエクスポート
+      - name: Export IPA (auto-sign via App Store Connect API)
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath BabySteps.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath ./export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath `pwd`/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.APP_STORE_CONNECT_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+
+      # 5) TestFlight へアップロード（altool + アプリ用パスワード）
+      - name: Upload to TestFlight (altool)
+        run: |
+          xcrun altool --upload-app \
+            -f ./export/BabySteps.ipa \
+            -t ios \
+            -u ${{ secrets.APPLE_ACCOUNT }} \
+            -p ${{ secrets.APP_SPECIFIC_PASSWORD }}
