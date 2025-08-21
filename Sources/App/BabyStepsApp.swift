@@ -12,7 +12,7 @@ struct BabyStepsApp: App {
                         Text("タスク")
                     }
                 
-                ActivityView(modelContext: ModelContext(try! ModelContainer(for: [Task.self, TaskStep.self])))
+                ActivityView(modelContext: ModelContext(try! ModelContainer(for: Task.self, TaskStep.self)))
                     .tabItem {
                         Image(systemName: "chart.bar.fill")
                         Text("アクティビティ")

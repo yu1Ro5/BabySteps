@@ -60,11 +60,14 @@ class ActivityViewModel {
     // 指定された日のステップ完了数を取得
     private func getCommitCount(for date: Date) -> Int {
         let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
         
         let predicate = #Predicate<TaskStep> { step in
             step.isCompleted && 
             step.completedAt != nil &&
-            calendar.isDate(step.completedAt!, inSameDayAs: date)
+            step.completedAt! >= startOfDay &&
+            step.completedAt! < endOfDay
         }
         
         let descriptor = FetchDescriptor<TaskStep>(predicate: predicate)
