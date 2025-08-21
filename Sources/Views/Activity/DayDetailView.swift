@@ -89,10 +89,9 @@ struct DayDetailView: View {
                 .font(.headline)
             
             if activity.commitCount > 0 {
-                Text("この機能は次のフェーズで実装予定です")
+                Text("完了したステップ: \(activity.commitCount)件")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .italic()
             } else {
                 Text("この日は完了したステップがありません")
                     .font(.caption)
