@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct ActivityView: View {
     @State private var viewModel: ActivityViewModel
