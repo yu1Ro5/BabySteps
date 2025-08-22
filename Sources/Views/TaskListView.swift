@@ -5,6 +5,7 @@ struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var tasks: [Task]
     @State private var viewModel: TaskViewModel?
+    @State private var activityViewModel: ActivityViewModel?
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
@@ -37,6 +38,12 @@ struct TaskListView: View {
             .onAppear {
                 // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
+                activityViewModel = ActivityViewModel(modelContext: modelContext)
+                
+                // TaskViewModelのアクティビティ更新通知を設定
+                viewModel?.onActivityUpdate = {
+                    activityViewModel?.refreshActivities()
+                }
                 
                 // 既存の完了済みステップにcompletedAtを設定
                 initializeCompletedSteps()
@@ -44,6 +51,8 @@ struct TaskListView: View {
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 // データベースの変更を検知して必要に応じて更新
                 // @Queryで自動更新されるため、ここでは特別な処理は不要
+                // ただし、アクティビティも更新
+                activityViewModel?.refreshActivities()
             }
         }
     }
@@ -185,14 +194,21 @@ struct TaskListView: View {
     
     // 既存の完了済みステップにcompletedAtを設定
     private func initializeCompletedSteps() {
+        var hasChanges = false
         for task in tasks {
             for step in task.steps {
                 if step.isCompleted && step.completedAt == nil {
                     step.completedAt = Date()
+                    hasChanges = true
                 }
             }
         }
-        try? modelContext.save()
+        
+        if hasChanges {
+            try? modelContext.save()
+            // アクティビティも更新
+            activityViewModel?.refreshActivities()
+        }
     }
 }
 

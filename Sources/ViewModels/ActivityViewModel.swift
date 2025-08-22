@@ -12,6 +12,8 @@ class ActivityViewModel {
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
+        // 初期データ読み込み
+        loadDailyActivities()
     }
     
     // MARK: - Public Methods
@@ -28,6 +30,11 @@ class ActivityViewModel {
         }
         
         isLoading = false
+    }
+    
+    // アクティビティを強制更新（外部から呼び出し可能）
+    func refreshActivities() {
+        loadDailyActivities()
     }
     
     // MARK: - Private Methods
