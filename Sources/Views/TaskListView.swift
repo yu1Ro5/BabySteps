@@ -4,17 +4,12 @@ import SwiftData
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var tasks: [Task]
-    @State private var viewModel: TaskViewModel
+    @State private var viewModel: TaskViewModel?
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
     @State private var showingAddStep = false
     @State private var newStepTitle = ""
-    
-    init() {
-        // 初期化時にViewModelを作成（後でModelContextを注入）
-        self._viewModel = State(initialValue: TaskViewModel(modelContext: ModelContext(try! ModelContainer(for: Task.self))))
-    }
     
     var body: some View {
         NavigationStack {
@@ -40,11 +35,15 @@ struct TaskListView: View {
                 addStepSheet
             }
             .onAppear {
-                // ModelContextを注入
+                // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
                 
                 // 既存の完了済みステップにcompletedAtを設定
                 initializeCompletedSteps()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                // データベースの変更を検知して必要に応じて更新
+                // @Queryで自動更新されるため、ここでは特別な処理は不要
             }
         }
     }
@@ -104,7 +103,7 @@ struct TaskListView: View {
                 
                 Button("作成") {
                     if !newTaskTitle.isEmpty {
-                        _ = viewModel.createTask(title: newTaskTitle)
+                        _ = viewModel?.createTask(title: newTaskTitle)
                         newTaskTitle = ""
                         showingAddTask = false
                     }
@@ -145,7 +144,7 @@ struct TaskListView: View {
                     
                     Button("追加") {
                         if !newStepTitle.isEmpty {
-                            viewModel.addStep(to: task, stepTitle: newStepTitle)
+                            viewModel?.addStep(to: task, stepTitle: newStepTitle)
                             newStepTitle = ""
                             showingAddStep = false
                         }
@@ -174,7 +173,7 @@ struct TaskListView: View {
     
     private func deleteTasks(offsets: IndexSet) {
         for index in offsets {
-            viewModel.deleteTask(tasks[index])
+            viewModel?.deleteTask(tasks[index])
         }
     }
     
@@ -193,7 +192,7 @@ struct TaskListView: View {
                 }
             }
         }
-        try? viewModel.modelContext.save()
+        try? modelContext.save()
     }
 }
 
@@ -201,7 +200,7 @@ struct TaskListView: View {
 
 struct TaskRowView: View {
     let task: Task
-    let viewModel: TaskViewModel
+    let viewModel: TaskViewModel?
     let onAddStep: () -> Void
     
     var body: some View {
@@ -236,12 +235,14 @@ struct TaskRowView: View {
                     ForEach(task.steps.sorted(by: { $0.order < $1.order }), id: \.id) { step in
                         HStack {
                             Button(action: {
+                                guard let viewModel = viewModel else { return }
                                 viewModel.toggleStepCompletion(step)
                             }) {
                                 Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
                                     .foregroundColor(step.isCompleted ? .green : .gray)
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .disabled(viewModel == nil)
                             
                             Text(step.title)
                                 .strikethrough(step.isCompleted)
