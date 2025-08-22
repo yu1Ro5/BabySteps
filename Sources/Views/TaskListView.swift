@@ -195,19 +195,38 @@ struct TaskListView: View {
     // 既存の完了済みステップにcompletedAtを設定
     private func initializeCompletedSteps() {
         var hasChanges = false
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        
+        print("🔧 完了済みステップの初期化開始")
+        
         for task in tasks {
+            print("🔧 タスク: \(task.title)")
             for step in task.steps {
-                if step.isCompleted && step.completedAt == nil {
-                    step.completedAt = Date()
-                    hasChanges = true
+                if step.isCompleted {
+                    if step.completedAt == nil {
+                        // 完了済みだがcompletedAtが設定されていない場合
+                        step.completedAt = Date()
+                        hasChanges = true
+                        print("  ✅ ステップ: \(step.title) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))")
+                    } else {
+                        print("  ℹ️ ステップ: \(step.title) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))")
+                    }
+                } else {
+                    print("  ⏳ ステップ: \(step.title) - 未完了")
                 }
             }
         }
         
         if hasChanges {
+            print("🔧 変更を保存中...")
             try? modelContext.save()
+            print("🔧 保存完了")
             // アクティビティも更新
             activityViewModel?.refreshActivities()
+        } else {
+            print("🔧 変更なし")
         }
     }
 }

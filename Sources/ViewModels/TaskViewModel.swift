@@ -61,10 +61,23 @@ class TaskViewModel {
     
     // ステップの完了状態を切り替え
     func toggleStepCompletion(_ step: TaskStep) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        
+        print("🔄 ステップ完了状態切り替え開始: \(step.title)")
+        print("🔄 現在の状態: isCompleted=\(step.isCompleted), completedAt=\(step.completedAt?.description ?? "nil")")
+        
         step.toggleCompletion()
+        
+        print("🔄 切り替え後の状態: isCompleted=\(step.isCompleted), completedAt=\(step.completedAt?.description ?? "nil")")
+        
         try? modelContext.save()
+        print("🔄 データベース保存完了")
+        
         // ステップ完了時は必ずアクティビティを更新
         notifyActivityUpdate()
+        print("🔄 アクティビティ更新通知完了")
     }
     
     // ステップのタイトルを更新

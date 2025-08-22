@@ -19,6 +19,9 @@ struct BabyStepsApp: App {
                     }
             }
             .modelContainer(for: [Task.self, TaskStep.self])
+            .onAppear {
+                print("🚀 BabyStepsApp起動")
+            }
         }
     }
 }
