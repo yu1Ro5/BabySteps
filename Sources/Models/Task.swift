@@ -35,12 +35,14 @@ final class Task {
     // ステップを追加
     func addStep(_ step: TaskStep) {
         steps.append(step)
+        step.task = self
     }
     
     // ステップを削除
     func removeStep(_ step: TaskStep) {
         if let index = steps.firstIndex(where: { $0.id == step.id }) {
             steps.remove(at: index)
+            step.task = nil
         }
     }
 }

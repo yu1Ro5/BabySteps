@@ -5,6 +5,7 @@ struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var tasks: [Task]
     @State private var viewModel: TaskViewModel?
+    @State private var activityViewModel: ActivityViewModel?
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
@@ -37,6 +38,12 @@ struct TaskListView: View {
             .onAppear {
                 // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
+                activityViewModel = ActivityViewModel(modelContext: modelContext)
+                
+                // TaskViewModelのアクティビティ更新通知を設定
+                viewModel?.onActivityUpdate = {
+                    activityViewModel?.refreshActivities()
+                }
                 
                 // 既存の完了済みステップにcompletedAtを設定
                 initializeCompletedSteps()
@@ -44,6 +51,8 @@ struct TaskListView: View {
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 // データベースの変更を検知して必要に応じて更新
                 // @Queryで自動更新されるため、ここでは特別な処理は不要
+                // ただし、アクティビティも更新
+                activityViewModel?.refreshActivities()
             }
         }
     }
@@ -185,14 +194,40 @@ struct TaskListView: View {
     
     // 既存の完了済みステップにcompletedAtを設定
     private func initializeCompletedSteps() {
+        var hasChanges = false
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        
+        print("🔧 完了済みステップの初期化開始")
+        
         for task in tasks {
+            print("🔧 タスク: \(task.title)")
             for step in task.steps {
-                if step.isCompleted && step.completedAt == nil {
-                    step.completedAt = Date()
+                if step.isCompleted {
+                    if step.completedAt == nil {
+                        // 完了済みだがcompletedAtが設定されていない場合
+                        step.completedAt = Date()
+                        hasChanges = true
+                        print("  ✅ ステップ: \(step.title) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))")
+                    } else {
+                        print("  ℹ️ ステップ: \(step.title) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))")
+                    }
+                } else {
+                    print("  ⏳ ステップ: \(step.title) - 未完了")
                 }
             }
         }
-        try? modelContext.save()
+        
+        if hasChanges {
+            print("🔧 変更を保存中...")
+            try? modelContext.save()
+            print("🔧 保存完了")
+            // アクティビティも更新
+            activityViewModel?.refreshActivities()
+        } else {
+            print("🔧 変更なし")
+        }
     }
 }
 

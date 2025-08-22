@@ -6,6 +6,9 @@ import SwiftUI
 class TaskViewModel {
     let modelContext: ModelContext
     
+    // アクティビティ更新の通知用
+    var onActivityUpdate: (() -> Void)?
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
@@ -16,6 +19,8 @@ class TaskViewModel {
     func createTask(title: String) -> Task {
         let task = Task(title: title)
         modelContext.insert(task)
+        try? modelContext.save()
+        notifyActivityUpdate()
         return task
     }
     
@@ -23,12 +28,14 @@ class TaskViewModel {
     func deleteTask(_ task: Task) {
         modelContext.delete(task)
         try? modelContext.save()
+        notifyActivityUpdate()
     }
     
     // タスクのタイトルを更新
     func updateTaskTitle(_ task: Task, newTitle: String) {
         task.title = newTitle
         try? modelContext.save()
+        notifyActivityUpdate()
     }
     
     // MARK: - Step Management
@@ -41,6 +48,7 @@ class TaskViewModel {
         task.addStep(step)
         modelContext.insert(step)
         try? modelContext.save()
+        notifyActivityUpdate()
     }
     
     // ステップを削除
@@ -48,18 +56,35 @@ class TaskViewModel {
         task.removeStep(step)
         modelContext.delete(step)
         try? modelContext.save()
+        notifyActivityUpdate()
     }
     
     // ステップの完了状態を切り替え
     func toggleStepCompletion(_ step: TaskStep) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+        
+        print("🔄 ステップ完了状態切り替え開始: \(step.title)")
+        print("🔄 現在の状態: isCompleted=\(step.isCompleted), completedAt=\(step.completedAt?.description ?? "nil")")
+        
         step.toggleCompletion()
+        
+        print("🔄 切り替え後の状態: isCompleted=\(step.isCompleted), completedAt=\(step.completedAt?.description ?? "nil")")
+        
         try? modelContext.save()
+        print("🔄 データベース保存完了")
+        
+        // ステップ完了時は必ずアクティビティを更新
+        notifyActivityUpdate()
+        print("🔄 アクティビティ更新通知完了")
     }
     
     // ステップのタイトルを更新
     func updateStepTitle(_ step: TaskStep, newTitle: String) {
         step.title = newTitle
         try? modelContext.save()
+        notifyActivityUpdate()
     }
     
     // MARK: - Data Queries
@@ -108,5 +133,12 @@ class TaskViewModel {
         
         let totalProgress = tasks.reduce(0.0) { $0 + $1.progress }
         return totalProgress / Double(tasks.count)
+    }
+    
+    // MARK: - Activity Update Notification
+    
+    // アクティビティ更新の通知
+    private func notifyActivityUpdate() {
+        onActivityUpdate?()
     }
 }

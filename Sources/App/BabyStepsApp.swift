@@ -12,13 +12,16 @@ struct BabyStepsApp: App {
                         Text("タスク")
                     }
                 
-                ActivityView()  // ModelContextを渡さない
+                ActivityView()
                     .tabItem {
                         Image(systemName: "chart.bar.fill")
                         Text("アクティビティ")
                     }
             }
             .modelContainer(for: [Task.self, TaskStep.self])
+            .onAppear {
+                print("🚀 BabyStepsApp起動")
+            }
         }
     }
 }
