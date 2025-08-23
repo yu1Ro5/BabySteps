@@ -8,9 +8,6 @@ struct ActivityView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // ヘッダー（月名表示）
-                monthHeaderView
-                
                 // カレンダーグリッド
                 if let viewModel = viewModel {
                     CalendarGridView(activities: viewModel.dailyActivities)
@@ -47,34 +44,5 @@ struct ActivityView: View {
         }
     }
     
-    // MARK: - Month Header View
-    
-    private var monthHeaderView: some View {
-        HStack {
-            ForEach(getMonthLabels(), id: \.self) { monthLabel in
-                Text(monthLabel)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(.horizontal)
-    }
-    
-    // 過去3ヶ月分の月名を取得
-    private func getMonthLabels() -> [String] {
-        let calendar = Calendar.current
-        let now = Date()
-        var months: [String] = []
-        
-        for i in 0..<3 {
-            if let date = calendar.date(byAdding: .month, value: -i, to: now) {
-                let formatter = DateFormatter()
-                formatter.dateFormat = "M月"
-                months.insert(formatter.string(from: date), at: 0)
-            }
-        }
-        
-        return months
-    }
+
 }
