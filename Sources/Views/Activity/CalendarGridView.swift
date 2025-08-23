@@ -8,9 +8,6 @@ struct CalendarGridView: View {
     
     var body: some View {
         VStack(spacing: 8) {
-            // 曜日ヘッダー
-            weekdayHeaderView
-            
             // カレンダーグリッド
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: columns), spacing: 4) {
                 ForEach(0..<rows, id: \.self) { row in
@@ -30,19 +27,7 @@ struct CalendarGridView: View {
         }
     }
     
-    // MARK: - Weekday Header View
-    
-    private var weekdayHeaderView: some View {
-        HStack(spacing: 4) {
-            ForEach(["日", "月", "火", "水", "木", "金", "土"], id: \.self) { weekday in
-                Text(weekday)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(.horizontal)
-    }
+
 }
 
 // MARK: - Activity Cell
