@@ -51,8 +51,7 @@ struct TaskListView: View {
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 // データベースの変更を検知して必要に応じて更新
                 // @Queryで自動更新されるため、ここでは特別な処理は不要
-                // ただし、アクティビティも更新
-                activityViewModel?.refreshActivities()
+                // アクティビティの更新は、TaskViewModelのonActivityUpdateで制御される
             }
         }
     }
@@ -192,7 +191,7 @@ struct TaskListView: View {
         return totalProgress / Double(tasks.count)
     }
     
-    // 既存の完了済みステップにcompletedAtを設定
+    // 既存の完了済みステップのcompletedAtを適切に設定
     private func initializeCompletedSteps() {
         var hasChanges = false
         let dateFormatter = DateFormatter()
@@ -207,7 +206,24 @@ struct TaskListView: View {
                 if step.isCompleted {
                     if step.completedAt == nil {
                         // 完了済みだがcompletedAtが設定されていない場合
-                        step.completedAt = Date()
+                        // タスクの作成日時を基準に、ステップの順序に応じて適切な時刻を設定
+                        let baseDate = task.createdAt
+                        let stepOffset = Double(step.order) * 3600 // 1時間ずつずらす
+                        let estimatedCompletionDate = baseDate.addingTimeInterval(stepOffset)
+                        
+                        // 現在時刻より過去の場合は、その時刻を使用
+                        if estimatedCompletionDate < Date() {
+                            step.completedAt = estimatedCompletionDate
+                        } else {
+                            // 現在時刻より未来の場合は、タスク作成日の翌日を使用
+                            let calendar = Calendar.current
+                            if let nextDay = calendar.date(byAdding: .day, value: 1, to: baseDate) {
+                                step.completedAt = nextDay
+                            } else {
+                                step.completedAt = baseDate
+                            }
+                        }
+                        
                         hasChanges = true
                         print("  ✅ ステップ: \(step.title) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))")
                     } else {
