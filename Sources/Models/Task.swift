@@ -19,13 +19,6 @@ final class Task {
         self.steps = []
     }
     
-    // 進捗率を計算（完了したステップ数 / 全ステップ数）
-    var progress: Double {
-        guard !steps.isEmpty else { return 0.0 }
-        let completedSteps = steps.filter { $0.isCompleted }.count
-        return Double(completedSteps) / Double(steps.count)
-    }
-    
     // 完了したステップ数を取得
     var completedStepsCount: Int {
         steps.filter { $0.isCompleted }.count

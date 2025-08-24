@@ -209,12 +209,12 @@ struct TaskListView: View {
                         // 完了済みだがcompletedAtが設定されていない場合
                         step.completedAt = Date()
                         hasChanges = true
-                        print("  ✅ ステップ: \(step.title) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))")
+                        print("  ✅ ステップ\(step.order + 1) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))")
                     } else {
-                        print("  ℹ️ ステップ: \(step.title) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))")
+                        print("  ℹ️ ステップ\(step.order + 1) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))")
                     }
                 } else {
-                    print("  ⏳ ステップ: \(step.title) - 未完了")
+                    print("  ⏳ ステップ\(step.order + 1) - 未完了")
                 }
             }
         }
@@ -255,7 +255,7 @@ struct TaskRowView: View {
             
             // 進捗バー
             HStack {
-                ProgressView(value: task.progress)
+                ProgressView(value: task.totalStepsCount > 0 ? Double(task.completedStepsCount) / Double(task.totalStepsCount) : 0.0)
                     .progressViewStyle(LinearProgressViewStyle())
                     .frame(height: 6)
                 
@@ -279,7 +279,7 @@ struct TaskRowView: View {
                             .buttonStyle(PlainButtonStyle())
                             .disabled(viewModel == nil)
                             
-                            Text(step.title)
+                            Text("ステップ\(step.order + 1)")
                                 .strikethrough(step.isCompleted)
                                 .foregroundColor(step.isCompleted ? .secondary : .primary)
                             

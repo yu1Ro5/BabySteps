@@ -41,9 +41,9 @@ class TaskViewModel {
     // MARK: - Step Management
     
     // タスクにステップを追加
-    func addStep(to task: Task, stepTitle: String) {
+    func addStep(to task: Task) {
         let order = task.steps.count
-        let step = TaskStep(title: stepTitle, order: order)
+        let step = TaskStep(order: order)
         step.task = task
         task.addStep(step)
         modelContext.insert(step)
@@ -65,7 +65,7 @@ class TaskViewModel {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateFormatter.timeZone = TimeZone.current
         
-        print("🔄 ステップ完了状態切り替え開始: \(step.title)")
+        print("🔄 ステップ完了状態切り替え開始: ステップ\(step.order + 1)")
         print("🔄 現在の状態: isCompleted=\(step.isCompleted), completedAt=\(step.completedAt?.description ?? "nil")")
         
         step.toggleCompletion()
@@ -80,12 +80,7 @@ class TaskViewModel {
         print("🔄 アクティビティ更新通知完了")
     }
     
-    // ステップのタイトルを更新
-    func updateStepTitle(_ step: TaskStep, newTitle: String) {
-        step.title = newTitle
-        try? modelContext.save()
-        notifyActivityUpdate()
-    }
+
     
     // MARK: - Data Queries
     
@@ -121,19 +116,7 @@ class TaskViewModel {
     
     // MARK: - Progress Management
     
-    // タスクの進捗率を取得
-    func getTaskProgress(_ task: Task) -> Double {
-        return task.progress
-    }
-    
-    // 全体的な進捗率を計算
-    func getOverallProgress() throws -> Double {
-        let tasks = try fetchTasks()
-        guard !tasks.isEmpty else { return 0.0 }
-        
-        let totalProgress = tasks.reduce(0.0) { $0 + $1.progress }
-        return totalProgress / Double(tasks.count)
-    }
+
     
     // MARK: - Activity Update Notification
     

@@ -5,8 +5,6 @@ import SwiftData
 final class TaskStep {
     /// ステップの一意識別子
     var id: UUID
-    /// ステップのタイトル
-    var title: String
     /// ステップの完了状態
     var isCompleted: Bool
     /// ステップの表示順序（0から開始）
@@ -16,9 +14,8 @@ final class TaskStep {
     /// ステップが完了した日時（完了していない場合はnil）
     var completedAt: Date?
     
-    init(title: String, order: Int) {
+    init(order: Int) {
         self.id = UUID()
-        self.title = title
         self.isCompleted = false
         self.order = order
         self.completedAt = nil
