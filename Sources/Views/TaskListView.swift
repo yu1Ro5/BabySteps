@@ -2,13 +2,28 @@ import SwiftUI
 import SwiftData
 
 struct TaskListView: View {
+    /// データベースのモデルコンテキストを管理する環境変数
     @Environment(\.modelContext) private var modelContext
+    
+    /// データベースから取得したタスクの配列
     @Query private var tasks: [Task]
+    
+    /// タスクの操作を管理するビューモデル
     @State private var viewModel: TaskViewModel?
+    
+    /// アクティビティの操作を管理するビューモデル
     @State private var activityViewModel: ActivityViewModel?
+    
+    /// タスク追加シートの表示状態を管理するフラグ
     @State private var showingAddTask = false
+    
+    /// 新しく作成するタスクのタイトルを保持する文字列
     @State private var newTaskTitle = ""
+    
+    /// ステップ追加対象として選択されたタスク
     @State private var selectedTask: Task?
+    
+    /// ステップ追加シートの表示状態を管理するフラグ
     @State private var showingAddStep = false
     @State private var stepCount = 5  // デフォルトのステップ数
 
