@@ -15,9 +15,6 @@ struct TaskListView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                // 全体進捗表示
-                overallProgressView
-                
                 // タスク一覧
                 taskList
             }
@@ -57,30 +54,7 @@ struct TaskListView: View {
         }
     }
     
-    // MARK: - Overall Progress View
-    
-    private var overallProgressView: some View {
-        VStack(spacing: 8) {
-            Text("全体進捗")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            HStack {
-                ProgressView(value: calculateOverallProgress())
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .frame(height: 8)
-                
-                Text("\(Int(calculateOverallProgress() * 100))%")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal)
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .padding(.horizontal)
-    }
+
     
     // MARK: - Task List
     
@@ -182,14 +156,7 @@ struct TaskListView: View {
         }
     }
     
-    private func calculateOverallProgress() -> Double {
-        guard !tasks.isEmpty else { return 0.0 }
-        let totalProgress = tasks.reduce(0.0) { accumulated, task in
-            let progress = task.totalStepsCount > 0 ? Double(task.completedStepsCount) / Double(task.totalStepsCount) : 0.0
-            return accumulated + progress
-        }
-        return totalProgress / Double(tasks.count)
-    }
+
     
     // 既存の完了済みステップにcompletedAtを設定
     private func initializeCompletedSteps() {
@@ -239,7 +206,7 @@ struct TaskRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // タスクタイトルと進捗
+            // タスクタイトル
             HStack {
                 Text(task.title)
                     .font(.headline)
@@ -252,16 +219,7 @@ struct TaskRowView: View {
                 }
             }
             
-            // 進捗バー
-            HStack {
-                ProgressView(value: task.totalStepsCount > 0 ? Double(task.completedStepsCount) / Double(task.totalStepsCount) : 0.0)
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .frame(height: 6)
-                
-                Text("\(task.completedStepsCount)/\(task.totalStepsCount)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+
             
             // ステップ一覧
             if !task.steps.isEmpty {

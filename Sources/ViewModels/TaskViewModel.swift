@@ -114,10 +114,6 @@ class TaskViewModel {
         return try modelContext.fetch(descriptor)
     }
     
-    // MARK: - Progress Management
-    
-
-    
     // MARK: - Activity Update Notification
     
     // アクティビティ更新の通知
