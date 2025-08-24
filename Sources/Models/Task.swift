@@ -3,9 +3,13 @@ import SwiftData
 
 @Model
 final class Task {
+    /// タスクの一意識別子
     var id: UUID
+    /// タスクのタイトル
     var title: String
+    /// タスクの作成日時
     var createdAt: Date
+    /// タスクに紐づくステップの配列
     var steps: [TaskStep]
     
     init(title: String) {
@@ -13,13 +17,6 @@ final class Task {
         self.title = title
         self.createdAt = Date()
         self.steps = []
-    }
-    
-    // 進捗率を計算（完了したステップ数 / 全ステップ数）
-    var progress: Double {
-        guard !steps.isEmpty else { return 0.0 }
-        let completedSteps = steps.filter { $0.isCompleted }.count
-        return Double(completedSteps) / Double(steps.count)
     }
     
     // 完了したステップ数を取得
@@ -47,30 +44,4 @@ final class Task {
     }
 }
 
-@Model
-final class TaskStep {
-    var id: UUID
-    var title: String
-    var isCompleted: Bool
-    var order: Int
-    var task: Task?
-    var completedAt: Date?
-    
-    init(title: String, order: Int) {
-        self.id = UUID()
-        self.title = title
-        self.isCompleted = false
-        self.order = order
-        self.completedAt = nil
-    }
-    
-    // ステップの完了状態を切り替え
-    func toggleCompletion() {
-        isCompleted.toggle()
-        if isCompleted {
-            completedAt = Date()
-        } else {
-            completedAt = nil
-        }
-    }
-}
+

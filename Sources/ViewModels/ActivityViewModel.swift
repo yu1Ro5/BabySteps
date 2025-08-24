@@ -119,7 +119,7 @@ class ActivityViewModel {
             print("🔍 完了済みステップ数: \(completedSteps.count)")
             for step in completedSteps {
                 if let completedAt = step.completedAt {
-                    print("  - ステップ: \(step.title), 完了時刻: \(dateFormatter.string(from: completedAt))")
+                    print("  - ステップ\(step.order + 1), 完了時刻: \(dateFormatter.string(from: completedAt))")
                 }
             }
             
