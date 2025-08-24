@@ -3,9 +3,13 @@ import SwiftData
 
 @Model
 final class Task {
+    /// タスクの一意識別子
     var id: UUID
+    /// タスクのタイトル
     var title: String
+    /// タスクの作成日時
     var createdAt: Date
+    /// タスクに紐づくステップの配列
     var steps: [TaskStep]
     
     init(title: String) {
