@@ -10,7 +10,7 @@ struct TaskListView: View {
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
     @State private var showingAddStep = false
-    @State private var newStepTitle = ""
+
     
     var body: some View {
         NavigationStack {
@@ -147,19 +147,16 @@ struct TaskListView: View {
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                     
-                    TextField("ステップのタイトル", text: $newStepTitle)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
+                    Text("このタスクに着手回数を追加します")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                     
                     Button("追加") {
-                        if !newStepTitle.isEmpty {
-                            viewModel?.addStep(to: task, stepTitle: newStepTitle)
-                            newStepTitle = ""
-                            showingAddStep = false
-                        }
+                        viewModel?.addStep(to: task)
+                        showingAddStep = false
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(newStepTitle.isEmpty)
                 }
                 
                 Spacer()
@@ -171,7 +168,6 @@ struct TaskListView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("キャンセル") {
                         showingAddStep = false
-                        newStepTitle = ""
                     }
                 }
             }
@@ -188,7 +184,10 @@ struct TaskListView: View {
     
     private func calculateOverallProgress() -> Double {
         guard !tasks.isEmpty else { return 0.0 }
-        let totalProgress = tasks.reduce(0.0) { $0 + $1.progress }
+        let totalProgress = tasks.reduce(0.0) { task in
+            let progress = task.totalStepsCount > 0 ? Double(task.completedStepsCount) / Double(task.totalStepsCount) : 0.0
+            return $0 + progress
+        }
         return totalProgress / Double(tasks.count)
     }
     
