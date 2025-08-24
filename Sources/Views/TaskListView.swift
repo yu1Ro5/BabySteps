@@ -184,9 +184,9 @@ struct TaskListView: View {
     
     private func calculateOverallProgress() -> Double {
         guard !tasks.isEmpty else { return 0.0 }
-        let totalProgress = tasks.reduce(0.0) { task in
+        let totalProgress = tasks.reduce(0.0) { accumulated, task in
             let progress = task.totalStepsCount > 0 ? Double(task.completedStepsCount) / Double(task.totalStepsCount) : 0.0
-            return $0 + progress
+            return accumulated + progress
         }
         return totalProgress / Double(tasks.count)
     }
