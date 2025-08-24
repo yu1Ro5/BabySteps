@@ -15,15 +15,6 @@ class TaskViewModel {
     
     // MARK: - Task Management
     
-    // 新しいタスクを作成
-    func createTask(title: String) -> Task {
-        let task = Task(title: title)
-        modelContext.insert(task)
-        try? modelContext.save()
-        notifyActivityUpdate()
-        return task
-    }
-    
     // 指定された数のステップを持つタスクを作成
     func createTaskWithSteps(title: String, stepCount: Int) -> Task {
         let task = Task(title: title)
