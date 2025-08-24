@@ -10,6 +10,7 @@ struct TaskListView: View {
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
     @State private var showingAddStep = false
+    @State private var stepCount = 5  // デフォルトのステップ数
 
     
     var body: some View {
@@ -84,10 +85,51 @@ struct TaskListView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
                 
+                // ステップ数選択UI
+                VStack(spacing: 12) {
+                    Text("チェックボックスの数")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    HStack(spacing: 20) {
+                        Button(action: {
+                            if stepCount > 1 {
+                                stepCount -= 1
+                            }
+                        }) {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.red)
+                        }
+                        .disabled(stepCount <= 1)
+                        
+                        Text("\(stepCount)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .frame(minWidth: 60)
+                        
+                        Button(action: {
+                            stepCount += 1
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    
+                    Text("\(stepCount)個のチェックボックスが作成されます")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                
                 Button("作成") {
                     if !newTaskTitle.isEmpty {
-                        _ = viewModel?.createTask(title: newTaskTitle)
+                        _ = viewModel?.createTaskWithSteps(title: newTaskTitle, stepCount: stepCount)
                         newTaskTitle = ""
+                        stepCount = 5  // リセット
                         showingAddTask = false
                     }
                 }
@@ -104,6 +146,7 @@ struct TaskListView: View {
                     Button("キャンセル") {
                         showingAddTask = false
                         newTaskTitle = ""
+                        stepCount = 5  // リセット
                     }
                 }
             }
