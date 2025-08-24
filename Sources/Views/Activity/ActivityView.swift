@@ -35,11 +35,17 @@ struct ActivityView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 // データベースの変更を検知してアクティビティを再読み込み
-                viewModel?.refreshActivities()
+                // ただし、過度な更新を避けるため、必要最小限のみ
+                if viewModel?.isLoading == false {
+                    viewModel?.refreshActivities()
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
                 // オブジェクトの変更も検知してアクティビティを更新
-                viewModel?.refreshActivities()
+                // ただし、過度な更新を避けるため、必要最小限のみ
+                if viewModel?.isLoading == false {
+                    viewModel?.refreshActivities()
+                }
             }
         }
     }

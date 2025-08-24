@@ -92,7 +92,6 @@ class ActivityViewModel {
         
         // より安全な日付範囲計算
         let startOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
-        let endOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
         
         guard let startOfDaySafe = calendar.date(from: startOfDayComponents),
               let endOfDaySafe = calendar.date(byAdding: .day, value: 1, to: startOfDaySafe) else {
@@ -102,6 +101,7 @@ class ActivityViewModel {
         
         print("🔍 安全な開始時刻: \(dateFormatter.string(from: startOfDaySafe))")
         print("🔍 安全な終了時刻: \(dateFormatter.string(from: endOfDaySafe))")
+        print("🔍 日付範囲: \(dateFormatter.string(from: startOfDaySafe)) 〜 \(dateFormatter.string(from: endOfDaySafe))")
         
         let predicate = #Predicate<TaskStep> { step in
             step.isCompleted && 
