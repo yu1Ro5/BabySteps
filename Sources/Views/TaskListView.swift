@@ -251,25 +251,18 @@ struct TaskRowView: View {
             
             // ステップ一覧
             if !task.steps.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 8) {
                     ForEach(task.steps.sorted(by: { $0.order < $1.order }), id: \.id) { step in
-                        HStack {
-                            Button(action: {
-                                guard let viewModel = viewModel else { return }
-                                viewModel.toggleStepCompletion(step)
-                            }) {
-                                Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
-                                    .foregroundColor(step.isCompleted ? .green : .gray)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .disabled(viewModel == nil)
-                            
-                            Text("ステップ\(step.order + 1)")
-                                .strikethrough(step.isCompleted)
-                                .foregroundColor(step.isCompleted ? .secondary : .primary)
-                            
-                            Spacer()
+                        Button(action: {
+                            guard let viewModel = viewModel else { return }
+                            viewModel.toggleStepCompletion(step)
+                        }) {
+                            Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
+                                .foregroundColor(step.isCompleted ? .green : .gray)
+                                .font(.title2)
                         }
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(viewModel == nil)
                     }
                 }
                 .padding(.leading)
