@@ -260,13 +260,10 @@ struct TaskRowView: View {
                             }) {
                                 Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
                                     .foregroundColor(step.isCompleted ? .green : .gray)
+                                    .font(.title2)
                             }
                             .buttonStyle(PlainButtonStyle())
                             .disabled(viewModel == nil)
-                            
-                            Text("ステップ\(step.order + 1)")
-                                .strikethrough(step.isCompleted)
-                                .foregroundColor(step.isCompleted ? .secondary : .primary)
                             
                             Spacer()
                         }
