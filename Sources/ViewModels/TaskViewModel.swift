@@ -6,9 +6,6 @@ import SwiftUI
 class TaskViewModel {
     let modelContext: ModelContext
     
-    // アクティビティ更新の通知用
-    var onActivityUpdate: (() -> Void)?
-    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
@@ -29,7 +26,6 @@ class TaskViewModel {
         }
         
         try? modelContext.save()
-        notifyActivityUpdate()
         return task
     }
     
@@ -37,14 +33,12 @@ class TaskViewModel {
     func deleteTask(_ task: Task) {
         modelContext.delete(task)
         try? modelContext.save()
-        notifyActivityUpdate()
     }
     
     // タスクのタイトルを更新
     func updateTaskTitle(_ task: Task, newTitle: String) {
         task.title = newTitle
         try? modelContext.save()
-        notifyActivityUpdate()
     }
     
     // MARK: - Step Management
@@ -57,7 +51,6 @@ class TaskViewModel {
         task.addStep(step)
         modelContext.insert(step)
         try? modelContext.save()
-        notifyActivityUpdate()
     }
     
     // ステップを削除
@@ -65,7 +58,6 @@ class TaskViewModel {
         task.removeStep(step)
         modelContext.delete(step)
         try? modelContext.save()
-        notifyActivityUpdate()
     }
     
     // ステップの完了状態を切り替え
@@ -83,10 +75,6 @@ class TaskViewModel {
         
         try? modelContext.save()
         print("🔄 データベース保存完了")
-        
-        // ステップ完了時は必ずアクティビティを更新
-        notifyActivityUpdate()
-        print("🔄 アクティビティ更新通知完了")
     }
     
 
@@ -121,12 +109,5 @@ class TaskViewModel {
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         )
         return try modelContext.fetch(descriptor)
-    }
-    
-    // MARK: - Activity Update Notification
-    
-    // アクティビティ更新の通知
-    private func notifyActivityUpdate() {
-        onActivityUpdate?()
     }
 }
