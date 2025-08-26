@@ -108,13 +108,18 @@ struct ActivityView: View {
         
         while currentDate <= endDate {
             let dateKey = calendar.startOfDay(for: currentDate)
-            let commitCount = stepsByDate[dateKey]?.count ?? 0
+            let stepsForDate = stepsByDate[dateKey] ?? []
+            let commitCount = stepsForDate.count
             let level = calculateActivityLevel(commitCount)
+            
+            // タスク履歴を作成
+            let taskHistory = createTaskHistory(from: stepsForDate)
             
             let activity = DailyActivity(
                 date: currentDate,
                 commitCount: commitCount,
-                activityLevel: level
+                activityLevel: level,
+                taskHistory: taskHistory
             )
             
             activities.append(activity)
@@ -151,6 +156,39 @@ struct ActivityView: View {
         // このメソッドは非推奨になりました
         // 代わりにgroupStepsByDateを使用してください
         return 0
+    }
+    
+    // タスク履歴を作成
+    private func createTaskHistory(from steps: [TaskStep]) -> [TaskHistoryItem] {
+        var taskAttempts: [UUID: Int] = [:]
+        var history: [TaskHistoryItem] = []
+        
+        // 時刻順にソート
+        let sortedSteps = steps.sorted { step1, step2 in
+            guard let date1 = step1.completedAt, let date2 = step2.completedAt else { return false }
+            return date1 < date2
+        }
+        
+        for step in sortedSteps {
+            guard let completedAt = step.completedAt,
+                  let task = step.task else { continue }
+            
+            // そのタスクの着手回数をカウント
+            let attemptCount = (taskAttempts[task.id] ?? 0) + 1
+            taskAttempts[task.id] = attemptCount
+            
+            let historyItem = TaskHistoryItem(
+                taskId: task.id,
+                taskTitle: task.title,
+                stepOrder: step.order,
+                completedAt: completedAt,
+                attemptCount: attemptCount
+            )
+            
+            history.append(historyItem)
+        }
+        
+        return history
     }
     
     // コミット数からアクティビティレベルを計算
