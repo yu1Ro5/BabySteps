@@ -7,6 +7,9 @@ struct ActivityView: View {
     @State private var dailyActivities: [DailyActivity] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var lastCalculationDate: Date?
+    @State private var calculationCache: [Date: DailyActivity] = [:]
+    @State private var lastStepsHash: Int = 0
     
     var body: some View {
         NavigationStack {
@@ -46,14 +49,29 @@ struct ActivityView: View {
     
     // MARK: - Private Methods
     
-    // 日別アクティビティを読み込み
+    // 日別アクティビティを読み込み（最適化版）
     private func loadDailyActivities(for days: Int = 90) {
+        let today = Date()
+        
+        // ステップの内容が変更されたかチェック
+        let currentStepsHash = calculateStepsHash(completedSteps)
+        let stepsChanged = currentStepsHash != lastStepsHash
+        
+        // 今日のデータが既に計算済みで、ステップに変更がない場合
+        if let lastCalc = lastCalculationDate,
+           Calendar.current.isDate(lastCalc, inSameDayAs: today) && !stepsChanged {
+            print("📊 今日のデータは既に計算済み、キャッシュを使用")
+            return
+        }
+        
         print("📊 アクティビティ読み込み開始 (過去\(days)日分)")
         isLoading = true
         errorMessage = nil
         
         do {
             dailyActivities = try getDailyActivities(for: days)
+            lastCalculationDate = today
+            lastStepsHash = currentStepsHash
             print("📊 アクティビティ読み込み完了: \(dailyActivities.count)日分")
         } catch {
             errorMessage = "アクティビティの読み込みに失敗しました: \(error.localizedDescription)"
@@ -63,24 +81,46 @@ struct ActivityView: View {
         isLoading = false
     }
     
-    // 指定された日数分の日別アクティビティを取得
+    // ステップの内容をハッシュ化して変更検知
+    private func calculateStepsHash(_ steps: [TaskStep]) -> Int {
+        var hasher = Hasher()
+        for step in steps {
+            hasher.combine(step.id)
+            hasher.combine(step.isCompleted)
+            if let completedAt = step.completedAt {
+                hasher.combine(completedAt.timeIntervalSince1970)
+            }
+        }
+        return hasher.finalize()
+    }
+    
+    // 指定された日数分の日別アクティビティを取得（最適化版）
     private func getDailyActivities(for days: Int) throws -> [DailyActivity] {
         let calendar = Calendar.current
         let endDate = Date()
         let startDate = calendar.date(byAdding: .day, value: -days, to: endDate)!
         
+        // 完了済みステップを日付別にグループ化
+        let stepsByDate = groupStepsByDate(completedSteps)
+        
         var activities: [DailyActivity] = []
         var currentDate = startDate
         
         while currentDate <= endDate {
-            let commitCount = getCommitCount(for: currentDate)
+            let dateKey = calendar.startOfDay(for: currentDate)
+            let commitCount = stepsByDate[dateKey]?.count ?? 0
             let level = calculateActivityLevel(commitCount)
             
-            activities.append(DailyActivity(
+            let activity = DailyActivity(
                 date: currentDate,
                 commitCount: commitCount,
                 activityLevel: level
-            ))
+            )
+            
+            activities.append(activity)
+            
+            // キャッシュに保存
+            calculationCache[dateKey] = activity
             
             currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
         }
@@ -88,63 +128,29 @@ struct ActivityView: View {
         return activities
     }
     
-    // 指定された日のステップ完了数を取得
-    private func getCommitCount(for date: Date) -> Int {
+    // ステップを日付別にグループ化（効率化）
+    private func groupStepsByDate(_ steps: [TaskStep]) -> [Date: [TaskStep]] {
         let calendar = Calendar.current
+        var groupedSteps: [Date: [TaskStep]] = [:]
         
-        // 指定された日の開始時刻（00:00:00）
-        let startOfDay = calendar.startOfDay(for: date)
-        
-        // 指定された日の終了時刻（23:59:59.999）
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
-        
-        // デバッグ用：日付範囲をログ出力
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-        
-        print("🔍 検索対象日: \(dateFormatter.string(from: date))")
-        print("🔍 開始時刻: \(dateFormatter.string(from: startOfDay))")
-        print("🔍 終了時刻: \(dateFormatter.string(from: endOfDay))")
-        
-        // より安全な日付範囲計算
-        let startOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
-        let endOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
-        
-        guard let startOfDaySafe = calendar.date(from: startOfDayComponents),
-              let endOfDaySafe = calendar.date(byAdding: .day, value: 1, to: startOfDaySafe) else {
-            print("❌ 日付計算エラー")
-            return 0
-        }
-        
-        print("🔍 安全な開始時刻: \(dateFormatter.string(from: startOfDaySafe))")
-        print("🔍 安全な終了時刻: \(dateFormatter.string(from: endOfDaySafe))")
-        
-        let predicate = #Predicate<TaskStep> { step in
-            step.isCompleted && 
-            step.completedAt != nil &&
-            step.completedAt! >= startOfDaySafe &&
-            step.completedAt! < endOfDaySafe
-        }
-        
-        let descriptor = FetchDescriptor<TaskStep>(predicate: predicate)
-        
-        do {
-            let completedSteps = try modelContext.fetch(descriptor)
+        for step in steps {
+            guard let completedAt = step.completedAt else { continue }
+            let dateKey = calendar.startOfDay(for: completedAt)
             
-            // デバッグ用：完了済みステップの詳細をログ出力
-            print("🔍 完了済みステップ数: \(completedSteps.count)")
-            for step in completedSteps {
-                if let completedAt = step.completedAt {
-                    print("  - ステップ\(step.order + 1), 完了時刻: \(dateFormatter.string(from: completedAt))")
-                }
+            if groupedSteps[dateKey] == nil {
+                groupedSteps[dateKey] = []
             }
-            
-            return completedSteps.count
-        } catch {
-            print("❌ ステップ取得エラー: \(error)")
-            return 0
+            groupedSteps[dateKey]?.append(step)
         }
+        
+        return groupedSteps
+    }
+    
+    // 指定された日のステップ完了数を取得（非推奨 - 効率化版に置き換え）
+    private func getCommitCount(for date: Date) -> Int {
+        // このメソッドは非推奨になりました
+        // 代わりにgroupStepsByDateを使用してください
+        return 0
     }
     
     // コミット数からアクティビティレベルを計算
