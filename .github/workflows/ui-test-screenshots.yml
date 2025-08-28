@@ -36,6 +36,37 @@ jobs:
         run: |
           xcodegen generate
           
+      - name: Verify XcodeGen Generation
+        run: |
+          echo "=== XcodeGen Generation Verification ==="
+          
+          if [ -f "BabySteps.xcodeproj/project.pbxproj" ]; then
+            echo "✅ XcodeGen project generated successfully"
+            
+            # プロジェクトの基本情報を確認
+            echo "=== Project Basic Info ==="
+            xcodebuild -list -project BabySteps.xcodeproj
+            
+            # UIテストターゲットが正しく生成されているか確認
+            echo ""
+            echo "=== UI Test Target Verification ==="
+            if grep -q "BabyStepsUITests" BabySteps.xcodeproj/project.pbxproj; then
+              echo "✅ BabyStepsUITests target found in project"
+            else
+              echo "❌ BabyStepsUITests target NOT found in project"
+            fi
+            
+            # TEST_HOSTの設定を確認
+            if grep -q "TEST_HOST.*BabySteps.app" BabySteps.xcodeproj/project.pbxproj; then
+              echo "✅ TEST_HOST correctly configured"
+            else
+              echo "❌ TEST_HOST NOT correctly configured"
+            fi
+          else
+            echo "❌ XcodeGen project generation failed"
+            exit 1
+          fi
+          
       - name: Verify project structure
         run: |
           echo "=== Project Structure ==="
@@ -73,6 +104,40 @@ jobs:
           echo ""
           echo "=== Generated Xcode Project Info ==="
           xcodebuild -showBuildSettings -project BabySteps.xcodeproj -target BabyStepsUITests 2>/dev/null | grep -E "(TEST_HOST|TEST_TARGET_NAME|PRODUCT_BUNDLE_IDENTIFIER)" || echo "Could not retrieve build settings"
+          
+      - name: Deep Dive UI Test Configuration
+        run: |
+          echo "=== Deep Dive UI Test Configuration ==="
+          
+          # プロジェクトファイルの詳細分析
+          if [ -f "BabySteps.xcodeproj/project.pbxproj" ]; then
+            echo "=== Project.pbxproj Analysis ==="
+            
+            # UIテストターゲットの完全な設定を確認
+            echo "--- BabyStepsUITests Target Configuration ---"
+            awk '/BabyStepsUITests/,/};/' BabySteps.xcodeproj/project.pbxproj | grep -E "(TEST_HOST|TEST_TARGET_NAME|PRODUCT_BUNDLE_IDENTIFIER|BUNDLE_LOADER|CODE_SIGNING_ALLOWED|SKIP_INSTALL)" || echo "No UI test settings found in project file"
+            
+            # メインアプリターゲットの設定も確認
+            echo "--- BabySteps App Target Configuration ---"
+            awk '/BabySteps[^T]/,/};/' BabySteps.xcodeproj/project.pbxproj | grep -E "(PRODUCT_NAME|PRODUCT_BUNDLE_IDENTIFIER|EXECUTABLE_NAME)" || echo "No app target settings found"
+            
+            # スキームファイルの詳細確認
+            echo "=== Scheme File Analysis ==="
+            for scheme_file in BabySteps.xcodeproj/xcshareddata/xcschemes/*.xcscheme; do
+              if [ -f "$scheme_file" ]; then
+                echo "Scheme: $(basename "$scheme_file")"
+                grep -A 5 -B 5 "BabyStepsUITests" "$scheme_file" || echo "  No UI test target found in scheme"
+              fi
+            done
+          fi
+          
+          echo ""
+          echo "=== Build Settings Verification ==="
+          # 各ターゲットのビルド設定を詳細確認
+          for target in "BabySteps" "BabyStepsUITests"; do
+            echo "--- $target Build Settings ---"
+            xcodebuild -showBuildSettings -project BabySteps.xcodeproj -target "$target" 2>/dev/null | grep -E "(PRODUCT_NAME|PRODUCT_BUNDLE_IDENTIFIER|TEST_HOST|TEST_TARGET_NAME|BUNDLE_LOADER)" || echo "  Could not retrieve build settings for $target"
+          done
           
       - name: Show available SDKs
         run: xcodebuild -showsdks

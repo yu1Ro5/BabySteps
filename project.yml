@@ -67,5 +67,6 @@ targets:
       GENERATE_INFOPLIST_FILE: "YES"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
       TEST_TARGET_NAME: "BabySteps"
+      BUNDLE_LOADER: "$(TEST_HOST)"
       CODE_SIGNING_ALLOWED: "NO"
       SKIP_INSTALL: "YES"
