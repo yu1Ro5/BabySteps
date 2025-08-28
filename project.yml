@@ -13,6 +13,26 @@ settings:
   DEVELOPMENT_TEAM: "58Y7Q3D4A7"
   CODE_SIGN_STYLE: "Automatic"
 
+schemes:
+  BabySteps:
+    build:
+      targets:
+        BabySteps: all
+        BabyStepsTests: [test]
+        BabyStepsUITests: [test]
+    test:
+      targets:
+        - BabyStepsTests
+        - BabyStepsUITests
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   BabySteps:
     type: application
