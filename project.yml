@@ -66,5 +66,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsUITests"
       GENERATE_INFOPLIST_FILE: "YES"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+      TEST_TARGET_NAME: "BabySteps"
       CODE_SIGNING_ALLOWED: "NO"
       SKIP_INSTALL: "YES"

@@ -50,6 +50,30 @@ jobs:
           echo "=== Available Targets ==="
           xcodebuild -list -project BabySteps.xcodeproj | grep -A 20 "Targets:"
           
+      - name: Verify UI Test Target Configuration
+        run: |
+          echo "=== UI Test Target Configuration ==="
+          echo "Checking BabyStepsUITests target configuration..."
+          
+          # プロジェクトファイルの内容を確認
+          if [ -f "BabySteps.xcodeproj/project.pbxproj" ]; then
+            echo "✅ Project file exists"
+            
+            # UIテストターゲットの設定を確認
+            echo "=== UI Test Target Settings ==="
+            grep -A 10 -B 5 "BabyStepsUITests" BabySteps.xcodeproj/project.pbxproj | grep -E "(TEST_HOST|TEST_TARGET_NAME|PRODUCT_BUNDLE_IDENTIFIER)" || echo "No UI test settings found"
+            
+            # スキームの設定を確認
+            echo "=== Scheme Configuration ==="
+            find BabySteps.xcodeproj -name "*.xcscheme" -exec echo "Scheme file: {}" \;
+          else
+            echo "❌ Project file not found"
+          fi
+          
+          echo ""
+          echo "=== Generated Xcode Project Info ==="
+          xcodebuild -showBuildSettings -project BabySteps.xcodeproj -target BabyStepsUITests 2>/dev/null | grep -E "(TEST_HOST|TEST_TARGET_NAME|PRODUCT_BUNDLE_IDENTIFIER)" || echo "Could not retrieve build settings"
+          
       - name: Show available SDKs
         run: xcodebuild -showsdks
           
