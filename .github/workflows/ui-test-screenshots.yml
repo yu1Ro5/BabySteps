@@ -88,7 +88,7 @@ jobs:
           xcodebuild test \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -destination "platform=iOS Simulator,name=$AVAILABLE_IPHONE" \
+            -destination "platform=iOS Simulator,name=$AVAILABLE_IPHONE,OS=18.6" \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-iphone.xcresult \
             -verbose | xcbeautify || echo "iPhone UI tests failed, but continuing..."
@@ -117,7 +117,7 @@ jobs:
           xcodebuild test \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -destination "platform=iOS Simulator,name=$AVAILABLE_IPAD" \
+            -destination "platform=iOS Simulator,name=$AVAILABLE_IPAD,OS=18.6" \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-ipad.xcresult \
             -verbose | xcbeautify || echo "iPad UI tests failed, but continuing..."
