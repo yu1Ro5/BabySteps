@@ -142,10 +142,6 @@ jobs:
                 # ファイル名をApp Store用に整理
                 case "$file" in
                   *"01-main-screen"*) mv "$file" "01-main-screen.png" ;;
-                  *"02-task-list"*) mv "$file" "02-task-list.png" ;;
-                  *"03-add-task"*) mv "$file" "03-add-task.png" ;;
-                  *"04-task-detail"*) mv "$file" "04-task-detail.png" ;;
-                  *"05-progress-view"*) mv "$file" "05-progress-view.png" ;;
                   *) echo "Unknown screenshot: $file" ;;
                 esac
               fi
@@ -177,10 +173,6 @@ jobs:
                 # ファイル名をApp Store用に整理
                 case "$file" in
                   *"01-main-screen"*) mv "$file" "01-main-screen.png" ;;
-                  *"02-task-list"*) mv "$file" "02-task-list.png" ;;
-                  *"03-add-task"*) mv "$file" "03-add-task.png" ;;
-                  *"04-task-detail"*) mv "$file" "04-task-detail.png" ;;
-                  *"05-progress-view"*) mv "$file" "05-progress-view.png" ;;
                   *) echo "Unknown screenshot: $file" ;;
                 esac
               fi
@@ -206,6 +198,7 @@ jobs:
           echo "**Method**: XCUITest with automated UI interactions" >> $GITHUB_STEP_SUMMARY
           echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Log Formatting**: xcbeauty for beautiful Xcode logs" >> $GITHUB_STEP_SUMMARY
+          echo "**Current Test**: Main screen screenshot only (simplified for stability)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -d "screenshots/iphone" ]; then
@@ -215,10 +208,6 @@ jobs:
             else
               echo "### 📱 iPhone Screenshots - Success" >> $GITHUB_STEP_SUMMARY
               echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
-              echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
-              echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY
-              echo "- Task Detail - タスク詳細" >> $GITHUB_STEP_SUMMARY
-              echo "- Progress View - 進捗表示" >> $GITHUB_STEP_SUMMARY
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
@@ -230,10 +219,6 @@ jobs:
             else
               echo "### 📱 iPad Screenshots - Success" >> $GITHUB_STEP_SUMMARY
               echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
-              echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
-              echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY
-              echo "- Task Detail - タスク詳細" >> $GITHUB_STEP_SUMMARY
-              echo "- Progress View - 進捗表示" >> $GITHUB_STEP_SUMMARY
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
@@ -243,3 +228,10 @@ jobs:
           echo "2. Click on this run: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "3. Scroll down to Artifacts section" >> $GITHUB_STEP_SUMMARY
           echo "4. Download 'ui-test-screenshots-${{ github.run_number }}'" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**💡 Next Steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "Once this basic test passes, we can gradually add more screenshot tests:" >> $GITHUB_STEP_SUMMARY
+          echo "- Task list view" >> $GITHUB_STEP_SUMMARY
+          echo "- Add task modal" >> $GITHUB_STEP_SUMMARY
+          echo "- Task detail view" >> $GITHUB_STEP_SUMMARY
+          echo "- Progress indicators" >> $GITHUB_STEP_SUMMARY
