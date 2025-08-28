@@ -1,0 +1,157 @@
+name: UI Test Screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_type:
+        description: 'デバイスタイプを選択'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - ipad
+          - iphone
+
+jobs:
+  ui-test-screenshots:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+          
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+          
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate
+          
+      - name: Run UI Tests for iPhone
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' }}
+        run: |
+          # iPhone 15 Pro Max (6.5 inch equivalent) でUIテスト実行
+          xcodebuild test \
+            -project BabySteps.xcodeproj \
+            -scheme BabySteps \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max,OS=18.0' \
+            -only-testing:BabyStepsUITests/ScreenshotUITests \
+            -resultBundlePath test-results-iphone.xcresult
+          
+      - name: Run UI Tests for iPad
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' }}
+        run: |
+          # iPad Pro (13 inch) でUIテスト実行
+          xcodebuild test \
+            -project BabySteps.xcodeproj \
+            -scheme BabySteps \
+            -destination 'platform=iOS Simulator,name=iPad Pro (13-inch) (6th generation),OS=18.0' \
+            -only-testing:BabyStepsUITests/ScreenshotUITests \
+            -resultBundlePath test-results-ipad.xcresult
+          
+      - name: Extract Screenshots from iPhone Tests
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' }}
+        run: |
+          # テスト結果からスクリーンショットを抽出
+          mkdir -p screenshots/iphone
+          
+          # xcresultからスクリーンショットを抽出
+          xcrun xcresulttool export \
+            --path test-results-iphone.xcresult \
+            --output-path screenshots/iphone \
+            --type screenshot
+          
+          # ファイル名を整理
+          cd screenshots/iphone
+          for file in *.png; do
+            if [[ -f "$file" ]]; then
+              # ファイル名をApp Store用に整理
+              case "$file" in
+                *"01-main-screen"*) mv "$file" "01-main-screen.png" ;;
+                *"02-task-list"*) mv "$file" "02-task-list.png" ;;
+                *"03-add-task"*) mv "$file" "03-add-task.png" ;;
+                *"04-task-detail"*) mv "$file" "04-task-detail.png" ;;
+                *"05-progress-view"*) mv "$file" "05-progress-view.png" ;;
+                *) echo "Unknown screenshot: $file" ;;
+              esac
+            fi
+          done
+          cd ../..
+          
+      - name: Extract Screenshots from iPad Tests
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' }}
+        run: |
+          # テスト結果からスクリーンショットを抽出
+          mkdir -p screenshots/ipad
+          
+          # xcresultからスクリーンショットを抽出
+          xcrun xcresulttool export \
+            --path test-results-ipad.xcresult \
+            --output-path screenshots/ipad \
+            --type screenshot
+          
+          # ファイル名を整理
+          cd screenshots/ipad
+          for file in *.png; do
+            if [[ -f "$file" ]]; then
+              # ファイル名をApp Store用に整理
+              case "$file" in
+                *"01-main-screen"*) mv "$file" "01-main-screen.png" ;;
+                *"02-task-list"*) mv "$file" "02-task-list.png" ;;
+                *"03-add-task"*) mv "$file" "03-add-task.png" ;;
+                *"04-task-detail"*) mv "$file" "04-task-detail.png" ;;
+                *"05-progress-view"*) mv "$file" "05-progress-view.png" ;;
+                *) echo "Unknown screenshot: $file" ;;
+              esac
+            fi
+          done
+          cd ../..
+          
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-screenshots
+          path: screenshots/
+          retention-days: 30
+          
+      - name: Create summary
+        run: |
+          echo "## 📱 UI Test Screenshots Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Method**: XCUITest with automated UI interactions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "screenshots/iphone" ]; then
+            echo "### 📱 iPhone (6.5 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
+            echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
+            echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY
+            echo "- Task Detail - タスク詳細" >> $GITHUB_STEP_SUMMARY
+            echo "- Progress View - 進捗表示" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -d "screenshots/ipad" ]; then
+            echo "### 📱 iPad (13 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
+            echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
+            echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY
+            echo "- Task Detail - タスク詳細" >> $GITHUB_STEP_SUMMARY
+            echo "- Progress View - 進捗表示" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "**Advantages of XCUITest method:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ High-quality screenshots with proper app state" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Consistent UI element display" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Automated interaction and waiting" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Perfect for App Store review" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Download screenshots from the Artifacts section above**" >> $GITHUB_STEP_SUMMARY
