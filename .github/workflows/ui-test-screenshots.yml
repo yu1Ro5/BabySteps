@@ -12,6 +12,9 @@ on:
           - both
           - ipad
           - iphone
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   ui-test-screenshots:
@@ -35,7 +38,7 @@ jobs:
           xcodegen generate
           
       - name: Run UI Tests for iPhone
-        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' }}
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' || github.event_name == 'pull_request' }}
         run: |
           # iPhone 15 Pro Max (6.5 inch equivalent) でUIテスト実行
           xcodebuild test \
@@ -46,7 +49,7 @@ jobs:
             -resultBundlePath test-results-iphone.xcresult
           
       - name: Run UI Tests for iPad
-        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' }}
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' || github.event_name == 'pull_request' }}
         run: |
           # iPad Pro (13 inch) でUIテスト実行
           xcodebuild test \
@@ -57,7 +60,7 @@ jobs:
             -resultBundlePath test-results-ipad.xcresult
           
       - name: Extract Screenshots from iPhone Tests
-        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' }}
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' || github.event_name == 'pull_request' }}
         run: |
           # テスト結果からスクリーンショットを抽出
           mkdir -p screenshots/iphone
@@ -86,7 +89,7 @@ jobs:
           cd ../..
           
       - name: Extract Screenshots from iPad Tests
-        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' }}
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' || github.event_name == 'pull_request' }}
         run: |
           # テスト結果からスクリーンショットを抽出
           mkdir -p screenshots/ipad
@@ -117,7 +120,7 @@ jobs:
       - name: Upload screenshots as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-screenshots
+          name: ui-test-screenshots-${{ github.run_number }}
           path: screenshots/
           retention-days: 30
           
@@ -126,6 +129,7 @@ jobs:
           echo "## 📱 UI Test Screenshots Generated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Method**: XCUITest with automated UI interactions" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -d "screenshots/iphone" ]; then
@@ -154,4 +158,8 @@ jobs:
           echo "- ✅ Automated interaction and waiting" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Perfect for App Store review" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Download screenshots from the Artifacts section above**" >> $GITHUB_STEP_SUMMARY
+          echo "**📥 Download screenshots:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Go to Actions tab → UI Test Screenshots" >> $GITHUB_STEP_SUMMARY
+          echo "2. Click on this run: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "3. Scroll down to Artifacts section" >> $GITHUB_STEP_SUMMARY
+          echo "4. Download 'ui-test-screenshots-${{ github.run_number }}'" >> $GITHUB_STEP_SUMMARY
