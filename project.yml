@@ -53,7 +53,7 @@ targets:
       SKIP_INSTALL: "YES"
 
   BabyStepsUITests:
-    type: bundle.ui-test
+    type: bundle.unit-test
     platform: iOS
     deploymentTarget: "18.0"
     sources:
@@ -65,6 +65,6 @@ targets:
       PRODUCT_NAME: "BabyStepsUITests"
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsUITests"
       GENERATE_INFOPLIST_FILE: "YES"
-      TEST_TARGET_NAME: "BabySteps"
+      TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
       CODE_SIGNING_ALLOWED: "NO"
       SKIP_INSTALL: "YES"

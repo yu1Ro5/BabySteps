@@ -24,11 +24,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v4
-        with:
-          xcode-version: '16.4'
-          
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
+        
       - name: Install XcodeGen
         run: |
           brew install xcodegen
