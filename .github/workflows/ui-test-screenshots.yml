@@ -40,11 +40,11 @@ jobs:
       - name: Run UI Tests for iPhone
         if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' || github.event_name == 'pull_request' }}
         run: |
-          # iPhone 15 Pro Max (6.5 inch equivalent) でUIテスト実行
+          # iPhone 16 Pro Max (6.5 inch equivalent) でUIテスト実行
           xcodebuild test \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max,OS=18.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.6' \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-iphone.xcresult
           
@@ -55,7 +55,7 @@ jobs:
           xcodebuild test \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -destination 'platform=iOS Simulator,name=iPad Pro (13-inch) (6th generation),OS=18.0' \
+            -destination 'platform=iOS Simulator,name=iPad Pro (13-inch) (6th generation),OS=18.6' \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-ipad.xcresult
           
@@ -130,10 +130,11 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Method**: XCUITest with automated UI interactions" >> $GITHUB_STEP_SUMMARY
           echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Devices**: iPhone 16 Pro Max (iOS 18.6), iPad Pro 13-inch (iOS 18.6)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -d "screenshots/iphone" ]; then
-            echo "### 📱 iPhone (6.5 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "### 📱 iPhone 16 Pro Max (6.5 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
             echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
             echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
             echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY
@@ -143,7 +144,7 @@ jobs:
           fi
           
           if [ -d "screenshots/ipad" ]; then
-            echo "### 📱 iPad (13 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "### 📱 iPad Pro (13 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
             echo "- Main Screen - メイン画面" >> $GITHUB_STEP_SUMMARY
             echo "- Task List - タスクリスト" >> $GITHUB_STEP_SUMMARY
             echo "- Add Task - タスク追加" >> $GITHUB_STEP_SUMMARY

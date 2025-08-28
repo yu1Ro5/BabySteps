@@ -6,8 +6,8 @@ BabyStepsアプリのApp Store Connect審査用スクリーンショットを、
 
 App Store Connectの審査では、以下のデバイスサイズのスクリーンショットが必要です：
 
-- **📱 iPhone (6.5 inch)**: iPhone 15 Pro Max相当
-- **📱 iPad (13 inch)**: iPad Pro (13-inch) (6th generation)
+- **📱 iPhone (6.5 inch)**: iPhone 16 Pro Max (iOS 18.6)
+- **📱 iPad (13 inch)**: iPad Pro (13-inch) (6th generation) (iOS 18.6)
 
 ## 🚀 ワークフローの実行方法
 
