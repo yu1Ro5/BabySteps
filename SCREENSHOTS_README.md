@@ -124,11 +124,45 @@ App Store Connectの審査では、以下のデバイスサイズのスクリー
 - `Tests/BabyStepsUITests/ScreenshotUITests.swift` の要素識別子を確認
 - アプリのUI要素に適切なアクセシビリティ識別子を設定
 
+#### 4. "BabyStepsUITests isn't a member of the specified test plan or scheme" エラー
+
+**原因**: UIテストターゲットがプロジェクトに正しく設定されていない
+**解決方法**:
+- `project.yml` に `BabyStepsUITests` ターゲットが定義されているか確認
+- XcodeGenでプロジェクトを再生成
+- ワークフローの "Verify project structure" ステップでプロジェクト構造を確認
+
+#### 5. プロジェクト生成エラー
+
+**原因**: XcodeGenの設定ファイルに問題がある
+**解決方法**:
+- `project.yml` の構文を確認
+- 必要なファイルが存在するか確認
+- ローカルで `xcodegen generate` を実行してエラーを確認
+
 ### ログの確認方法
 
-1. ワークフロー実行結果ページで **Run UI Tests for iPhone/iPad** ステップを展開
-2. 実行ログを確認してエラーメッセージを特定
-3. 必要に応じてテストコードを修正
+1. ワークフロー実行結果ページで **Verify project structure** ステップを展開
+2. プロジェクト構造とターゲットの一覧を確認
+3. **Run UI Tests for iPhone/iPad** ステップを展開
+4. 実行ログを確認してエラーメッセージを特定
+5. 必要に応じてテストコードを修正
+
+### デバッグ手順
+
+1. **プロジェクト構造の確認**
+   - `project.yml` に `BabyStepsUITests` ターゲットが定義されているか
+   - 必要なファイルが存在するか
+
+2. **ローカルでの確認**
+   ```bash
+   xcodegen generate
+   xcodebuild -list -project BabySteps.xcodeproj
+   ```
+
+3. **ワークフローの再実行**
+   - 修正後にワークフローを再実行
+   - "Verify project structure" ステップの出力を確認
 
 ## 📋 App Store Connectでの使用方法
 
