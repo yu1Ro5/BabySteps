@@ -27,10 +27,10 @@ jobs:
       - name: Select Xcode 16.4
         run: sudo xcode-select -switch /Applications/Xcode_16.4.app
         
-      - name: Install XcodeGen and xcbeauty
+      - name: Install XcodeGen and xcbeautify
         run: |
           brew install xcodegen
-          brew install xcbeauty
+          brew install xcbeautify
           
       - name: Generate Xcode project
         run: |
@@ -83,7 +83,7 @@ jobs:
           
           echo "Using iPhone simulator: $AVAILABLE_IPHONE"
           
-          # iPhone でUIテスト実行（xcbeautyでログをフォーマット）
+          # iPhone でUIテスト実行（xcbeautifyでログをフォーマット）
           echo "Running UI tests for iPhone..."
           xcodebuild test \
             -project BabySteps.xcodeproj \
@@ -91,7 +91,7 @@ jobs:
             -destination "platform=iOS Simulator,name=$AVAILABLE_IPHONE" \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-iphone.xcresult \
-            -verbose | xcbeauty || echo "iPhone UI tests failed, but continuing..."
+            -verbose | xcbeautify || echo "iPhone UI tests failed, but continuing..."
           
       - name: Run UI Tests for iPad
         if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' || github.event_name == 'pull_request' }}
@@ -112,7 +112,7 @@ jobs:
           
           echo "Using iPad simulator: $AVAILABLE_IPAD"
           
-          # iPad でUIテスト実行（xcbeautyでログをフォーマット）
+          # iPad でUIテスト実行（xcbeautifyでログをフォーマット）
           echo "Running UI tests for iPad..."
           xcodebuild test \
             -project BabySteps.xcodeproj \
@@ -120,7 +120,7 @@ jobs:
             -destination "platform=iOS Simulator,name=$AVAILABLE_IPAD" \
             -only-testing:BabyStepsUITests/ScreenshotUITests \
             -resultBundlePath test-results-ipad.xcresult \
-            -verbose | xcbeauty || echo "iPad UI tests failed, but continuing..."
+            -verbose | xcbeautify || echo "iPad UI tests failed, but continuing..."
           
       - name: Extract Screenshots from iPhone Tests
         if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' || github.event_name == 'pull_request' }}
@@ -197,7 +197,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Method**: XCUITest with automated UI interactions" >> $GITHUB_STEP_SUMMARY
           echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Log Formatting**: xcbeauty for beautiful Xcode logs" >> $GITHUB_STEP_SUMMARY
+          echo "**Log Formatting**: xcbeautify for beautiful Xcode logs" >> $GITHUB_STEP_SUMMARY
           echo "**Current Test**: Main screen screenshot only (simplified for stability)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
