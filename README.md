@@ -34,6 +34,10 @@ SwiftUIとSwiftDataを使用したモダンなiOSタスク管理アプリケー�
 ```text
 BabySteps/
 ├── .github/workflows/     # GitHub Actions設定
+├── docs/                  # プライバシーポリシーページ（GitHub Pages）
+│   ├── index.html        # プライバシーポリシーHTML
+│   ├── .nojekyll         # Jekyll処理無効化
+│   └── README.md         # ドキュメント説明
 ├── Sources/               # ソースコード
 │   ├── App/              # アプリケーションコード
 │   │   └── BabyStepsApp.swift      # メインアプリ（SwiftData設定）
@@ -194,6 +198,33 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 4. **SwiftData関連のエラー**
    - iOS 17.0+のデプロイメントターゲットを確認
    - ModelContainerの設定を確認
+
+## プライバシーポリシー
+
+このアプリのプライバシーポリシーは、GitHub Pagesでホスティングされています。
+
+### アクセス方法
+
+- **URL**: `https://[ユーザー名].github.io/[リポジトリ名]/`
+- **ローカル確認**: `docs/index.html` をブラウザで開く
+
+### 特徴
+
+- iOSアプリ審査要件を満たす内容
+- 日本語対応
+- モバイルフレンドリーなレスポンシブデザイン
+- 日本の個人情報保護法に準拠
+
+### カスタマイズ
+
+プライバシーポリシーの内容をカスタマイズする場合は、`docs/index.html`を編集してください。主な変更点：
+
+- 会社情報・連絡先
+- アプリ名
+- 最終更新日
+- 具体的な内容
+
+詳細は `docs/README.md` を参照してください。
 
 ## 貢献
 
