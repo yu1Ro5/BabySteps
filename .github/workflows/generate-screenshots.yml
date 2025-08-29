@@ -52,22 +52,9 @@ jobs:
           echo "=== Available iOS Runtimes ==="
           xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
           
-          # iOS 18.5が利用可能かチェック
-          if xcrun simctl list runtimes | grep -q "iOS 18.5"; then
-            echo "✅ iOS 18.5 runtime available"
-            export IOS_VERSION="18.5"
-          elif xcrun simctl list runtimes | grep -q "iOS 18.4"; then
-            echo "⚠️ iOS 18.4 runtime available (fallback from 18.5)"
-            export IOS_VERSION="18.4"
-          elif xcrun simctl list runtimes | grep -q "iOS 18.3"; then
-            echo "⚠️ iOS 18.3 runtime available (fallback from 18.5)"
-            export IOS_VERSION="18.3"
-          else
-            echo "❌ No iOS 18.x runtime available"
-            exit 1
-          fi
-          
-          echo "Selected iOS version: $IOS_VERSION"
+          # iOS 18.5を固定で使用
+          export IOS_VERSION="18.5"
+          echo "Using iOS version: $IOS_VERSION"
 
       - name: Setup simulators
         run: |
@@ -79,20 +66,10 @@ jobs:
           
           echo "=== Available iPad Simulators ==="
           xcrun simctl list devices available | grep "iPad" | grep "$IOS_VERSION" || echo "No iPad simulators found for iOS $IOS_VERSION"
-          
-          # 利用可能なシミュレータの詳細を表示
-          echo "=== Detailed Simulator List ==="
-          xcrun simctl list devices available | grep -E "(iPhone|iPad)" | head -20
 
       - name: Build app for iPhone
         run: |
           echo "Building for iPhone simulator with iOS $IOS_VERSION..."
-          
-          # 利用可能なiPhoneシミュレータを確認
-          echo "Available iPhone simulators for iOS $IOS_VERSION:"
-          xcrun simctl list devices available | grep "iPhone" | grep "$IOS_VERSION" || echo "No iPhone simulators found"
-          
-          # ビルド実行
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
