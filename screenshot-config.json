@@ -1,0 +1,32 @@
+{
+  "ios_version": "18.5",
+  "fallback_versions": ["18.4", "18.3"],
+  "devices": [
+    {
+      "name": "iPhone 15 Pro Max",
+      "simulator_name": "iPhone 15 Pro Max",
+      "display_size": "6.5-inch",
+      "output_filename": "iphone_6.5inch.png",
+      "description": "iPhone 6.5-inch display for App Store"
+    },
+    {
+      "name": "iPad Pro (13-inch)",
+      "simulator_name": "iPad Pro (13-inch)",
+      "display_size": "13-inch",
+      "output_filename": "ipad_13inch.png",
+      "description": "iPad 13-inch display for App Store"
+    }
+  ],
+  "screenshot_settings": {
+    "app_launch_wait_time": 8,
+    "simulator_boot_wait_time": 10,
+    "output_directory": "screenshots",
+    "retention_days": 30
+  },
+  "build_settings": {
+    "scheme": "BabySteps",
+    "bundle_identifier": "com.yu1Ro5.BabySteps",
+    "configuration": "Debug",
+    "derived_data_path": "build"
+  }
+}
