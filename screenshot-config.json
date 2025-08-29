@@ -9,8 +9,8 @@
       "description": "iPhone 6.5-inch display for App Store"
     },
     {
-      "name": "iPad Pro (13-inch)",
-      "simulator_name": "iPad Pro (13-inch)",
+      "name": "iPad Pro 13-inch (M4)",
+      "simulator_name": "iPad Pro 13-inch (M4)",
       "display_size": "13-inch",
       "output_filename": "ipad_13inch.png",
       "description": "iPad 13-inch display for App Store"

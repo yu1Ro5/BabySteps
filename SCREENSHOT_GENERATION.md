@@ -37,7 +37,7 @@
 | デバイス | ファイル名 | サイズ | 説明 |
 |---------|-----------|--------|------|
 | iPhone 16 Pro Max | `iphone_6.5inch.png` | 6.5インチ | App Store用iPhoneスクリーンショット |
-| iPad Pro (13-inch) | `ipad_13inch.png` | 13インチ | App Store用iPadスクリーンショット |
+| iPad Pro 13-inch (M4) | `ipad_13inch.png` | 13インチ | App Store用iPadスクリーンショット |
 
 ## 成果物のダウンロード
 
