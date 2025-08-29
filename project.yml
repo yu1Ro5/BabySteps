@@ -13,6 +13,26 @@ settings:
   DEVELOPMENT_TEAM: "58Y7Q3D4A7"
   CODE_SIGN_STYLE: "Automatic"
 
+schemes:
+  BabySteps:
+    build:
+      targets:
+        BabySteps: all
+        BabyStepsTests: [test]
+        BabyStepsUITests: [test]
+    test:
+      targets:
+        - BabyStepsTests
+        - BabyStepsUITests
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   BabySteps:
     type: application
@@ -49,5 +69,24 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsTests"
       GENERATE_INFOPLIST_FILE: "YES"
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+      CODE_SIGNING_ALLOWED: "NO"
+      SKIP_INSTALL: "YES"
+
+  BabyStepsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: Tests/BabyStepsUITests
+        type: group
+    dependencies:
+      - target: BabySteps
+    settings:
+      PRODUCT_NAME: "BabyStepsUITests"
+      PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabyStepsUITests"
+      GENERATE_INFOPLIST_FILE: "YES"
+      TEST_HOST: "$(BUILT_PRODUCTS_DIR)/BabySteps.app/BabySteps"
+      TEST_TARGET_NAME: "BabySteps"
+      BUNDLE_LOADER: "$(TEST_HOST)"
       CODE_SIGNING_ALLOWED: "NO"
       SKIP_INSTALL: "YES"

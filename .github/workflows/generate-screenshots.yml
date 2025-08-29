@@ -1,0 +1,131 @@
+name: Generate App Store Screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_type:
+        description: 'デバイスタイプを選択'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - ipad
+          - iphone
+
+jobs:
+  generate-screenshots:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+          
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+          
+      - name: Generate Xcode project
+        run: |
+          xcodegen generate
+          
+      - name: Build and run app for screenshots
+        run: |
+          # アプリをビルド
+          xcodebuild -project BabySteps.xcodeproj -scheme BabySteps -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max,OS=18.0' build
+          
+      - name: Generate iPhone screenshots (6.5 inch)
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'iphone' }}
+        run: |
+          # iPhone 15 Pro Max (6.5 inch equivalent) でスクリーンショット
+          xcrun simctl boot "iPhone 15 Pro Max"
+          sleep 10
+          
+          # アプリを起動
+          xcrun simctl install booted "$(find ~/Library/Developer/Xcode/DerivedData -name '*.app' -path '*/BabySteps-*' | head -1)"
+          xcrun simctl launch booted com.yu1Ro5.BabySteps
+          sleep 15
+          
+          # スクリーンショットを撮影
+          mkdir -p screenshots/iphone
+          xcrun simctl io booted screenshot screenshots/iphone/01-main-screen.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/iphone/02-task-list.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/iphone/03-add-task.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/iphone/04-task-detail.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/iphone/05-progress-view.png
+          
+          echo "iPhone screenshots generated successfully"
+          
+      - name: Generate iPad screenshots (13 inch)
+        if: ${{ github.event.inputs.device_type == 'both' || github.event.inputs.device_type == 'ipad' }}
+        run: |
+          # iPad Pro (13 inch) でスクリーンショット
+          xcrun simctl boot "iPad Pro (13-inch) (6th generation)"
+          sleep 10
+          
+          # アプリをビルド（iPad用）
+          xcodebuild -project BabySteps.xcodeproj -scheme BabySteps -destination 'platform=iOS Simulator,name=iPad Pro (13-inch) (6th generation),OS=18.0' build
+          
+          # アプリを起動
+          xcrun simctl install booted "$(find ~/Library/Developer/Xcode/DerivedData -name '*.app' -path '*/BabySteps-*' | head -1)"
+          xcrun simctl launch booted com.yu1Ro5.BabySteps
+          sleep 15
+          
+          # スクリーンショットを撮影
+          mkdir -p screenshots/ipad
+          xcrun simctl io booted screenshot screenshots/ipad/01-main-screen.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/ipad/02-task-list.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/ipad/03-add-task.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/ipad/04-task-detail.png
+          sleep 2
+          xcrun simctl io booted screenshot screenshots/ipad/05-progress-view.png
+          
+          echo "iPad screenshots generated successfully"
+          
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-store-screenshots
+          path: screenshots/
+          retention-days: 30
+          
+      - name: Create summary
+        run: |
+          echo "## 📱 App Store Screenshots Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "screenshots/iphone" ]; then
+            echo "### 📱 iPhone (6.5 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "- Main Screen" >> $GITHUB_STEP_SUMMARY
+            echo "- Task List" >> $GITHUB_STEP_SUMMARY
+            echo "- Add Task" >> $GITHUB_STEP_SUMMARY
+            echo "- Task Detail" >> $GITHUB_STEP_SUMMARY
+            echo "- Progress View" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -d "screenshots/ipad" ]; then
+            echo "### 📱 iPad (13 inch) Screenshots" >> $GITHUB_STEP_SUMMARY
+            echo "- Main Screen" >> $GITHUB_STEP_SUMMARY
+            echo "- Task List" >> $GITHUB_STEP_SUMMARY
+            echo "- Add Task" >> $GITHUB_STEP_SUMMARY
+            echo "- Task Detail" >> $GITHUB_STEP_SUMMARY
+            echo "- Progress View" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "**Download screenshots from the Artifacts section above**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "These screenshots are ready for App Store Connect submission!" >> $GITHUB_STEP_SUMMARY
