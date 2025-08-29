@@ -1,17 +1,11 @@
 name: Generate App Store Screenshots
 
 on:
-  workflow_dispatch:
   push:
     branches: [ main, develop ]
-    paths:
-      - 'Sources/**'
-      - 'project.yml'
   pull_request:
     branches: [ main, develop ]
-    paths:
-      - 'Sources/**'
-      - 'project.yml'
+  workflow_dispatch:
 
 jobs:
   screenshots:
