@@ -73,7 +73,7 @@ targets:
       SKIP_INSTALL: "YES"
 
   BabyStepsUITests:
-    type: bundle.unit-test
+    type: bundle.ui-testing
     platform: iOS
     deploymentTarget: "18.0"
     sources:
