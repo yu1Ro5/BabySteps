@@ -62,10 +62,10 @@ jobs:
           
           # 利用可能なシミュレータを確認
           echo "=== Available iPhone Simulators ==="
-          xcrun simctl list devices available | grep "iPhone" | grep "$IOS_VERSION" || echo "No iPhone simulators found for iOS $IOS_VERSION"
+          xcrun simctl list devices available | grep "iPhone" | grep "18.5" || echo "No iPhone simulators found for iOS 18.5"
           
           echo "=== Available iPad Simulators ==="
-          xcrun simctl list devices available | grep "iPad" | grep "$IOS_VERSION" || echo "No iPad simulators found for iOS $IOS_VERSION"
+          xcrun simctl list devices available | grep "iPad" | grep "18.5" || echo "No iPad simulators found for iOS 18.5"
 
       - name: Build app for iPhone
         run: |
@@ -73,7 +73,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=iPhone 15 Pro Max,OS=$IOS_VERSION" \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.5' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
@@ -88,8 +88,8 @@ jobs:
         run: |
           echo "Generating iPhone screenshot..."
           
-          # iPhone 15 Pro Maxシミュレータを起動
-          xcrun simctl boot "iPhone 15 Pro Max" || echo "iPhone simulator already booted"
+          # iPhone 16 Pro Maxシミュレータを起動
+          xcrun simctl boot "iPhone 16 Pro Max" || echo "iPhone simulator already booted"
           
           # シミュレータが完全に起動するまで待機
           echo "Waiting for iPhone simulator to fully boot..."
