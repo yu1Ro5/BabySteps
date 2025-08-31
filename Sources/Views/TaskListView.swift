@@ -245,8 +245,11 @@ struct TaskStepSheetView: View {
                 descriptionView
                 
                 // タスクタイトル入力（addTaskモードのみ）
-                if case .addTask = mode {
+                switch mode {
+                case .addTask:
                     taskTitleInputView
+                case .addStep:
+                    EmptyView()
                 }
                 
                 // ステップ数選択UI
