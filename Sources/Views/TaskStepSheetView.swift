@@ -3,37 +3,39 @@ import SwiftUI
 struct TaskStepSheetView: View {
     // MARK: - Properties
     
-    let title: String
-    let description: String
-    let confirmButtonTitle: String
-    let cancelButtonTitle: String
+    enum Mode {
+        case addTask
+        case addStep(Task)
+    }
     
-    @Binding var stepCount: Int
+    let mode: Mode
     @Binding var isPresented: Bool
+    @State private var taskTitle = ""
+    @State private var stepCount: Int
     
-    let onConfirm: () -> Void
+    let onConfirm: (String, Int) -> Void
     let onCancel: () -> Void
     
     // MARK: - Initializer
     
     init(
-        title: String,
-        description: String,
-        confirmButtonTitle: String,
-        cancelButtonTitle: String = "キャンセル",
-        stepCount: Binding<Int>,
+        mode: Mode,
         isPresented: Binding<Bool>,
-        onConfirm: @escaping () -> Void,
+        onConfirm: @escaping (String, Int) -> Void,
         onCancel: @escaping () -> Void
     ) {
-        self.title = title
-        self.description = description
-        self.confirmButtonTitle = confirmButtonTitle
-        self.cancelButtonTitle = cancelButtonTitle
-        self._stepCount = stepCount
+        self.mode = mode
         self._isPresented = isPresented
         self.onConfirm = onConfirm
         self.onCancel = onCancel
+        
+        // モードに応じてデフォルト値を設定
+        switch mode {
+        case .addTask:
+            self._stepCount = State(initialValue: 5)
+        case .addStep:
+            self._stepCount = State(initialValue: 1)
+        }
     }
     
     // MARK: - Body
@@ -42,42 +44,103 @@ struct TaskStepSheetView: View {
         NavigationStack {
             VStack(spacing: 20) {
                 // タイトル
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
+                titleView
                 
                 // 説明
-                Text(description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
+                descriptionView
+                
+                // タスクタイトル入力（addTaskモードのみ）
+                if case .addTask = mode {
+                    taskTitleInputView
+                }
                 
                 // ステップ数選択UI
                 stepCountSelector
                 
                 // 確認ボタン
-                Button(confirmButtonTitle) {
-                    onConfirm()
-                }
-                .buttonStyle(.borderedProminent)
+                confirmButton
                 
                 Spacer()
             }
             .padding()
-            .navigationTitle("ステップ設定")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(cancelButtonTitle) {
+                    Button("キャンセル") {
                         onCancel()
+                        resetForm()
                     }
                 }
             }
         }
     }
     
-    // MARK: - Step Count Selector
+    // MARK: - Computed Properties
+    
+    private var navigationTitle: String {
+        switch mode {
+        case .addTask:
+            return "タスク追加"
+        case .addStep:
+            return "ステップ追加"
+        }
+    }
+    
+    private var confirmButtonTitle: String {
+        switch mode {
+        case .addTask:
+            return "作成"
+        case .addStep:
+            return "追加"
+        }
+    }
+    
+    // MARK: - View Components
+    
+    private var titleView: some View {
+        Text(titleText)
+            .font(.title2)
+            .fontWeight(.bold)
+            .multilineTextAlignment(.center)
+    }
+    
+    private var titleText: String {
+        switch mode {
+        case .addTask:
+            return "新しいタスクを作成"
+        case .addStep(let task):
+            return "「\(task.title)」にステップを追加"
+        }
+    }
+    
+    private var descriptionView: some View {
+        Text(descriptionText)
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
+    }
+    
+    private var descriptionText: String {
+        switch mode {
+        case .addTask:
+            return "タスクのタイトルとステップ数を設定してください"
+        case .addStep:
+            return "このタスクに着手回数を追加します"
+        }
+    }
+    
+    private var taskTitleInputView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("タスクのタイトル")
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            TextField("タスクのタイトル", text: $taskTitle)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+        .padding(.horizontal)
+    }
     
     private var stepCountSelector: some View {
         VStack(spacing: 12) {
@@ -119,18 +182,47 @@ struct TaskStepSheetView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
+    
+    private var confirmButton: some View {
+        Button(confirmButtonTitle) {
+            let finalTaskTitle = (mode == .addTask) ? taskTitle : ""
+            onConfirm(finalTaskTitle, stepCount)
+            resetForm()
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(mode == .addTask && taskTitle.isEmpty)
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func resetForm() {
+        taskTitle = ""
+        switch mode {
+        case .addTask:
+            stepCount = 5
+        case .addStep:
+            stepCount = 1
+        }
+    }
 }
 
 // MARK: - Preview
 
-#Preview {
+#Preview("Add Task") {
     TaskStepSheetView(
-        title: "新しいタスクを作成",
-        description: "タスクのタイトルとステップ数を設定してください",
-        confirmButtonTitle: "作成",
-        stepCount: .constant(5),
+        mode: .addTask,
         isPresented: .constant(true),
-        onConfirm: {},
+        onConfirm: { _, _ in },
+        onCancel: {}
+    )
+}
+
+#Preview("Add Step") {
+    let task = Task(title: "サンプルタスク")
+    return TaskStepSheetView(
+        mode: .addStep(task),
+        isPresented: .constant(true),
+        onConfirm: { _, _ in },
         onCancel: {}
     )
 }

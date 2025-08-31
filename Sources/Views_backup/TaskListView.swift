@@ -3,6 +3,8 @@ import SwiftData
 
 // 共通コンポーネントのインポート
 @_exported import struct Sources.Views.TaskStepSheetView
+@_exported import struct Sources.Views.AddTaskSheetView
+@_exported import struct Sources.Views.AddStepSheetView
 
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
@@ -28,8 +30,7 @@ struct TaskListView: View {
                 }
             }
             .sheet(isPresented: $showingAddTask) {
-                TaskStepSheetView(
-                    mode: .addTask,
+                AddTaskSheetView(
                     isPresented: $showingAddTask,
                     onConfirm: { title, stepCount in
                         _ = viewModel?.createTaskWithSteps(title: title, stepCount: stepCount)
@@ -42,10 +43,10 @@ struct TaskListView: View {
             }
             .sheet(isPresented: $showingAddStep) {
                 if let task = selectedTask {
-                    TaskStepSheetView(
-                        mode: .addStep(task),
+                    AddStepSheetView(
+                        task: task,
                         isPresented: $showingAddStep,
-                        onConfirm: { _, stepCount in
+                        onConfirm: { stepCount in
                             viewModel?.addMultipleSteps(to: task, count: stepCount)
                             showingAddStep = false
                         },
