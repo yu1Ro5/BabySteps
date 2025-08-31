@@ -8,6 +8,7 @@ struct TaskListView: View {
     @State private var showingAddTask = false
     @State private var selectedTask: Task?
     @State private var showingAddStep = false
+    @State private var showingEditTask = false
 
     
     var body: some View {
@@ -51,6 +52,21 @@ struct TaskListView: View {
                     )
                 }
             }
+            .sheet(isPresented: $showingEditTask) {
+                if let task = selectedTask {
+                    EditTaskSheetView(
+                        task: task,
+                        isPresented: $showingEditTask,
+                        onConfirm: { newTitle in
+                            viewModel?.updateTaskTitle(task, newTitle: newTitle)
+                            showingEditTask = false
+                        },
+                        onCancel: {
+                            showingEditTask = false
+                        }
+                    )
+                }
+            }
             .onAppear {
                 // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
@@ -71,7 +87,8 @@ struct TaskListView: View {
                 TaskRowView(
                     task: task,
                     viewModel: viewModel,
-                    onAddStep: { selectedTask = task; showingAddStep = true }
+                    onAddStep: { selectedTask = task; showingAddStep = true },
+                    onEditTask: { selectedTask = task; showingEditTask = true }
                 )
             }
             .onDelete(perform: deleteTasks)
@@ -131,13 +148,24 @@ struct TaskRowView: View {
     let task: Task
     let viewModel: TaskViewModel?
     let onAddStep: () -> Void
+    let onEditTask: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // タスクタイトル
             HStack {
-                Text(task.title)
-                    .font(.headline)
+                Button(action: onEditTask) {
+                    HStack {
+                        Text(task.title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Image(systemName: "pencil")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
                 
                 Spacer()
                 
