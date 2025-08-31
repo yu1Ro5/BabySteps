@@ -1,9 +1,6 @@
 import SwiftUI
 import SwiftData
 
-// 共通コンポーネントのインポート
-@_exported import struct Sources.Views.TaskStepSheetView
-
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var tasks: [Task]
