@@ -3,9 +3,11 @@ import SwiftUI
 struct CalendarGridView: View {
     let activities: [DailyActivity]
     
-    private let columns = 7 // 日曜日〜土曜日
-    private let rows = 13   // 約90日分
-    
+    /// 日曜日〜土曜日
+    private let columns = 7
+    /// 約90日分
+    private let rows = 13
+
     var body: some View {
         VStack(spacing: 8) {
             // カレンダーグリッド
@@ -26,7 +28,6 @@ struct CalendarGridView: View {
             .padding(.horizontal)
         }
     }
-    
 
 }
 
@@ -35,7 +36,7 @@ struct CalendarGridView: View {
 struct ActivityCell: View {
     let activity: DailyActivity
     @State private var showingDetail = false
-    
+
     var body: some View {
         Button(action: {
             showingDetail = true
