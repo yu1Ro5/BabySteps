@@ -17,6 +17,8 @@ struct TaskListView: View {
     @State private var selectedTask: Task?
     /// 新しいタスク作成時のチェックボックス（ステップ）数（デフォルト: 5）。
     @State private var stepCount = 5
+    /// ステップ追加時のステップ数（デフォルト: 1）。
+    @State private var addStepCount = 1
 
     /// メイン画面のView階層を定義します。
     var body: some View {
@@ -37,37 +39,7 @@ struct TaskListView: View {
                 addTaskSheet
             }
             .sheet(item: $selectedTask) { task in
-                NavigationStack {
-                    VStack(spacing: 20) {
-                        Text("「\(task.title)」にステップを追加")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.center)
-
-                        Text("このタスクに着手回数を追加します")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-
-                        Button("追加") {
-                            viewModel?.addStep(to: task)
-                            selectedTask = nil
-                        }
-                        .buttonStyle(.borderedProminent)
-
-                        Spacer()
-                    }
-                    .padding()
-                    .navigationTitle("ステップ追加")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("キャンセル") {
-                                selectedTask = nil
-                            }
-                        }
-                    }
-                }
+                addStepSheet(for: task)
             }
             .onAppear {
                 // ModelContextを使用してViewModelを作成
@@ -167,6 +139,85 @@ struct TaskListView: View {
                         showingAddTask = false
                         newTaskTitle = ""
                         stepCount = 5  // リセット
+                    }
+                }
+            }
+        }
+    }
+
+    /// ステップ追加用のシートViewを返します。
+    private func addStepSheet(for task: Task) -> some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("「\(task.title)」にステップを追加")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+
+                Text("このタスクに着手回数を追加します")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+
+                // ステップ数選択UI
+                VStack(spacing: 12) {
+                    Text("追加するステップの数")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    HStack(spacing: 20) {
+                        Button(action: {
+                            if addStepCount > 1 {
+                                addStepCount -= 1
+                            }
+                        }) {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.red)
+                        }
+                        .disabled(addStepCount <= 1)
+
+                        Text("\(addStepCount)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .frame(minWidth: 60)
+
+                        Button(action: {
+                            addStepCount += 1
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                        }
+                    }
+
+                    Text("\(addStepCount)個のステップが追加されます")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+
+                Button("追加") {
+                    for _ in 0..<addStepCount {
+                        viewModel?.addStep(to: task)
+                    }
+                    addStepCount = 1  // リセット
+                    selectedTask = nil
+                }
+                .buttonStyle(.borderedProminent)
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("ステップ追加")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("キャンセル") {
+                        addStepCount = 1  // リセット
+                        selectedTask = nil
                     }
                 }
             }
