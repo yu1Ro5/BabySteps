@@ -237,46 +237,68 @@ struct TaskRowView: View {
     let onAddStep: () -> Void
     
     /// タスク名編集モードの状態
-    @State private var isEditingTitle = false
+    @State private var isEditing = false
     /// 編集中のタスク名
     @State private var editingTitle = ""
     /// キーボードの表示状態
     @FocusState private var isTitleFieldFocused: Bool
+    /// 変更があったかどうか
+    @State private var hasChanges = false
 
     /// タスク1件の表示レイアウトを定義します。
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // タスクタイトル
             HStack {
-                if isEditingTitle {
-                    // 編集モード：TextFieldを表示
-                    TextField("タスク名", text: $editingTitle)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .focused($isTitleFieldFocused)
-                        .onSubmit {
-                            saveTitle()
-                        }
-                        .onAppear {
-                            editingTitle = task.title
-                            isTitleFieldFocused = true
-                        }
-                        .onChange(of: isTitleFieldFocused) { _, isFocused in
-                            if !isFocused && isEditingTitle {
-                                // フォーカスが外れた場合は編集をキャンセル
-                                cancelEditing()
+                if isEditing {
+                    // 編集モード：TextField + 保存ボタン
+                    HStack(spacing: 8) {
+                        TextField("タスク名", text: $editingTitle)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .focused($isTitleFieldFocused)
+                            .onSubmit {
+                                saveAndExitEditing()
                             }
+                            .onChange(of: editingTitle) { _, newValue in
+                                hasChanges = newValue != task.title
+                            }
+                            .background(Color(.systemYellow).opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.blue, lineWidth: 2)
+                            )
+                            .animation(.easeInOut(duration: 0.2), value: isEditing)
+                            .accessibilityLabel("タスク名")
+                            .accessibilityHint("編集中。完了するには保存ボタンをタップしてください")
+                            .accessibilityAddTraits([.isSelected])
+                        
+                        Button("保存") {
+                            saveAndExitEditing()
                         }
+                        .buttonStyle(.borderedProminent)
+                        .scaleEffect(0.8)
+                        .accessibilityLabel("変更を保存")
+                    }
                 } else {
-                    // 通常モード：タップ可能なテキストを表示
-                    Button(action: {
-                        startEditing()
-                    }) {
+                    // 通常モード：タップ可能なテキスト + 編集アイコン
+                    HStack(spacing: 8) {
                         Text(task.title)
                             .font(.headline)
                             .foregroundColor(.primary)
                             .multilineTextAlignment(.leading)
+                            .onTapGesture(count: 2) {
+                                startEditing()
+                            }
+                            .accessibilityLabel("タスク名")
+                            .accessibilityHint("ダブルタップで編集を開始")
+                        
+                        Button(action: startEditing) {
+                            Image(systemName: "pencil")
+                                .foregroundColor(.blue)
+                                .opacity(0.7)
+                        }
+                        .accessibilityLabel("タスク名を編集")
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
 
                 Spacer()
@@ -315,6 +337,11 @@ struct TaskRowView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+        .onChange(of: isTitleFieldFocused) { _, isFocused in
+            if !isFocused && isEditing && hasChanges {
+                saveAndExitEditing()
+            }
+        }
     }
     
     // MARK: - Title Editing Methods
@@ -322,11 +349,13 @@ struct TaskRowView: View {
     /// タスク名の編集を開始します。
     private func startEditing() {
         editingTitle = task.title
-        isEditingTitle = true
+        isEditing = true
+        hasChanges = false
+        isTitleFieldFocused = true
     }
     
-    /// タスク名の編集を保存します。
-    private func saveTitle() {
+    /// タスク名の編集を保存して編集モードを終了します。
+    private func saveAndExitEditing() {
         let trimmedTitle = editingTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // 空文字列や元のタイトルと同じ場合は何もしない
@@ -339,14 +368,16 @@ struct TaskRowView: View {
         viewModel?.updateTaskTitle(task, newTitle: trimmedTitle)
         
         // 編集モードを終了
-        isEditingTitle = false
+        isEditing = false
         isTitleFieldFocused = false
+        hasChanges = false
     }
     
     /// タスク名の編集をキャンセルします。
     private func cancelEditing() {
-        isEditingTitle = false
+        isEditing = false
         isTitleFieldFocused = false
+        hasChanges = false
         editingTitle = ""
     }
 }
