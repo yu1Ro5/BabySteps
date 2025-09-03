@@ -286,11 +286,11 @@ struct TaskRowView: View {
                             .font(.headline)
                             .foregroundColor(.primary)
                             .multilineTextAlignment(.leading)
-                            .onTapGesture(count: 2) {
+                            .onTapGesture {
                                 startEditing()
                             }
                             .accessibilityLabel("タスク名")
-                            .accessibilityHint("ダブルタップで編集を開始")
+                            .accessibilityHint("タップで編集を開始")
                         
                         Button(action: startEditing) {
                             Image(systemName: "pencil")
