@@ -8,7 +8,6 @@ struct TaskListView: View {
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var selectedTask: Task?
-    @State private var showingAddStep = false
     @State private var stepCount = 5  // デフォルトのステップ数
 
     
@@ -29,8 +28,38 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 addTaskSheet
             }
-            .sheet(isPresented: $showingAddStep) {
-                addStepSheet
+            .sheet(item: $selectedTask) { task in
+                NavigationStack {
+                    VStack(spacing: 20) {
+                        Text("「\(task.title)」にステップを追加")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("このタスクに着手回数を追加します")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        
+                        Button("追加") {
+                            viewModel?.addStep(to: task)
+                            selectedTask = nil
+                        }
+                        .buttonStyle(.borderedProminent)
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    .navigationTitle("ステップ追加")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("キャンセル") {
+                                selectedTask = nil
+                            }
+                        }
+                    }
+                }
             }
             .onAppear {
                 // ModelContextを使用してViewModelを作成
@@ -52,7 +81,7 @@ struct TaskListView: View {
                 TaskRowView(
                     task: task,
                     viewModel: viewModel,
-                    onAddStep: { selectedTask = task; showingAddStep = true }
+                    onAddStep: { selectedTask = task }
                 )
             }
             .onDelete(perform: deleteTasks)
@@ -140,44 +169,6 @@ struct TaskListView: View {
         }
     }
     
-    // MARK: - Add Step Sheet
-    
-    private var addStepSheet: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                if let task = selectedTask {
-                    Text("「\(task.title)」にステップを追加")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("このタスクに着手回数を追加します")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    
-                    Button("追加") {
-                        viewModel?.addStep(to: task)
-                        showingAddStep = false
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("ステップ追加")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("キャンセル") {
-                        showingAddStep = false
-                    }
-                }
-            }
-        }
-    }
-    
     // MARK: - Helper Methods
     
     private func deleteTasks(offsets: IndexSet) {
@@ -186,7 +177,7 @@ struct TaskListView: View {
         }
     }
     
-
+    
     
     // 既存の完了済みステップにcompletedAtを設定
     private func initializeCompletedSteps() {
@@ -247,7 +238,7 @@ struct TaskRowView: View {
                 }
             }
             
-
+            
             
             // ステップ一覧
             if !task.steps.isEmpty {
