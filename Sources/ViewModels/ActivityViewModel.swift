@@ -92,7 +92,6 @@ class ActivityViewModel {
         
         // より安全な日付範囲計算
         let startOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
-        let endOfDayComponents = calendar.dateComponents([.year, .month, .day], from: date)
         
         guard let startOfDaySafe = calendar.date(from: startOfDayComponents),
               let endOfDaySafe = calendar.date(byAdding: .day, value: 1, to: startOfDaySafe) else {

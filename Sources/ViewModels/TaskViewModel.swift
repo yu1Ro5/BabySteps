@@ -53,20 +53,6 @@ class TaskViewModel {
         try? modelContext.save()
     }
     
-    // タスクに複数のステップを一括追加
-    func addMultipleSteps(to task: Task, count: Int) {
-        let startOrder = task.steps.count
-        
-        for i in 0..<count {
-            let step = TaskStep(order: startOrder + i)
-            step.task = task
-            task.addStep(step)
-            modelContext.insert(step)
-        }
-        
-        try? modelContext.save()
-    }
-    
     // ステップを削除
     func removeStep(_ step: TaskStep, from task: Task) {
         task.removeStep(step)
