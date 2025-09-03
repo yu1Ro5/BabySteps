@@ -2,6 +2,18 @@ name: iOS Build → TestFlight (Auto-Sign on Export)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - '.markdownlint.json'
+      - '.swift-format'
+      - 'screenshot-config.json'
+      - 'GITHUB_ACTIONS_SETUP.md'
+      - 'SCREENSHOT_GENERATION.md'
 
 jobs:
   release:
