@@ -250,11 +250,12 @@ struct TaskRowView: View {
         VStack(alignment: .leading, spacing: 12) {
             // タスクタイトル
             HStack {
-                if isEditing {
-                    // 編集モード：TextField + 保存ボタン
-                    HStack(spacing: 8) {
+                // リマインダーアプリ風の編集仕様
+                HStack(spacing: 8) {
+                    if isEditing {
+                        // 編集モード：シンプルなTextField
                         TextField("タスク名", text: $editingTitle)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .textFieldStyle(PlainTextFieldStyle())
                             .focused($isTitleFieldFocused)
                             .onSubmit {
                                 saveAndExitEditing()
@@ -262,26 +263,17 @@ struct TaskRowView: View {
                             .onChange(of: editingTitle) { _, newValue in
                                 hasChanges = newValue != task.title
                             }
-                            .background(Color(.systemYellow).opacity(0.1))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.blue, lineWidth: 2)
-                            )
-                            .animation(.easeInOut(duration: 0.2), value: isEditing)
+                            .font(.headline)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(Color(.systemGray5))
+                            .cornerRadius(6)
+                            .animation(.easeInOut(duration: 0.15), value: isEditing)
                             .accessibilityLabel("タスク名")
-                            .accessibilityHint("編集中。完了するには保存ボタンをタップしてください")
+                            .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
                             .accessibilityAddTraits([.isSelected])
-                        
-                        Button("保存") {
-                            saveAndExitEditing()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .scaleEffect(0.8)
-                        .accessibilityLabel("変更を保存")
-                    }
-                } else {
-                    // 通常モード：タップ可能なテキスト + 編集アイコン
-                    HStack(spacing: 8) {
+                    } else {
+                        // 通常モード：タップ可能なテキスト
                         Text(task.title)
                             .font(.headline)
                             .foregroundColor(.primary)
@@ -291,13 +283,6 @@ struct TaskRowView: View {
                             }
                             .accessibilityLabel("タスク名")
                             .accessibilityHint("タップで編集を開始")
-                        
-                        Button(action: startEditing) {
-                            Image(systemName: "pencil")
-                                .foregroundColor(.blue)
-                                .opacity(0.7)
-                        }
-                        .accessibilityLabel("タスク名を編集")
                     }
                 }
 
@@ -338,7 +323,8 @@ struct TaskRowView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
         .onChange(of: isTitleFieldFocused) { _, isFocused in
-            if !isFocused && isEditing && hasChanges {
+            if !isFocused && isEditing {
+                // リマインダーアプリ風：フォーカスが外れたら自動保存
                 saveAndExitEditing()
             }
         }
@@ -358,14 +344,16 @@ struct TaskRowView: View {
     private func saveAndExitEditing() {
         let trimmedTitle = editingTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 空文字列や元のタイトルと同じ場合は何もしない
-        guard !trimmedTitle.isEmpty && trimmedTitle != task.title else {
+        // リマインダーアプリ風：空文字列の場合は元のタイトルに戻す
+        if trimmedTitle.isEmpty {
             cancelEditing()
             return
         }
         
-        // タイトルを更新
-        viewModel?.updateTaskTitle(task, newTitle: trimmedTitle)
+        // 変更がある場合のみ保存
+        if trimmedTitle != task.title {
+            viewModel?.updateTaskTitle(task, newTitle: trimmedTitle)
+        }
         
         // 編集モードを終了
         isEditing = false
