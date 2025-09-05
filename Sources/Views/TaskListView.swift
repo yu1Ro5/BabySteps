@@ -286,14 +286,56 @@ struct TaskRowView: View {
     let viewModel: TaskViewModel?
     /// ＋ボタンがタップされた際に呼ばれるクロージャ。
     let onAddStep: () -> Void
+    
+    /// タスク名編集モードの状態
+    @State private var isEditing = false
+    /// 編集中のタスク名
+    @State private var editingTitle = ""
+    /// キーボードの表示状態
+    @FocusState private var isTitleFieldFocused: Bool
+    /// 変更があったかどうか
+    @State private var hasChanges = false
 
     /// タスク1件の表示レイアウトを定義します。
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // タスクタイトル
             HStack {
-                Text(task.title)
-                    .font(.headline)
+                // リマインダーアプリ風の編集仕様
+                HStack(spacing: 8) {
+                    if isEditing {
+                        // 編集モード：シンプルなTextField
+                        TextField("タスク名", text: $editingTitle)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .focused($isTitleFieldFocused)
+                            .onSubmit {
+                                saveAndExitEditing()
+                            }
+                            .onChange(of: editingTitle) { _, newValue in
+                                hasChanges = newValue != task.title
+                            }
+                            .font(.headline)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(Color(.systemGray5))
+                            .cornerRadius(6)
+                            .animation(.easeInOut(duration: 0.15), value: isEditing)
+                            .accessibilityLabel("タスク名")
+                            .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
+                            .accessibilityAddTraits([.isSelected])
+                    } else {
+                        // 通常モード：タップ可能なテキスト
+                        Text(task.title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
+                            .onTapGesture {
+                                startEditing()
+                            }
+                            .accessibilityLabel("タスク名")
+                            .accessibilityHint("タップで編集を開始")
+                    }
+                }
 
                 Spacer()
 
@@ -331,6 +373,51 @@ struct TaskRowView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+        .onChange(of: isTitleFieldFocused) { _, isFocused in
+            if !isFocused && isEditing {
+                // リマインダーアプリ風：フォーカスが外れたら自動保存
+                saveAndExitEditing()
+            }
+        }
+    }
+    
+    // MARK: - Title Editing Methods
+    
+    /// タスク名の編集を開始します。
+    private func startEditing() {
+        editingTitle = task.title
+        isEditing = true
+        hasChanges = false
+        isTitleFieldFocused = true
+    }
+    
+    /// タスク名の編集を保存して編集モードを終了します。
+    private func saveAndExitEditing() {
+        let trimmedTitle = editingTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // リマインダーアプリ風：空文字列の場合は元のタイトルに戻す
+        if trimmedTitle.isEmpty {
+            cancelEditing()
+            return
+        }
+        
+        // 変更がある場合のみ保存
+        if trimmedTitle != task.title {
+            viewModel?.updateTaskTitle(task, newTitle: trimmedTitle)
+        }
+        
+        // 編集モードを終了
+        isEditing = false
+        isTitleFieldFocused = false
+        hasChanges = false
+    }
+    
+    /// タスク名の編集をキャンセルします。
+    private func cancelEditing() {
+        isEditing = false
+        isTitleFieldFocused = false
+        hasChanges = false
+        editingTitle = ""
     }
 }
 
