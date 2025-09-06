@@ -374,6 +374,13 @@ struct TaskRowView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // 編集中のテキストフィールド以外をタップした時にキーボードを閉じる
+            if isEditing {
+                isTitleFieldFocused = false
+            }
+        }
         .onChange(of: isTitleFieldFocused) { _, isFocused in
             if !isFocused && isEditing {
                 // リマインダーアプリ風：フォーカスが外れたら自動保存
