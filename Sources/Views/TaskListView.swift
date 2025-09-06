@@ -286,7 +286,7 @@ struct TaskRowView: View {
     let viewModel: TaskViewModel?
     /// ＋ボタンがタップされた際に呼ばれるクロージャ。
     let onAddStep: () -> Void
-    
+
     /// タスク名編集モードの状態
     @State private var isEditing = false
     /// 編集中のタスク名
@@ -323,7 +323,8 @@ struct TaskRowView: View {
                             .accessibilityLabel("タスク名")
                             .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
                             .accessibilityAddTraits([.isSelected])
-                    } else {
+                    }
+                    else {
                         // 通常モード：タップ可能なテキスト
                         Text(task.title)
                             .font(.headline)
@@ -380,9 +381,9 @@ struct TaskRowView: View {
             }
         }
     }
-    
+
     // MARK: - Title Editing Methods
-    
+
     /// タスク名の編集を開始します。
     private func startEditing() {
         editingTitle = task.title
@@ -390,28 +391,28 @@ struct TaskRowView: View {
         hasChanges = false
         isTitleFieldFocused = true
     }
-    
+
     /// タスク名の編集を保存して編集モードを終了します。
     private func saveAndExitEditing() {
         let trimmedTitle = editingTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         // リマインダーアプリ風：空文字列の場合は元のタイトルに戻す
         if trimmedTitle.isEmpty {
             cancelEditing()
             return
         }
-        
+
         // 変更がある場合のみ保存
         if trimmedTitle != task.title {
             viewModel?.updateTaskTitle(task, newTitle: trimmedTitle)
         }
-        
+
         // 編集モードを終了
         isEditing = false
         isTitleFieldFocused = false
         hasChanges = false
     }
-    
+
     /// タスク名の編集をキャンセルします。
     private func cancelEditing() {
         isEditing = false

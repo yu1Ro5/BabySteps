@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct BabyStepsApp: App {
@@ -11,7 +11,7 @@ struct BabyStepsApp: App {
                         Image(systemName: "list.bullet")
                         Text("タスク")
                     }
-                
+
                 ActivityView()
                     .tabItem {
                         Image(systemName: "chart.bar.fill")

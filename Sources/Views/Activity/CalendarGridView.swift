@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CalendarGridView: View {
     let activities: [DailyActivity]
-    
+
     /// 日曜日〜土曜日
     private let columns = 7
     /// 約90日分
@@ -17,7 +17,8 @@ struct CalendarGridView: View {
                         let index = row * columns + column
                         if index < activities.count {
                             ActivityCell(activity: activities[index])
-                        } else {
+                        }
+                        else {
                             // 空のセル（過去の日付でアクティビティがない場合）
                             Color.clear
                                 .frame(height: 20)
