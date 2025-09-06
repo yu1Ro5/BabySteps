@@ -54,14 +54,33 @@ struct TaskListView: View {
     /// タスク一覧リストのViewを返します。
     private var taskList: some View {
         List {
-            ForEach(tasks, id: \.id) { task in
-                TaskRowView(
-                    task: task,
-                    viewModel: viewModel,
-                    onAddStep: { selectedTask = task }
-                )
+            // 未完了のタスク
+            if !incompleteTasks.isEmpty {
+                Section("進行中") {
+                    ForEach(incompleteTasks, id: \.id) { task in
+                        TaskRowView(
+                            task: task,
+                            viewModel: viewModel,
+                            onAddStep: { selectedTask = task }
+                        )
+                    }
+                    .onDelete(perform: deleteIncompleteTasks)
+                }
             }
-            .onDelete(perform: deleteTasks)
+            
+            // 完了したタスク
+            if !completedTasks.isEmpty {
+                Section("完了済み") {
+                    ForEach(completedTasks, id: \.id) { task in
+                        TaskRowView(
+                            task: task,
+                            viewModel: viewModel,
+                            onAddStep: { selectedTask = task }
+                        )
+                    }
+                    .onDelete(perform: deleteCompletedTasks)
+                }
+            }
         }
     }
 
@@ -224,11 +243,31 @@ struct TaskListView: View {
         }
     }
 
-    /// 指定されたインデックスのタスクを削除します。
+    /// 未完了のタスクを取得
+    private var incompleteTasks: [Task] {
+        tasks.filter { !$0.isCompleted }
+    }
+    
+    /// 完了したタスクを取得
+    private var completedTasks: [Task] {
+        tasks.filter { $0.isCompleted }
+    }
+    
+    /// 指定されたインデックスの未完了タスクを削除します。
     /// - Parameter offsets: タスクのインデックス
-    private func deleteTasks(offsets: IndexSet) {
+    private func deleteIncompleteTasks(offsets: IndexSet) {
         for index in offsets {
-            viewModel?.deleteTask(tasks[index])
+            let task = incompleteTasks[index]
+            viewModel?.deleteTask(task)
+        }
+    }
+    
+    /// 指定されたインデックスの完了タスクを削除します。
+    /// - Parameter offsets: タスクのインデックス
+    private func deleteCompletedTasks(offsets: IndexSet) {
+        for index in offsets {
+            let task = completedTasks[index]
+            viewModel?.deleteTask(task)
         }
     }
 
@@ -339,6 +378,18 @@ struct TaskRowView: View {
                 }
 
                 Spacer()
+                
+                // タスク全体の完了ボタン
+                Button(action: {
+                    guard let viewModel = viewModel else { return }
+                    viewModel.toggleTaskCompletion(task)
+                }) {
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(task.isCompleted ? .green : .gray)
+                        .font(.title2)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(viewModel == nil)
 
                 Button(action: onAddStep) {
                     Image(systemName: "plus.circle")
@@ -372,8 +423,9 @@ struct TaskRowView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(task.isCompleted ? Color(.systemGray5) : Color(.systemGray6))
         .cornerRadius(12)
+        .opacity(task.isCompleted ? 0.7 : 1.0)
         .onChange(of: isTitleFieldFocused) { _, isFocused in
             if !isFocused && isEditing {
                 // リマインダーアプリ風：フォーカスが外れたら自動保存
