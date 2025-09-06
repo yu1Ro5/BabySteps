@@ -18,9 +18,10 @@ struct BabyStepsApp: App {
                         Text("アクティビティ")
                     }
             }
-            .modelContainer(for: [Task.self, TaskStep.self])
+            .modelContainer(for: [Task.self, TaskStep.self], migrationPlan: TaskMigrationPlan.self)
             .onAppear {
                 print("🚀 BabyStepsApp起動")
+                print("🚀 マイグレーションプラン: TaskMigrationPlan")
             }
         }
     }

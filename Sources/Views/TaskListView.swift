@@ -45,8 +45,8 @@ struct TaskListView: View {
                 // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
 
-                // 既存の完了済みステップにcompletedAtを設定
-                initializeCompletedSteps()
+                // データ整合性チェックを実行
+                performDataIntegrityChecks()
             }
         }
     }
@@ -271,47 +271,16 @@ struct TaskListView: View {
         }
     }
 
-    /// 既存の完了済みステップにcompletedAtの日付を設定します。
-    private func initializeCompletedSteps() {
-        var hasChanges = false
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-
-        print("🔧 完了済みステップの初期化開始")
-
-        for task in tasks {
-            print("🔧 タスク: \(task.title)")
-            for step in task.steps {
-                if step.isCompleted {
-                    if step.completedAt == nil {
-                        // 完了済みだがcompletedAtが設定されていない場合
-                        step.completedAt = Date()
-                        hasChanges = true
-                        print(
-                            "  ✅ ステップ\(step.order + 1) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))"
-                        )
-                    }
-                    else {
-                        print(
-                            "  ℹ️ ステップ\(step.order + 1) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))"
-                        )
-                    }
-                }
-                else {
-                    print("  ⏳ ステップ\(step.order + 1) - 未完了")
-                }
-            }
-        }
-
-        if hasChanges {
-            print("🔧 変更を保存中...")
-            try? modelContext.save()
-            print("🔧 保存完了")
-        }
-        else {
-            print("🔧 変更なし")
-        }
+    /// データ整合性チェックを実行します。
+    private func performDataIntegrityChecks() {
+        print("🔍 アプリ起動時のデータ整合性チェック開始")
+        
+        // DataIntegrityCheckerを使用してチェックを実行
+        let checker = DataIntegrityChecker(modelContext: modelContext)
+        checker.performStartupChecks()
+        checker.printMigrationStatistics()
+        
+        print("🔍 データ整合性チェック完了")
     }
 }
 
