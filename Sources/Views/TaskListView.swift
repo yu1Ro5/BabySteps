@@ -323,9 +323,6 @@ struct TaskRowView: View {
                             .accessibilityLabel("タスク名")
                             .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
                             .accessibilityAddTraits([.isSelected])
-                            .onTapGesture {
-                                // テキストフィールド自体のタップは親のタップジェスチャーを無効化
-                            }
                     }
                     else {
                         // 通常モード：タップ可能なテキスト
