@@ -10,32 +10,32 @@ on:
 jobs:
   build-and-test:
     runs-on: macos-15   # macOS 15 (Xcode 16.3が利用可能)
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Select Xcode 16.3
       run: sudo xcode-select -switch /Applications/Xcode_16.3.app
-      
+
     - name: Show available SDKs
       run: xcodebuild -showsdks
-      
+
     - name: List Available Simulators
       run: |
         echo "=== Available iOS Simulators ==="
         xcrun simctl list devices available | grep "iPhone" || echo "No iPhone simulators found"
         echo "=== Available iOS Runtimes ==="
         xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
-        
+
     - name: Install XcodeGen
       run: brew install xcodegen
-        
+
     - name: Generate Xcode Project
       run: |
         xcodegen generate
         ls -la *.xcodeproj
-        
+
     - name: Build iOS App (Debug)
       run: |
         xcodebuild -project BabySteps.xcodeproj \
@@ -48,7 +48,7 @@ jobs:
                    CODE_SIGNING_ALLOWED=NO \
                    build \
                    -verbose
-                   
+
     - name: Build iOS App (Release)
       run: |
         xcodebuild -project BabySteps.xcodeproj \
@@ -61,7 +61,7 @@ jobs:
                    CODE_SIGNING_ALLOWED=NO \
                    build \
                    -verbose
-                   
+
     - name: Run Tests (Skip if simulator issues)
       run: |
         # Try to run tests, but don't fail the build if tests fail
@@ -75,7 +75,7 @@ jobs:
                    CODE_SIGNING_ALLOWED=NO \
                    test \
                    -verbose || echo "Tests failed, but continuing with build"
-                   
+
     - name: Archive App (unsigned)
       run: |
         xcodebuild -project BabySteps.xcodeproj \
@@ -88,14 +88,14 @@ jobs:
                    CODE_SIGNING_ALLOWED=NO \
                    archive \
                    -archivePath build/BabySteps.xcarchive
-                   
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ios-build-artifacts
         path: build/
         retention-days: 7
-        
+
     - name: Build Summary
       run: |
         echo "=== Build Summary ==="

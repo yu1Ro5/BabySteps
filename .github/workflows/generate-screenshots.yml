@@ -11,7 +11,7 @@ jobs:
   screenshots:
     runs-on: macos-15
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "=== Available iOS Runtimes ==="
           xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
-          
+
           # iOS 18.5を固定で使用
           export IOS_VERSION="18.5"
           echo "Using iOS version: $IOS_VERSION"
@@ -59,11 +59,11 @@ jobs:
       - name: Setup simulators
         run: |
           echo "Using iOS version: $IOS_VERSION"
-          
+
           # 利用可能なシミュレータを確認
           echo "=== Available iPhone Simulators ==="
           xcrun simctl list devices available | grep "iPhone" | grep "18.5" || echo "No iPhone simulators found for iOS 18.5"
-          
+
           echo "=== Available iPad Simulators ==="
           xcrun simctl list devices available | grep "iPad" | grep "18.5" || echo "No iPad simulators found for iOS 18.5"
 
@@ -87,27 +87,27 @@ jobs:
       - name: Generate iPhone screenshot
         run: |
           echo "Generating iPhone screenshot..."
-          
+
           # iPhone 16 Pro Maxシミュレータを起動
           xcrun simctl boot "iPhone 16 Pro Max" || echo "iPhone simulator already booted"
-          
+
           # シミュレータが完全に起動するまで待機
           echo "Waiting for iPhone simulator to fully boot..."
           sleep 10
-          
+
           # アプリをインストール
           xcrun simctl install booted "build/Build/Products/Debug-iphonesimulator/BabySteps.app"
-          
+
           # アプリを起動
           xcrun simctl launch booted com.yu1Ro5.BabySteps
-          
+
           # アプリが完全に起動するまで待機
           echo "Waiting for app to fully launch..."
           sleep 8
-          
+
           # スクリーンショットを撮影
           xcrun simctl io booted screenshot "screenshots/iphone_6.5inch.png"
-          
+
           echo "✅ iPhone screenshot saved: screenshots/iphone_6.5inch.png"
 
       - name: Build app for iPad
@@ -127,37 +127,37 @@ jobs:
       - name: Generate iPad screenshot
         run: |
           echo "Generating iPad screenshot..."
-          
+
           # すべてのシミュレータをシャットダウン
           xcrun simctl shutdown all
-          
+
           # iPad Pro 13-inch (M4)シミュレータを起動
           xcrun simctl boot "iPad Pro 13-inch (M4)" || echo "iPad simulator already booted"
-          
+
           # シミュレータが完全に起動するまで待機
           echo "Waiting for iPad simulator to fully boot..."
           sleep 10
-          
+
           # アプリをインストール
           xcrun simctl install booted "build/Build/Products/Debug-iphonesimulator/BabySteps.app"
-          
+
           # アプリを起動
           xcrun simctl launch booted com.yu1Ro5.BabySteps
-          
+
           # アプリが完全に起動するまで待機
           echo "Waiting for app to fully launch..."
           sleep 8
-          
+
           # スクリーンショットを撮影
           xcrun simctl io booted screenshot "screenshots/ipad_13inch.png"
-          
+
           echo "✅ iPad screenshot saved: screenshots/ipad_13inch.png"
 
       - name: Verify screenshots
         run: |
           echo "=== Screenshot Verification ==="
           ls -la screenshots/
-          
+
           if [ -f "screenshots/iphone_6.5inch.png" ]; then
             echo "✅ iPhone screenshot exists"
             file "screenshots/iphone_6.5inch.png"
@@ -165,7 +165,7 @@ jobs:
             echo "❌ iPhone screenshot missing"
             exit 1
           fi
-          
+
           if [ -f "screenshots/ipad_13inch.png" ]; then
             echo "✅ iPad screenshot exists"
             file "screenshots/ipad_13inch.png"
