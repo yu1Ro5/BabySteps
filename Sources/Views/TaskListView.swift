@@ -323,6 +323,9 @@ struct TaskRowView: View {
                             .accessibilityLabel("タスク名")
                             .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
                             .accessibilityAddTraits([.isSelected])
+                            .onTapGesture {
+                                // テキストフィールド自体のタップは親のタップジェスチャーを無効化
+                            }
                     }
                     else {
                         // 通常モード：タップ可能なテキスト
@@ -374,6 +377,13 @@ struct TaskRowView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // 編集中のテキストフィールド以外をタップした時にキーボードを閉じる
+            if isEditing {
+                isTitleFieldFocused = false
+            }
+        }
         .onChange(of: isTitleFieldFocused) { _, isFocused in
             if !isFocused && isEditing {
                 // リマインダーアプリ風：フォーカスが外れたら自動保存
