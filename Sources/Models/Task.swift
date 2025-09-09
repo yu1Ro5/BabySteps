@@ -11,12 +11,18 @@ final class Task {
     var createdAt: Date
     /// タスクに紐づくステップの配列
     var steps: [TaskStep]
+    /// タスク全体の完了状態
+    var isCompleted: Bool
+    /// タスク全体の完了日時
+    var completedAt: Date?
 
     init(title: String) {
         self.id = UUID()
         self.title = title
         self.createdAt = Date()
         self.steps = []
+        self.isCompleted = false
+        self.completedAt = nil
     }
 
     // 完了したステップ数を取得
@@ -40,6 +46,16 @@ final class Task {
         if let index = steps.firstIndex(where: { $0.id == step.id }) {
             steps.remove(at: index)
             step.task = nil
+        }
+    }
+    
+    // タスク全体の完了状態を切り替え
+    func toggleCompletion() {
+        isCompleted.toggle()
+        if isCompleted {
+            completedAt = Date()
+        } else {
+            completedAt = nil
         }
     }
 }

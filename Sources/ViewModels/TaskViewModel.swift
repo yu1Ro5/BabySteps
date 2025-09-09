@@ -76,6 +76,23 @@ class TaskViewModel {
         try? modelContext.save()
         print("🔄 データベース保存完了")
     }
+    
+    // タスク全体の完了状態を切り替え
+    func toggleTaskCompletion(_ task: Task) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.timeZone = TimeZone.current
+
+        print("🎯 タスク完了状態切り替え開始: \(task.title)")
+        print("🎯 現在の状態: isCompleted=\(task.isCompleted), completedAt=\(task.completedAt?.description ?? "nil")")
+
+        task.toggleCompletion()
+
+        print("🎯 切り替え後の状態: isCompleted=\(task.isCompleted), completedAt=\(task.completedAt?.description ?? "nil")")
+
+        try? modelContext.save()
+        print("🎯 データベース保存完了")
+    }
 
     // MARK: - Data Queries
 

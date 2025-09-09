@@ -19,6 +19,18 @@ struct TaskListView: View {
     @State private var stepCount = 5
     /// ステップ追加時のステップ数（デフォルト: 1）。
     @State private var addStepCount = 1
+    
+    // MARK: - Computed Properties
+    
+    /// 未完了のタスクを取得
+    private var incompleteTasks: [Task] {
+        tasks.filter { !$0.isCompleted }
+    }
+    
+    /// 完了済みのタスクを取得
+    private var completedTasks: [Task] {
+        tasks.filter { $0.isCompleted }
+    }
 
     /// メイン画面のView階層を定義します。
     var body: some View {
@@ -54,14 +66,31 @@ struct TaskListView: View {
     /// タスク一覧リストのViewを返します。
     private var taskList: some View {
         List {
-            ForEach(tasks, id: \.id) { task in
-                TaskRowView(
-                    task: task,
-                    viewModel: viewModel,
-                    onAddStep: { selectedTask = task }
-                )
+            // 未完了タスクセクション
+            Section("進行中") {
+                ForEach(incompleteTasks, id: \.id) { task in
+                    TaskRowView(
+                        task: task,
+                        viewModel: viewModel,
+                        onAddStep: { selectedTask = task }
+                    )
+                }
+                .onDelete(perform: deleteIncompleteTasks)
             }
-            .onDelete(perform: deleteTasks)
+            
+            // 完了タスクセクション
+            if !completedTasks.isEmpty {
+                Section("完了済み") {
+                    ForEach(completedTasks, id: \.id) { task in
+                        TaskRowView(
+                            task: task,
+                            viewModel: viewModel,
+                            onAddStep: { selectedTask = task }
+                        )
+                    }
+                    .onDelete(perform: deleteCompletedTasks)
+                }
+            }
         }
     }
 
@@ -224,11 +253,19 @@ struct TaskListView: View {
         }
     }
 
-    /// 指定されたインデックスのタスクを削除します。
+    /// 指定されたインデックスの未完了タスクを削除します。
     /// - Parameter offsets: タスクのインデックス
-    private func deleteTasks(offsets: IndexSet) {
+    private func deleteIncompleteTasks(offsets: IndexSet) {
         for index in offsets {
-            viewModel?.deleteTask(tasks[index])
+            viewModel?.deleteTask(incompleteTasks[index])
+        }
+    }
+    
+    /// 指定されたインデックスの完了タスクを削除します。
+    /// - Parameter offsets: タスクのインデックス
+    private func deleteCompletedTasks(offsets: IndexSet) {
+        for index in offsets {
+            viewModel?.deleteTask(completedTasks[index])
         }
     }
 
@@ -301,6 +338,18 @@ struct TaskRowView: View {
         VStack(alignment: .leading, spacing: 12) {
             // タスクタイトル
             HStack {
+                // タスク完了ボタン
+                Button(action: {
+                    guard let viewModel = viewModel else { return }
+                    viewModel.toggleTaskCompletion(task)
+                }) {
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(task.isCompleted ? .green : .gray)
+                        .font(.title2)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(viewModel == nil)
+                
                 // リマインダーアプリ風の編集仕様
                 HStack(spacing: 8) {
                     if isEditing {
@@ -328,7 +377,7 @@ struct TaskRowView: View {
                         // 通常モード：タップ可能なテキスト
                         Text(task.title)
                             .font(.headline)
-                            .foregroundColor(.primary)
+                            .foregroundColor(task.isCompleted ? .secondary : .primary)
                             .multilineTextAlignment(.leading)
                             .onTapGesture {
                                 startEditing()
@@ -374,6 +423,7 @@ struct TaskRowView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
+        .opacity(task.isCompleted ? 0.6 : 1.0)
         .contentShape(Rectangle())
         .onTapGesture {
             // 編集中のテキストフィールド以外をタップした時にキーボードを閉じる
