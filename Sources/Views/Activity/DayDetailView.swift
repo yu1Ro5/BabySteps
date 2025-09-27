@@ -6,19 +6,23 @@ struct DayDetailView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                // 日付表示
-                dateHeaderView
+            ZStack {
+                LiquidGlassBackground()
+                
+                VStack(spacing: 24) {
+                    // 日付表示
+                    dateHeaderView
 
-                // アクティビティサマリー
-                activitySummaryView
+                    // アクティビティサマリー
+                    activitySummaryView
 
-                // 完了ステップ一覧（実装予定）
-                completedStepsView
+                    // 完了ステップ一覧（実装予定）
+                    completedStepsView
 
-                Spacer()
+                    Spacer()
+                }
+                .padding()
             }
-            .padding()
             .navigationTitle("詳細")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -26,6 +30,7 @@ struct DayDetailView: View {
                     Button("完了") {
                         dismiss()
                     }
+                    .liquidGlass(intensity: 0.1, cornerRadius: 8)
                 }
             }
         }
@@ -34,76 +39,84 @@ struct DayDetailView: View {
     // MARK: - Date Header View
 
     private var dateHeaderView: some View {
-        VStack(spacing: 8) {
-            Text(formatDate(activity.date))
-                .font(.title2)
-                .fontWeight(.bold)
+        LiquidGlassCard(intensity: 0.1, cornerRadius: 16, padding: 20) {
+            VStack(spacing: 8) {
+                Text(formatDate(activity.date))
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
 
-            Text(formatWeekday(activity.date))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                Text(formatWeekday(activity.date))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
         }
     }
 
     // MARK: - Activity Summary View
 
     private var activitySummaryView: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("アクティビティレベル")
-                    .font(.headline)
-                Spacer()
-                Text(activityLevelText)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
+        LiquidGlassCard(intensity: 0.12, cornerRadius: 16, padding: 20) {
+            VStack(spacing: 16) {
+                HStack {
+                    Text("アクティビティレベル")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text(activityLevelText)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
 
-            HStack {
-                Text("完了したステップ")
-                    .font(.headline)
-                Spacer()
-                Text("\(activity.commitCount)件")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
+                HStack {
+                    Text("完了したステップ")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text("\(activity.commitCount)件")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
 
-            // アクティビティレベルインジケーター
-            HStack(spacing: 4) {
-                ForEach(ActivityLevel.allCases, id: \.self) { level in
-                    Circle()
-                        .fill(level == activity.activityLevel ? level.color : Color.gray.opacity(0.3))
-                        .frame(width: 12, height: 12)
+                // アクティビティレベルインジケーター
+                HStack(spacing: 6) {
+                    ForEach(ActivityLevel.allCases, id: \.self) { level in
+                        Circle()
+                            .fill(level == activity.activityLevel ? level.color : Color.gray.opacity(0.3))
+                            .frame(width: 14, height: 14)
+                            .overlay(
+                                Circle()
+                                    .stroke(.white.opacity(0.3), lineWidth: 1)
+                            )
+                    }
                 }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
 
     // MARK: - Completed Steps View
 
     private var completedStepsView: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("完了したステップ")
-                .font(.headline)
+        LiquidGlassCard(intensity: 0.1, cornerRadius: 16, padding: 20) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("完了したステップ")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-            if activity.commitCount > 0 {
-                Text("完了したステップ: \(activity.commitCount)件")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if activity.commitCount > 0 {
+                    Text("完了したステップ: \(activity.commitCount)件")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                else {
+                    Text("この日は完了したステップがありません")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .italic()
+                }
             }
-            else {
-                Text("この日は完了したステップがありません")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .italic()
-            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
 
     // MARK: - Helper Methods
