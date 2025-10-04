@@ -16,14 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode 26
+      - name: Select Xcode 26.0
         run: |
-          # Xcode 26が利用可能かチェック
-          if [ -d "/Applications/Xcode_26.app" ]; then
-            sudo xcode-select -switch /Applications/Xcode_26.app
-            echo "✅ Xcode 26 selected"
+          # Xcode 26.0が利用可能かチェック
+          if [ -d "/Applications/Xcode_26.0.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_26.0.app
+            echo "✅ Xcode 26.0 selected"
           else
-            echo "❌ Xcode 26 not found"
+            echo "❌ Xcode 26.0 not found"
             exit 1
           fi
 

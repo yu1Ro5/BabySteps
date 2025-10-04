@@ -23,9 +23,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Xcode 26を明示的に選択
-      - name: Select Xcode 26
-        run: sudo xcode-select -switch /Applications/Xcode_26.app
+      # Xcode 26.0を明示的に選択
+      - name: Select Xcode 26.0
+        run: sudo xcode-select -switch /Applications/Xcode_26.0.app
 
       # 利用可能なSDKを表示
       - name: Show available SDKs
