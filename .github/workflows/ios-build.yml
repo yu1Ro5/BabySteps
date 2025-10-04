@@ -9,14 +9,15 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-15   # macOS 15 (Xcode 16.3が利用可能)
+    runs-on: macos-26   # macOS 26 (Xcode 26が利用可能)
+    timeout-minutes: 30
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Select Xcode 16.3
-      run: sudo xcode-select -switch /Applications/Xcode_16.3.app
+    - name: Select Xcode 26.0
+      run: sudo xcode-select -switch /Applications/Xcode_26.0.app
 
     - name: Show available SDKs
       run: xcodebuild -showsdks
@@ -24,9 +25,9 @@ jobs:
     - name: List Available Simulators
       run: |
         echo "=== Available iOS Simulators ==="
-        xcrun simctl list devices available | grep "iPhone" || echo "No iPhone simulators found"
+        xcrun simctl list devices available
         echo "=== Available iOS Runtimes ==="
-        xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
+        xcrun simctl list runtimes
 
     - name: Install XcodeGen
       run: brew install xcodegen
@@ -41,7 +42,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
+                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.0' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
@@ -54,7 +55,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
+                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.0' \
                    -derivedDataPath build \
                    -configuration Release \
                    CODE_SIGN_STYLE=Automatic \
@@ -63,12 +64,13 @@ jobs:
                    -verbose
 
     - name: Run Tests (Skip if simulator issues)
+      timeout-minutes: 15
       run: |
         # Try to run tests, but don't fail the build if tests fail
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.4' \
+                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.0' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
@@ -80,7 +82,7 @@ jobs:
       run: |
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
-                   -sdk iphoneos18.4 \
+                   -sdk iphoneos26.0 \
                    -destination 'generic/platform=iOS' \
                    -derivedDataPath build \
                    -configuration Release \
