@@ -9,24 +9,21 @@ on:
 
 jobs:
   screenshots:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode 16.4
+      - name: Select Xcode 26
         run: |
-          # Xcode 16.4が利用可能かチェック
-          if [ -d "/Applications/Xcode_16.4.app" ]; then
-            sudo xcode-select -switch /Applications/Xcode_16.4.app
-            echo "✅ Xcode 16.4 selected"
-          elif [ -d "/Applications/Xcode_16.3.app" ]; then
-            sudo xcode-select -switch /Applications/Xcode_16.3.app
-            echo "⚠️ Xcode 16.3 selected (16.4 not available)"
+          # Xcode 26が利用可能かチェック
+          if [ -d "/Applications/Xcode_26.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_26.app
+            echo "✅ Xcode 26 selected"
           else
-            echo "❌ Xcode 16.4 or 16.3 not found"
+            echo "❌ Xcode 26 not found"
             exit 1
           fi
 
@@ -52,8 +49,8 @@ jobs:
           echo "=== Available iOS Runtimes ==="
           xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
 
-          # iOS 18.5を固定で使用
-          export IOS_VERSION="18.5"
+          # iOS 26.0を固定で使用
+          export IOS_VERSION="26.0"
           echo "Using iOS version: $IOS_VERSION"
 
       - name: Setup simulators
@@ -62,10 +59,10 @@ jobs:
 
           # 利用可能なシミュレータを確認
           echo "=== Available iPhone Simulators ==="
-          xcrun simctl list devices available | grep "iPhone" | grep "18.5" || echo "No iPhone simulators found for iOS 18.5"
+          xcrun simctl list devices available | grep "iPhone" | grep "26.0" || echo "No iPhone simulators found for iOS 26.0"
 
           echo "=== Available iPad Simulators ==="
-          xcrun simctl list devices available | grep "iPad" | grep "18.5" || echo "No iPad simulators found for iOS 18.5"
+          xcrun simctl list devices available | grep "iPad" | grep "26.0" || echo "No iPad simulators found for iOS 26.0"
 
       - name: Build app for iPhone
         run: |
@@ -73,7 +70,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
@@ -116,7 +113,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4),OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4),OS=26.0' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \

@@ -2,8 +2,8 @@ name: BabySteps
 options:
   bundleIdPrefix: com.yu1Ro5
   deploymentTarget:
-    iOS: "18.0"
-  xcodeVersion: "16.4"
+    iOS: "26.0"
+  xcodeVersion: "26"
   generateEmptyDirectories: true
   groupSortPosition: top
 
@@ -17,7 +17,7 @@ targets:
   BabySteps:
     type: application
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "26.0"
     sources:
       - path: Sources
         type: group
@@ -38,7 +38,7 @@ targets:
   BabyStepsTests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "26.0"
     sources:
       - path: Tests
         type: group

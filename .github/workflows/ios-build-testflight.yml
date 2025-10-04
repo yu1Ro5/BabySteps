@@ -17,15 +17,15 @@ on:
 
 jobs:
   release:
-    runs-on: macos-15   # macOS 15 (Xcode 16.1が利用可能)
+    runs-on: macos-26   # macOS 26 (Xcode 26が利用可能)
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Xcode 16.4を明示的に選択
-      - name: Select Xcode 16.4
-        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+      # Xcode 26を明示的に選択
+      - name: Select Xcode 26
+        run: sudo xcode-select -switch /Applications/Xcode_26.app
 
       # 利用可能なSDKを表示
       - name: Show available SDKs
@@ -44,7 +44,7 @@ jobs:
           xcodebuild archive \
             -project BabySteps.xcodeproj \
             -scheme BabySteps \
-            -sdk iphoneos18.5 \
+            -sdk iphoneos26.0 \
             -configuration Release \
             -archivePath BabySteps.xcarchive \
             -destination "generic/platform=iOS" \
