@@ -6,7 +6,7 @@ SwiftUIとSwiftDataを使用したモダンなiOSタスク管理アプリケー�
 
 - 🚀 **SwiftUIベース**: モダンなSwiftUIフレームワークを使用
 - 💾 **SwiftData対応**: iOS 17+の新しいデータ永続化フレームワーク
-- 📱 **iOS 18.0+対応**: 最新のiOS機能をサポート
+- 📱 **iOS 26.0+対応**: 最新のiOS機能をサポート
 - 🎯 **タスク管理**: タスクを小さなステップに分解して管理
 - 📊 **進捗追跡**: 全体と個別の進捗率を視覚的に表示
 - 🔄 **CI/CD対応**: GitHub Actionsで自動ビルド・テスト
@@ -74,8 +74,8 @@ BabySteps/
 
 ### 前提条件
 
-- macOS環境（Xcode 15.0以上）
-- iOS 18.0+対応
+- macOS環境（Xcode 26.0以上）
+- iOS 26.0+対応
 - XcodeGen
 - Homebrew
 
@@ -168,11 +168,11 @@ GitHubのActionsタブから手動でワークフローを実行できます。
 
 ### 設定
 
-- **iOS Deployment Target**: 18.0
+- **iOS Deployment Target**: 26.0
 - **Bundle Identifier**: com.yu1Ro5.BabySteps
 - **Code Signing**: Automatic
 - **Framework**: SwiftUI + SwiftData
-- **Xcode Version**: 16.4
+- **Xcode Version**: 26.0
 
 ## トラブルシューティング
 
@@ -191,8 +191,8 @@ GitHubのActionsタブから手動でワークフローを実行できます。
    ```
 
 3. **ビルドエラー**
-   - Xcodeのバージョンを確認（16.4以上推奨）
-   - iOS 18.0+のシミュレーターを使用
+   - Xcodeのバージョンを確認（26.0以上推奨）
+   - iOS 26.0+のシミュレーターを使用
    - 依存関係の設定を確認
 
 4. **SwiftData関連のエラー**
