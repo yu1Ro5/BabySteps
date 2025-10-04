@@ -10,6 +10,7 @@ on:
 jobs:
   build-and-test:
     runs-on: macos-26   # macOS 26 (Xcode 26が利用可能)
+    timeout-minutes: 30
 
     steps:
     - name: Checkout code
@@ -24,9 +25,9 @@ jobs:
     - name: List Available Simulators
       run: |
         echo "=== Available iOS Simulators ==="
-        xcrun simctl list devices available | grep "iPhone" || echo "No iPhone simulators found"
+        xcrun simctl list devices available
         echo "=== Available iOS Runtimes ==="
-        xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
+        xcrun simctl list runtimes
 
     - name: Install XcodeGen
       run: brew install xcodegen
@@ -63,6 +64,7 @@ jobs:
                    -verbose
 
     - name: Run Tests (Skip if simulator issues)
+      timeout-minutes: 15
       run: |
         # Try to run tests, but don't fail the build if tests fail
         xcodebuild -project BabySteps.xcodeproj \
