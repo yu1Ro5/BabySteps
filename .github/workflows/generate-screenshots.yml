@@ -70,7 +70,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
@@ -85,8 +85,8 @@ jobs:
         run: |
           echo "Generating iPhone screenshot..."
 
-          # iPhone 16 Pro Maxシミュレータを起動
-          xcrun simctl boot "iPhone 16 Pro Max" || echo "iPhone simulator already booted"
+          # iPhone 17 Pro Maxシミュレータを起動
+          xcrun simctl boot "iPhone 17 Pro Max" || echo "iPhone simulator already booted"
 
           # シミュレータが完全に起動するまで待機
           echo "Waiting for iPhone simulator to fully boot..."
