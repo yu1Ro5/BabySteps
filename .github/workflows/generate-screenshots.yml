@@ -131,9 +131,9 @@ jobs:
           # iPad Pro 13-inch (M4)シミュレータを起動
           xcrun simctl boot "iPad Pro 13-inch (M4)" || echo "iPad simulator already booted"
 
-          # シミュレータが完全に起動するまで待機
+          # iPadシミュレータが完全に起動するまで待機（長めに設定）
           echo "Waiting for iPad simulator to fully boot..."
-          sleep 10
+          sleep 25
 
           # アプリをインストール
           xcrun simctl install booted "build/Build/Products/Debug-iphonesimulator/BabySteps.app"
@@ -141,9 +141,9 @@ jobs:
           # アプリを起動
           xcrun simctl launch booted com.yu1Ro5.BabySteps
 
-          # アプリが完全に起動するまで待機
-          echo "Waiting for app to fully launch..."
-          sleep 8
+          # iPadアプリが完全に起動するまで待機（長めに設定）
+          echo "Waiting for iPad app to fully launch..."
+          sleep 18
 
           # スクリーンショットを撮影
           xcrun simctl io booted screenshot "screenshots/ipad_13inch.png"
