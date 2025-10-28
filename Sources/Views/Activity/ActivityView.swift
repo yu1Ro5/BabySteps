@@ -13,28 +13,44 @@ struct ActivityView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                // カレンダーグリッド
-                if !dailyActivities.isEmpty {
-                    CalendarGridView(activities: dailyActivities)
-                }
+            ZStack {
+                LiquidGlassBackground()
+                
+                VStack(spacing: 24) {
+                    // カレンダーグリッド
+                    if !dailyActivities.isEmpty {
+                        CalendarGridView(activities: dailyActivities)
+                            .liquidGlass(intensity: 0.1, cornerRadius: 20)
+                    }
 
-                // ローディング表示
-                if isLoading {
-                    ProgressView("アクティビティを読み込み中...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
+                    // ローディング表示
+                    if isLoading {
+                        LiquidGlassCard(intensity: 0.15, cornerRadius: 16, padding: 20) {
+                            VStack(spacing: 12) {
+                                ProgressView()
+                                    .scaleEffect(1.2)
+                                Text("アクティビティを読み込み中...")
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
 
-                // エラー表示
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .padding()
-                }
+                    // エラー表示
+                    if let errorMessage = errorMessage {
+                        LiquidGlassCard(intensity: 0.15, cornerRadius: 16, padding: 16) {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
 
-                Spacer()
+                    Spacer()
+                }
+                .padding()
             }
             .navigationTitle("アクティビティ")
+            .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 // 初期データ読み込み
                 loadDailyActivities()

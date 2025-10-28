@@ -23,16 +23,25 @@ struct TaskListView: View {
     /// メイン画面のView階層を定義します。
     var body: some View {
         NavigationStack {
-            VStack {
-                // タスク一覧
-                taskList
+            ZStack {
+                // Liquid Glass背景
+                LiquidGlassBackground()
+                
+                VStack {
+                    // タスク一覧
+                    taskList
+                }
             }
             .navigationTitle("BabySteps")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddTask = true }) {
                         Image(systemName: "plus")
+                            .font(.title2)
+                            .foregroundColor(.primary)
                     }
+                    .liquidGlass(intensity: 0.1, cornerRadius: 8)
                 }
             }
             .sheet(isPresented: $showingAddTask) {
@@ -53,84 +62,99 @@ struct TaskListView: View {
 
     /// タスク一覧リストのViewを返します。
     private var taskList: some View {
-        List {
-            ForEach(tasks, id: \.id) { task in
-                TaskRowView(
-                    task: task,
-                    viewModel: viewModel,
-                    onAddStep: { selectedTask = task }
-                )
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(tasks, id: \.id) { task in
+                    TaskRowView(
+                        task: task,
+                        viewModel: viewModel,
+                        onAddStep: { selectedTask = task }
+                    )
+                }
             }
-            .onDelete(perform: deleteTasks)
+            .padding(.horizontal)
+            .padding(.top)
         }
     }
 
     /// 新しいタスク追加用のシートViewを返します。
     private var addTaskSheet: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Text("新しいタスクを作成")
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                TextField("タスクのタイトル", text: $newTaskTitle)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
-
-                // ステップ数選択UI
-                VStack(spacing: 12) {
-                    Text("チェックボックスの数")
-                        .font(.headline)
+            ZStack {
+                LiquidGlassBackground()
+                
+                VStack(spacing: 24) {
+                    Text("新しいタスクを作成")
+                        .font(.title2)
+                        .fontWeight(.bold)
                         .foregroundColor(.primary)
 
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            if stepCount > 1 {
-                                stepCount -= 1
+                    LiquidGlassCard(intensity: 0.1, cornerRadius: 16, padding: 16) {
+                        TextField("タスクのタイトル", text: $newTaskTitle)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.body)
+                    }
+
+                    // ステップ数選択UI
+                    LiquidGlassCard(intensity: 0.12, cornerRadius: 16, padding: 20) {
+                        VStack(spacing: 16) {
+                            Text("チェックボックスの数")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+
+                            HStack(spacing: 24) {
+                                Button(action: {
+                                    if stepCount > 1 {
+                                        stepCount -= 1
+                                    }
+                                }) {
+                                    Image(systemName: "minus.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.red)
+                                }
+                                .disabled(stepCount <= 1)
+                                .liquidGlass(intensity: 0.1, cornerRadius: 12)
+
+                                Text("\(stepCount)")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                    .frame(minWidth: 60)
+                                    .liquidGlass(intensity: 0.05, cornerRadius: 8)
+                                    .padding(.horizontal, 12)
+
+                                Button(action: {
+                                    stepCount += 1
+                                }) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.blue)
+                                }
+                                .liquidGlass(intensity: 0.1, cornerRadius: 12)
                             }
-                        }) {
-                            Image(systemName: "minus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.red)
-                        }
-                        .disabled(stepCount <= 1)
 
-                        Text("\(stepCount)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .frame(minWidth: 60)
-
-                        Button(action: {
-                            stepCount += 1
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
+                            Text("\(stepCount)個のチェックボックスが作成されます")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                         }
                     }
 
-                    Text("\(stepCount)個のチェックボックスが作成されます")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Button("作成") {
+                        if !newTaskTitle.isEmpty {
+                            _ = viewModel?.createTaskWithSteps(title: newTaskTitle, stepCount: stepCount)
+                            newTaskTitle = ""
+                            stepCount = 5  // リセット
+                            showingAddTask = false
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(newTaskTitle.isEmpty)
+                    .liquidGlass(intensity: 0.1, cornerRadius: 12)
+
+                    Spacer()
                 }
                 .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-
-                Button("作成") {
-                    if !newTaskTitle.isEmpty {
-                        _ = viewModel?.createTaskWithSteps(title: newTaskTitle, stepCount: stepCount)
-                        newTaskTitle = ""
-                        stepCount = 5  // リセット
-                        showingAddTask = false
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(newTaskTitle.isEmpty)
-
-                Spacer()
             }
-            .padding()
             .navigationTitle("タスク追加")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -140,6 +164,7 @@ struct TaskListView: View {
                         newTaskTitle = ""
                         stepCount = 5  // リセット
                     }
+                    .liquidGlass(intensity: 0.1, cornerRadius: 8)
                 }
             }
         }
@@ -148,69 +173,79 @@ struct TaskListView: View {
     /// ステップ追加用のシートViewを返します。
     private func addStepSheet(for task: Task) -> some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Text("「\(task.title)」にステップを追加")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-
-                Text("このタスクに着手回数を追加します")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-
-                // ステップ数選択UI
-                VStack(spacing: 12) {
-                    Text("追加するステップの数")
-                        .font(.headline)
+            ZStack {
+                LiquidGlassBackground()
+                
+                VStack(spacing: 24) {
+                    Text("「\(task.title)」にステップを追加")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
                         .foregroundColor(.primary)
 
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            if addStepCount > 1 {
-                                addStepCount -= 1
-                            }
-                        }) {
-                            Image(systemName: "minus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.red)
-                        }
-                        .disabled(addStepCount <= 1)
-
-                        Text("\(addStepCount)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .frame(minWidth: 60)
-
-                        Button(action: {
-                            addStepCount += 1
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
-                        }
-                    }
-
-                    Text("\(addStepCount)個のステップが追加されます")
+                    Text("このタスクに着手回数を追加します")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    // ステップ数選択UI
+                    LiquidGlassCard(intensity: 0.12, cornerRadius: 16, padding: 20) {
+                        VStack(spacing: 16) {
+                            Text("追加するステップの数")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+
+                            HStack(spacing: 24) {
+                                Button(action: {
+                                    if addStepCount > 1 {
+                                        addStepCount -= 1
+                                    }
+                                }) {
+                                    Image(systemName: "minus.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.red)
+                                }
+                                .disabled(addStepCount <= 1)
+                                .liquidGlass(intensity: 0.1, cornerRadius: 12)
+
+                                Text("\(addStepCount)")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                    .frame(minWidth: 60)
+                                    .liquidGlass(intensity: 0.05, cornerRadius: 8)
+                                    .padding(.horizontal, 12)
+
+                                Button(action: {
+                                    addStepCount += 1
+                                }) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.blue)
+                                }
+                                .liquidGlass(intensity: 0.1, cornerRadius: 12)
+                            }
+
+                            Text("\(addStepCount)個のステップが追加されます")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+
+                    Button("追加") {
+                        for _ in 0..<addStepCount {
+                            viewModel?.addStep(to: task)
+                        }
+                        addStepCount = 1  // リセット
+                        selectedTask = nil
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .liquidGlass(intensity: 0.1, cornerRadius: 12)
+
+                    Spacer()
                 }
                 .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-
-                Button("追加") {
-                    for _ in 0..<addStepCount {
-                        viewModel?.addStep(to: task)
-                    }
-                    addStepCount = 1  // リセット
-                    selectedTask = nil
-                }
-                .buttonStyle(.borderedProminent)
-
-                Spacer()
             }
-            .padding()
             .navigationTitle("ステップ追加")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -219,6 +254,7 @@ struct TaskListView: View {
                         addStepCount = 1  // リセット
                         selectedTask = nil
                     }
+                    .liquidGlass(intensity: 0.1, cornerRadius: 8)
                 }
             }
         }
@@ -298,82 +334,87 @@ struct TaskRowView: View {
 
     /// タスク1件の表示レイアウトを定義します。
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // タスクタイトル
-            HStack {
-                // リマインダーアプリ風の編集仕様
-                HStack(spacing: 8) {
-                    if isEditing {
-                        // 編集モード：シンプルなTextField
-                        TextField("タスク名", text: $editingTitle)
-                            .textFieldStyle(PlainTextFieldStyle())
-                            .focused($isTitleFieldFocused)
-                            .onSubmit {
-                                saveAndExitEditing()
-                            }
-                            .onChange(of: editingTitle) { _, newValue in
-                                hasChanges = newValue != task.title
-                            }
-                            .font(.headline)
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            .background(Color(.systemGray5))
-                            .cornerRadius(6)
-                            .animation(.easeInOut(duration: 0.15), value: isEditing)
-                            .accessibilityLabel("タスク名")
-                            .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
-                            .accessibilityAddTraits([.isSelected])
-                    }
-                    else {
-                        // 通常モード：タップ可能なテキスト
-                        Text(task.title)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.leading)
-                            .onTapGesture {
-                                startEditing()
-                            }
-                            .accessibilityLabel("タスク名")
-                            .accessibilityHint("タップで編集を開始")
-                    }
-                }
-
-                Spacer()
-
-                Button(action: onAddStep) {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.blue)
-                }
-            }
-
-            // ステップ一覧
-            if !task.steps.isEmpty {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 8) {
-                    ForEach(task.steps.sorted(by: { $0.order < $1.order }), id: \.id) { step in
-                        Button(action: {
-                            guard let viewModel = viewModel else { return }
-                            viewModel.toggleStepCompletion(step)
-                        }) {
-                            Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
-                                .foregroundColor(step.isCompleted ? .green : .gray)
-                                .font(.title2)
+        LiquidGlassCard(intensity: 0.12, cornerRadius: 20, padding: 20) {
+            VStack(alignment: .leading, spacing: 16) {
+                // タスクタイトル
+                HStack {
+                    // リマインダーアプリ風の編集仕様
+                    HStack(spacing: 8) {
+                        if isEditing {
+                            // 編集モード：シンプルなTextField
+                            TextField("タスク名", text: $editingTitle)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .focused($isTitleFieldFocused)
+                                .onSubmit {
+                                    saveAndExitEditing()
+                                }
+                                .onChange(of: editingTitle) { _, newValue in
+                                    hasChanges = newValue != task.title
+                                }
+                                .font(.headline)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 12)
+                                .liquidGlass(intensity: 0.15, cornerRadius: 8)
+                                .animation(.easeInOut(duration: 0.2), value: isEditing)
+                                .accessibilityLabel("タスク名")
+                                .accessibilityHint("編集中。完了するにはEnterキーを押すか、他の場所をタップしてください")
+                                .accessibilityAddTraits([.isSelected])
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .disabled(viewModel == nil)
+                        else {
+                            // 通常モード：タップ可能なテキスト
+                            Text(task.title)
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .multilineTextAlignment(.leading)
+                                .onTapGesture {
+                                    startEditing()
+                                }
+                                .accessibilityLabel("タスク名")
+                                .accessibilityHint("タップで編集を開始")
+                        }
                     }
+
+                    Spacer()
+
+                    Button(action: onAddStep) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                    }
+                    .liquidGlass(intensity: 0.1, cornerRadius: 12)
                 }
-                .padding(.leading)
-            }
-            else {
-                Text("ステップがありません")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .italic()
+
+                // ステップ一覧
+                if !task.steps.isEmpty {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
+                        ForEach(task.steps.sorted(by: { $0.order < $1.order }), id: \.id) { step in
+                            Button(action: {
+                                guard let viewModel = viewModel else { return }
+                                viewModel.toggleStepCompletion(step)
+                            }) {
+                                Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
+                                    .foregroundColor(step.isCompleted ? .green : .gray)
+                                    .font(.title2)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .disabled(viewModel == nil)
+                            .liquidGlass(intensity: step.isCompleted ? 0.2 : 0.05, cornerRadius: 8)
+                            .scaleEffect(step.isCompleted ? 1.1 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: step.isCompleted)
+                        }
+                    }
+                    .padding(.leading, 4)
+                }
+                else {
+                    Text("ステップがありません")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .italic()
+                        .padding(.vertical, 8)
+                }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
         .contentShape(Rectangle())
         .onTapGesture {
             // 編集中のテキストフィールド以外をタップした時にキーボードを閉じる
