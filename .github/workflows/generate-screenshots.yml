@@ -113,7 +113,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4),OS=26.2' \
+            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M5),OS=26.2' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
@@ -128,8 +128,8 @@ jobs:
           # すべてのシミュレータをシャットダウン
           xcrun simctl shutdown all
 
-          # iPad Pro 13-inch (M4)シミュレータを起動
-          xcrun simctl boot "iPad Pro 13-inch (M4)" || echo "iPad simulator already booted"
+          # iPad Pro 13-inch (M5)シミュレータを起動
+          xcrun simctl boot "iPad Pro 13-inch (M5)" || echo "iPad simulator already booted"
 
           # iPadシミュレータが完全に起動するまで待機（長めに設定）
           echo "Waiting for iPad simulator to fully boot..."
