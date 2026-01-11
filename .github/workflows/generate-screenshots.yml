@@ -49,8 +49,8 @@ jobs:
           echo "=== Available iOS Runtimes ==="
           xcrun simctl list runtimes | grep "iOS" || echo "No iOS runtimes found"
 
-          # iOS 26.0を固定で使用
-          export IOS_VERSION="26.0"
+          # iOS 26.2を固定で使用
+          export IOS_VERSION="26.2"
           echo "Using iOS version: $IOS_VERSION"
 
       - name: Setup simulators
@@ -59,10 +59,10 @@ jobs:
 
           # 利用可能なシミュレータを確認
           echo "=== Available iPhone Simulators ==="
-          xcrun simctl list devices available | grep "iPhone" | grep "26.0" || echo "No iPhone simulators found for iOS 26.0"
+          xcrun simctl list devices available | grep "iPhone" | grep "26.2" || echo "No iPhone simulators found for iOS 26.2"
 
           echo "=== Available iPad Simulators ==="
-          xcrun simctl list devices available | grep "iPad" | grep "26.0" || echo "No iPad simulators found for iOS 26.0"
+          xcrun simctl list devices available | grep "iPad" | grep "26.2" || echo "No iPad simulators found for iOS 26.2"
 
       - name: Build app for iPhone
         run: |
@@ -70,7 +70,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.2' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
@@ -113,7 +113,7 @@ jobs:
           xcodebuild -project BabySteps.xcodeproj \
             -scheme BabySteps \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4),OS=26.0' \
+            -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4),OS=26.2' \
             -derivedDataPath build \
             -configuration Debug \
             CODE_SIGN_STYLE=Automatic \
