@@ -6,7 +6,7 @@ struct TaskListView: View {
     /// データ操作のためのSwiftDataモデルコンテキストです。
     @Environment(\.modelContext) private var modelContext
     /// SwiftDataストアから取得されたすべてのタスクです。
-    @Query private var tasks: [Task]
+    @Query(sort: \Task.createdAt, order: .reverse) private var tasks: [Task]
     /// タスクやステップを管理するビューモデルです。
     @State private var viewModel: TaskViewModel?
     /// タスク追加シートの表示状態を管理します。
@@ -19,6 +19,8 @@ struct TaskListView: View {
     @State private var stepCount = 5
     /// ステップ追加時のステップ数（デフォルト: 1）。
     @State private var addStepCount = 1
+    /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
+    @State private var didBackfillCompletedAt = false
 
     /// メイン画面のView階層を定義します。
     var body: some View {
@@ -46,7 +48,10 @@ struct TaskListView: View {
                 viewModel = TaskViewModel(modelContext: modelContext)
 
                 // 既存の完了済みステップにcompletedAtを設定
-                initializeCompletedSteps()
+                if !didBackfillCompletedAt {
+                    didBackfillCompletedAt = true
+                    initializeCompletedSteps()
+                }
             }
         }
     }
@@ -234,45 +239,20 @@ struct TaskListView: View {
 
     /// 既存の完了済みステップにcompletedAtの日付を設定します。
     private func initializeCompletedSteps() {
-        var hasChanges = false
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = TimeZone.current
-
-        print("🔧 完了済みステップの初期化開始")
-
-        for task in tasks {
-            print("🔧 タスク: \(task.title)")
-            for step in task.steps {
-                if step.isCompleted {
-                    if step.completedAt == nil {
-                        // 完了済みだがcompletedAtが設定されていない場合
-                        step.completedAt = Date()
-                        hasChanges = true
-                        print(
-                            "  ✅ ステップ\(step.order + 1) - completedAtを設定: \(dateFormatter.string(from: step.completedAt!))"
-                        )
-                    }
-                    else {
-                        print(
-                            "  ℹ️ ステップ\(step.order + 1) - 既にcompletedAt設定済み: \(dateFormatter.string(from: step.completedAt!))"
-                        )
-                    }
-                }
-                else {
-                    print("  ⏳ ステップ\(step.order + 1) - 未完了")
-                }
-            }
+        let predicate = #Predicate<TaskStep> { step in
+            step.isCompleted && step.completedAt == nil
         }
+        let descriptor = FetchDescriptor<TaskStep>(predicate: predicate)
 
-        if hasChanges {
-            print("🔧 変更を保存中...")
-            try? modelContext.save()
-            print("🔧 保存完了")
+        guard let stepsNeedingBackfill = try? modelContext.fetch(descriptor),
+            !stepsNeedingBackfill.isEmpty
+        else { return }
+
+        let now = Date()
+        for step in stepsNeedingBackfill {
+            step.completedAt = now
         }
-        else {
-            print("🔧 変更なし")
-        }
+        try? modelContext.save()
     }
 }
 

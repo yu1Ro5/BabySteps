@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalendarGridView: View {
     let activities: [DailyActivity]
+    @State private var selectedActivity: DailyActivity?
 
     /// 日曜日〜土曜日
     private let columns = 7
@@ -16,7 +17,18 @@ struct CalendarGridView: View {
                     ForEach(0..<columns, id: \.self) { column in
                         let index = row * columns + column
                         if index < activities.count {
-                            ActivityCell(activity: activities[index])
+                            Button(action: {
+                                selectedActivity = activities[index]
+                            }) {
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(activities[index].activityLevel.color)
+                                    .frame(height: 20)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
+                                    )
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
                         else {
                             // 空のセル（過去の日付でアクティビティがない場合）
@@ -28,31 +40,9 @@ struct CalendarGridView: View {
             }
             .padding(.horizontal)
         }
-    }
-
-}
-
-// MARK: - Activity Cell
-
-struct ActivityCell: View {
-    let activity: DailyActivity
-    @State private var showingDetail = false
-
-    var body: some View {
-        Button(action: {
-            showingDetail = true
-        }) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(activity.activityLevel.color)
-                .frame(height: 20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
-                )
-        }
-        .buttonStyle(PlainButtonStyle())
-        .sheet(isPresented: $showingDetail) {
+        .sheet(item: $selectedActivity) { activity in
             DayDetailView(activity: activity)
         }
     }
+
 }
