@@ -19,7 +19,9 @@ struct ActivityView: View {
 
         _completedSteps = Query(
             filter: #Predicate<TaskStep> { step in
-                step.isCompleted && step.completedAt != nil && step.completedAt! >= windowStart
+                // NOTE: SwiftData predicate does not support forced unwrap (!).
+                // We only filter by completion here, and apply the date-window filter during aggregation.
+                step.isCompleted && step.completedAt != nil
             },
             sort: [SortDescriptor(\TaskStep.completedAt, order: .forward)]
         )
@@ -94,6 +96,7 @@ struct ActivityView: View {
 
         for step in steps {
             guard let completedAt = step.completedAt else { continue }
+            guard completedAt >= windowStart else { continue }
             let dateKey = calendar.startOfDay(for: completedAt)
             counts[dateKey, default: 0] += 1
         }

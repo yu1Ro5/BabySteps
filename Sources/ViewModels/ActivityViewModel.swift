@@ -45,11 +45,16 @@ class ActivityViewModel {
         let startDate = calendar.date(byAdding: .day, value: -days, to: endDate) ?? endDate
         let windowStart = calendar.startOfDay(for: startDate)
 
+        // NOTE: SwiftData predicate does not support forced unwrap (!).
+        // Fetch completed steps with a completion date, then filter by date range in memory.
         let predicate = #Predicate<TaskStep> { step in
-            step.isCompleted && step.completedAt != nil && step.completedAt! >= windowStart && step.completedAt! <= endDate
+            step.isCompleted && step.completedAt != nil
         }
         let descriptor = FetchDescriptor<TaskStep>(predicate: predicate)
-        let steps = try modelContext.fetch(descriptor)
+        let steps = try modelContext.fetch(descriptor).filter { step in
+            guard let completedAt = step.completedAt else { return false }
+            return completedAt >= windowStart && completedAt <= endDate
+        }
 
         var countsByDate: [Date: Int] = [:]
         countsByDate.reserveCapacity(days)
