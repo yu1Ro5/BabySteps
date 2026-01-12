@@ -35,11 +35,11 @@ struct DayDetailView: View {
 
     private var dateHeaderView: some View {
         VStack(spacing: 8) {
-            Text(formatDate(activity.date))
+            Text(activity.date, format: .dateTime.year().month().day().locale(Locale(identifier: "ja_JP")))
                 .font(.title2)
                 .fontWeight(.bold)
 
-            Text(formatWeekday(activity.date))
+            Text(activity.date, format: .dateTime.weekday(.wide).locale(Locale(identifier: "ja_JP")))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -104,21 +104,6 @@ struct DayDetailView: View {
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
-    }
-
-    // MARK: - Helper Methods
-
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年M月d日"
-        return formatter.string(from: date)
-    }
-
-    private func formatWeekday(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
-        formatter.locale = Locale(identifier: "ja_JP")
-        return formatter.string(from: date)
     }
 
     private var activityLevelText: String {
