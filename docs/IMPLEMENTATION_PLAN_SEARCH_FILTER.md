@@ -1,5 +1,17 @@
 # タスク検索・フィルター機能 実装計画
 
+## 0. 設計方針（標準コンポーネント優先）
+
+独自UIを避け、SwiftUI の標準コンポーネントを利用する。
+
+| 機能 | 使用する標準コンポーネント |
+|------|---------------------------|
+| 検索 | `.searchable`（検索バー） |
+| フィルター | `Picker`（`.pickerStyle(.menu)` または `.segmented`） |
+| 空状態 | `ContentUnavailableView`（iOS 17+） |
+
+---
+
 ## 1. 概要
 
 タスク一覧画面に検索とフィルター機能を追加し、ユーザーがタスクを効率的に絞り込めるようにする。
@@ -14,7 +26,7 @@
 |------|------|
 | 対象 | タスクのタイトル（`Task.title`） |
 | 方式 | 部分一致（大文字小文字を区別しない） |
-| UI | ナビゲーションバー下の検索バー（`searchable` または `TextField`） |
+| UI | `.searchable`（SwiftUI 標準の検索バー） |
 | 空文字 | 検索語が空の場合は全件表示 |
 
 ### 2.2 フィルター
@@ -121,8 +133,8 @@ var isCompleted: Bool {
    - フィルター: `selectedFilter` に応じて `tasks` を絞り込み
 
 3. **UI 追加**
-   - 検索: `.searchable(text: $searchText, prompt: "タスクを検索")`
-   - フィルター: `Picker` または `Menu` を toolbar に配置
+   - 検索: `.searchable(text: $searchText, prompt: "タスクを検索")`（標準モディファイア）
+   - フィルター: `Picker` + `.pickerStyle(.menu)` を toolbar に配置（標準コンポーネント）
 
 4. **List のデータソース変更**
    - `ForEach(tasks, ...)` → `ForEach(filteredTasks, ...)`
@@ -143,20 +155,21 @@ var isCompleted: Bool {
 
 #### 4.5 検索バー
 
-- `searchable` を使用（iOS 15+）
+- `.searchable(text:prompt:)` のみ使用（独自 TextField は使わない）
 - プレースホルダー: 「タスクを検索」
-- アクセシビリティラベルを付与
+- アクセシビリティは searchable の標準挙動に委ねる
 
 #### 4.6 フィルターピッカー
 
-- `Picker(selection: $selectedFilter, ...)` を toolbar に配置
-- スタイル: `Menu` または `SegmentedPickerStyle`（横並び）
-- アクセシビリティ: 「フィルター: すべて / 進行中 / 完了」
+- `Picker(selection: $selectedFilter, ...)` + `.pickerStyle(.menu)` を toolbar に配置
+- 横並びが必要な場合は `.pickerStyle(.segmented)` を検討（いずれも標準）
+- 独自の Menu やボタンは使わない
 
 #### 4.7 空状態
 
-- 検索・フィルター結果が0件の場合のメッセージ表示
-- 例: 「該当するタスクがありません」
+- `ContentUnavailableView`（iOS 17+ 標準）を使用
+- 例: `ContentUnavailableView("該当するタスクがありません", systemImage: "magnifyingglass", description: Text("検索語やフィルターを変えてみてください"))`
+- 独自の空状態 View は使わない
 
 ---
 
@@ -200,4 +213,16 @@ var isCompleted: Bool {
 
 - **削除時のインデックス**: `onDelete` の `IndexSet` は `filteredTasks` のインデックス。`filteredTasks[offset]` を `deleteTask` に渡す。
 - **SwiftData の @Query**: `tasks` は変更に応じて自動更新されるため、`filteredTasks` も再計算される。
-- **検索のパフォーマンス**: タスク数が数百を超える場合は、デバウンスや `@Query` の predicate 検討を検討するが、現状は View 層フィルタで十分。
+- **検索のパフォーマンス**: タスク数が数百を超える場合は、デバウンスや `@Query` の predicate 検討をするが、現状は View 層フィルタで十分。
+
+---
+
+## 8. 自己レビュー（標準コンポーネント観点）
+
+| 項目 | レビュー結果 |
+|------|--------------|
+| 検索 | ✅ `searchable` に一本化。TextField 等の独自UIは不使用。 |
+| フィルター | ✅ `Picker` の標準スタイル（menu / segmented）のみ使用。 |
+| 空状態 | ✅ `ContentUnavailableView` を使用。独自の空状態 View は不使用。 |
+| 状態管理 | ✅ `@State` と `@Query` のみ。独自の検索/フィルター状態管理は不要。 |
+| 避けるもの | 独自検索バー、カスタムドロップダウン、独自空状態メッセージ View |
