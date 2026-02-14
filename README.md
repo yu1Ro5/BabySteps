@@ -57,8 +57,7 @@ BabySteps/
 │   │   └── Components/           # 共通UIコンポーネント
 │   │       └── TabBarButton.swift
 │   ├── ViewModels/       # ビューモデル
-│   │   ├── TaskViewModel.swift   # タスク管理ロジック
-│   │   └── ActivityViewModel.swift
+│   │   └── TaskViewModel.swift   # タスク管理ロジック
 │   ├── Assets.xcassets/  # アセット
 │   ├── Info.plist        # アプリ情報
 │   └── PrivacyInfo.xcprivacy      # プライバシー情報
