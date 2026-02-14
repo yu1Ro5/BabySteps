@@ -21,6 +21,27 @@ struct TaskListView: View {
     @State private var addStepCount = 1
     /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
     @State private var didBackfillCompletedAt = false
+    /// 検索語
+    @State private var searchText = ""
+    /// フィルター種別
+    @State private var selectedFilter: TaskFilter = .all
+
+    /// 検索・フィルター適用後のタスク一覧
+    private var filteredTasks: [Task] {
+        var result = tasks
+        if !searchText.isEmpty {
+            result = result.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        }
+        switch selectedFilter {
+        case .all:
+            break
+        case .inProgress:
+            result = result.filter { !$0.steps.isEmpty && !$0.isCompleted }
+        case .completed:
+            result = result.filter(\.isCompleted)
+        }
+        return result
+    }
 
     /// メイン画面のView階層を定義します。
     var body: some View {
@@ -30,11 +51,20 @@ struct TaskListView: View {
                 taskList
             }
             .navigationTitle("BabySteps")
+            .searchable(text: $searchText, prompt: "タスクを検索")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddTask = true }) {
                         Image(systemName: "plus")
                     }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Picker("フィルター", selection: $selectedFilter) {
+                        ForEach(TaskFilter.allCases, id: \.self) { filter in
+                            Text(filter.rawValue).tag(filter)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
             }
             .sheet(isPresented: $showingAddTask) {
@@ -58,16 +88,35 @@ struct TaskListView: View {
 
     /// タスク一覧リストのViewを返します。
     private var taskList: some View {
-        List {
-            ForEach(tasks, id: \.id) { task in
-                TaskRowView(
-                    task: task,
-                    viewModel: viewModel,
-                    onAddStep: { selectedTask = task }
+        Group {
+            if filteredTasks.isEmpty {
+                ContentUnavailableView(
+                    "該当するタスクがありません",
+                    systemImage: "magnifyingglass",
+                    description: Text(emptyStateDescription)
                 )
             }
-            .onDelete(perform: deleteTasks)
+            else {
+                List {
+                    ForEach(filteredTasks, id: \.id) { task in
+                        TaskRowView(
+                            task: task,
+                            viewModel: viewModel,
+                            onAddStep: { selectedTask = task }
+                        )
+                    }
+                    .onDelete(perform: deleteTasks)
+                }
+            }
         }
+    }
+
+    /// 空状態時の説明文（検索・フィルターで0件か、タスクが全くないかで分岐）
+    private var emptyStateDescription: String {
+        if tasks.isEmpty {
+            return "タスクを追加してください"
+        }
+        return "検索語やフィルターを変えてみてください"
     }
 
     /// 新しいタスク追加用のシートViewを返します。
@@ -230,10 +279,10 @@ struct TaskListView: View {
     }
 
     /// 指定されたインデックスのタスクを削除します。
-    /// - Parameter offsets: タスクのインデックス
+    /// - Parameter offsets: filteredTasks のインデックス
     private func deleteTasks(offsets: IndexSet) {
         for index in offsets {
-            viewModel?.deleteTask(tasks[index])
+            viewModel?.deleteTask(filteredTasks[index])
         }
     }
 
@@ -411,5 +460,5 @@ struct TaskRowView: View {
 
 #Preview {
     TaskListView()
-        .modelContainer(for: Task.self, inMemory: true)
+        .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
 }

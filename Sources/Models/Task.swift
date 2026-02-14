@@ -29,6 +29,11 @@ final class Task {
         steps.count
     }
 
+    /// タスクが完了状態か（ステップが1つ以上かつ全ステップ完了）
+    var isCompleted: Bool {
+        !steps.isEmpty && steps.allSatisfy { $0.isCompleted }
+    }
+
     // ステップを追加
     func addStep(_ step: TaskStep) {
         steps.append(step)

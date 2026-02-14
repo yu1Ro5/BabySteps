@@ -1,3 +1,7 @@
+# Format Patch: Applies formatting and posts comment or pushes fix commit.
+# Fixes: (1) Use markdownlint-cli + .markdownlint.json to match project config
+#        (2) Add contents: write + commit/push for fix commits
+#        (3) Fork PRs: push fails, comment still posted with "apply locally"
 name: Format Patch
 
 on:
@@ -10,7 +14,7 @@ on:
 
 permissions:
   pull-requests: write
-  contents: read
+  contents: write  # Push formatting fix commits
 
 jobs:
   format-patch:
@@ -28,8 +32,8 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install markdownlint-cli2
-        run: npm install -g markdownlint-cli2
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli
 
       - name: Install swift-format
         run: |
@@ -63,8 +67,8 @@ jobs:
       - name: Format Markdown files
         if: steps.detect-changes.outputs.has_markdown == 'true'
         run: |
-          echo "Running markdownlint-cli2 --fix on all markdown files (.md/.mdc)..."
-          markdownlint-cli2 --fix "**/*.md" "**/*.mdc" || true
+          echo "Running markdownlint --fix on markdown files..."
+          markdownlint '**/*.md' '**/*.mdc' --fix --config .markdownlint.json || true
 
       - name: Format Swift files
         if: steps.detect-changes.outputs.has_swift == 'true'
@@ -93,8 +97,21 @@ jobs:
             echo "Formatting changes detected, diff saved"
           fi
 
+      - name: Commit and push formatting fixes
+        id: push-fixes
+        if: steps.generate-diff.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "style: apply formatting fixes [skip ci]"
+          git push
+        continue-on-error: true  # Push fails for fork PRs (no write access)
+
       - name: Post formatting patch comment
         if: steps.generate-diff.outputs.has_changes == 'true'
+        env:
+          PUSH_SUCCEEDED: ${{ steps.push-fixes.outcome == 'success' }}
         uses: actions/github-script@v7
         with:
           script: |
@@ -116,7 +133,7 @@ jobs:
             if ('${{ steps.detect-changes.outputs.has_markdown }}' === 'true') {
               commentBody += '**For Markdown files (.md/.mdc):**\n';
               commentBody += '```bash\n';
-              commentBody += 'markdownlint-cli2 --fix "**/*.md" "**/*.mdc"\n';
+              commentBody += 'markdownlint \'**/*.md\' \'**/*.mdc\' --fix --config .markdownlint.json\n';
               commentBody += '```\n\n';
             }
 
@@ -132,7 +149,10 @@ jobs:
               commentBody += '```\n\n';
             }
 
-            commentBody += '> **Note:** These changes are formatting-only and don\'t affect functionality. They are automatically generated and not pushed to the repository. Apply them locally and commit if desired.';
+            const pushSucceeded = process.env.PUSH_SUCCEEDED === 'true';
+            commentBody += pushSucceeded
+              ? '> **Note:** Formatting fixes have been pushed to this branch.'
+              : '> **Note:** Could not push (e.g. fork PR). Apply the changes locally using the commands above.';
 
             // Post the comment
             await github.rest.issues.createComment({
