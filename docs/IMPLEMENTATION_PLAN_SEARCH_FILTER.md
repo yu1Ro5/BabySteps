@@ -5,7 +5,7 @@
 独自UIを避け、SwiftUI の標準コンポーネントを利用する。
 
 | 機能 | 使用する標準コンポーネント |
-|------|---------------------------|
+| --- | --- |
 | 検索 | `.searchable`（検索バー） |
 | フィルター | `Picker`（`.pickerStyle(.menu)` または `.segmented`） |
 | 空状態 | `ContentUnavailableView`（iOS 17+） |
@@ -23,7 +23,7 @@
 ### 2.1 検索
 
 | 項目 | 内容 |
-|------|------|
+| --- | --- |
 | 対象 | タスクのタイトル（`Task.title`） |
 | 方式 | 部分一致（大文字小文字を区別しない） |
 | UI | `.searchable`（SwiftUI 標準の検索バー） |
@@ -32,7 +32,7 @@
 ### 2.2 フィルター
 
 | フィルター | 条件 | 説明 |
-|------------|------|------|
+| --- | --- | --- |
 | **すべて** | 全タスク | デフォルト |
 | **進行中** | ステップが1つ以上あり、かつ未完了のステップが1つ以上ある | 着手済みで未完了 |
 | **完了** | ステップが1つ以上あり、かつ全ステップが完了 | 全てのステップ完了 |
@@ -65,7 +65,7 @@ filteredTasks → List に表示
 ### 3.2 状態管理
 
 | 状態 | 型 | 保持場所 |
-|------|-----|----------|
+| --- | --- | --- |
 | 検索語 | `String` | `TaskListView` の `@State` |
 | フィルター種別 | `TaskFilter` enum | `TaskListView` の `@State` |
 
@@ -188,7 +188,7 @@ var isCompleted: Bool {
 ## 5. ファイル変更一覧
 
 | 操作 | ファイル |
-|------|----------|
+| --- | --- |
 | 新規 | `Sources/Models/TaskFilter.swift` |
 | 修正 | `Sources/Models/Task.swift`（`isCompleted` 追加） |
 | 修正 | `Sources/Views/TaskListView.swift`（検索・フィルターUI、`filteredTasks`） |
@@ -220,7 +220,7 @@ var isCompleted: Bool {
 ## 8. 自己レビュー（標準コンポーネント観点）
 
 | 項目 | レビュー結果 |
-|------|--------------|
+| --- | --- |
 | 検索 | ✅ `searchable` に一本化。TextField 等の独自UIは不使用。 |
 | フィルター | ✅ `Picker` の標準スタイル（menu / segmented）のみ使用。 |
 | 空状態 | ✅ `ContentUnavailableView` を使用。独自の空状態 View は不使用。 |
