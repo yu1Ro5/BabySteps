@@ -42,7 +42,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
@@ -55,7 +55,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Release \
                    CODE_SIGN_STYLE=Automatic \
@@ -70,7 +70,7 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Debug \
                    CODE_SIGN_STYLE=Automatic \
