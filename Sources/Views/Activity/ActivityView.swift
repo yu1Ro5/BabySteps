@@ -62,27 +62,12 @@ struct ActivityView: View {
     /// アクティビティ用ボトムバー：タブのみ。
     private var activityBottomBar: some View {
         HStack(spacing: 0) {
-            tabButton(tab: .tasks, icon: "list.bullet", label: "タスク")
-            tabButton(tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
+            TabBarButton(selectedTab: $selectedTab, tab: .tasks, icon: "list.bullet", label: "タスク")
+            TabBarButton(selectedTab: $selectedTab, tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(.bar)
-    }
-
-    private func tabButton(tab: AppTab, icon: String, label: String) -> some View {
-        Button {
-            selectedTab = tab
-        } label: {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                Text(label)
-                    .font(.caption2)
-            }
-            .frame(maxWidth: .infinity)
-            .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
-        }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Private Methods
@@ -117,7 +102,10 @@ struct ActivityView: View {
 
             activities.append(activity)
 
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+            guard let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) else {
+                break
+            }
+            currentDate = nextDate
         }
 
         return activities

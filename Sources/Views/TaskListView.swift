@@ -91,8 +91,8 @@ struct TaskListView: View {
 
             // 中央：タブ切り替え
             HStack(spacing: 0) {
-                tabButton(tab: .tasks, icon: "list.bullet", label: "タスク")
-                tabButton(tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
+                TabBarButton(selectedTab: $selectedTab, tab: .tasks, icon: "list.bullet", label: "タスク")
+                TabBarButton(selectedTab: $selectedTab, tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
             }
 
             Spacer()
@@ -107,21 +107,6 @@ struct TaskListView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(.bar)
-    }
-
-    private func tabButton(tab: AppTab, icon: String, label: String) -> some View {
-        Button {
-            selectedTab = tab
-        } label: {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                Text(label)
-                    .font(.caption2)
-            }
-            .frame(maxWidth: .infinity)
-            .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
-        }
-        .buttonStyle(.plain)
     }
 
     /// タスク一覧リストのViewを返します。

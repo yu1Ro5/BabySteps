@@ -34,7 +34,7 @@ SwiftUIとSwiftDataを使用したモダンなiOSタスク管理アプリケー�
 ```text
 BabySteps/
 ├── .github/workflows/     # GitHub Actions設定
-├── docs/                  # プライバシーポリシーページ（GitHub Pages）
+├── docs/                  # ドキュメント（プライバシーポリシー、実装計画など）
 │   ├── index.html        # プライバシーポリシーHTML
 │   ├── .nojekyll         # Jekyll処理無効化
 │   └── README.md         # ドキュメント説明
@@ -42,11 +42,23 @@ BabySteps/
 │   ├── App/              # アプリケーションコード
 │   │   └── BabyStepsApp.swift      # メインアプリ（SwiftData設定）
 │   ├── Models/           # データモデル
-│   │   └── Task.swift    # TaskとTaskStepモデル
+│   │   ├── Task.swift    # Taskモデル
+│   │   ├── TaskStep.swift    # TaskStepモデル
+│   │   ├── TaskFilter.swift   # タスクフィルター種別
+│   │   ├── Activity.swift    # アクティビティ関連
+│   │   └── ActivityLevel.swift
 │   ├── Views/            # SwiftUIビュー
-│   │   └── TaskListView.swift      # メイン画面
+│   │   ├── MainView.swift        # タブ・状態管理のルートビュー
+│   │   ├── TaskListView.swift   # タスク一覧画面
+│   │   ├── Activity/             # アクティビティ関連ビュー
+│   │   │   ├── ActivityView.swift
+│   │   │   ├── CalendarGridView.swift
+│   │   │   └── DayDetailView.swift
+│   │   └── Components/           # 共通UIコンポーネント
+│   │       └── TabBarButton.swift
 │   ├── ViewModels/       # ビューモデル
-│   │   └── TaskViewModel.swift     # タスク管理ロジック
+│   │   ├── TaskViewModel.swift   # タスク管理ロジック
+│   │   └── ActivityViewModel.swift
 │   ├── Assets.xcassets/  # アセット
 │   ├── Info.plist        # アプリ情報
 │   └── PrivacyInfo.xcprivacy      # プライバシー情報
