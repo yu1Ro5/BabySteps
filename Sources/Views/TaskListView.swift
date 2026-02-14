@@ -3,9 +3,11 @@ import SwiftUI
 
 /// タスク一覧とタスク管理機能を提供する画面のビュー構造体です。
 struct TaskListView: View {
-    /// フィルター種別（MainView から渡される）
+    /// 選択中のタブ（タブ切り替え用）
+    @Binding var selectedTab: AppTab
+    /// フィルター種別
     @Binding var selectedFilter: TaskFilter
-    /// タスク追加シートの表示状態（MainView から渡される）
+    /// タスク追加シートの表示状態
     @Binding var showingAddTask: Bool
 
     /// データ操作のためのSwiftDataモデルコンテキストです。
@@ -63,7 +65,63 @@ struct TaskListView: View {
                     initializeCompletedSteps()
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                taskListBottomBar
+            }
         }
+    }
+
+    /// タスクリスト用ボトムバー：左下フィルター、中央タブ、右下プラス。
+    private var taskListBottomBar: some View {
+        HStack(spacing: 0) {
+            // 左下：フィルター
+            Menu {
+                Picker("フィルター", selection: $selectedFilter) {
+                    ForEach(TaskFilter.allCases, id: \.self) { filter in
+                        Text(filter.rawValue).tag(filter)
+                    }
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .font(.title2)
+            }
+            .frame(width: 44, height: 44)
+
+            Spacer()
+
+            // 中央：タブ切り替え
+            HStack(spacing: 0) {
+                tabButton(tab: .tasks, icon: "list.bullet", label: "タスク")
+                tabButton(tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
+            }
+
+            Spacer()
+
+            // 右下：プラスボタン
+            Button(action: { showingAddTask = true }) {
+                Image(systemName: "square.and.pencil")
+                    .font(.title2)
+            }
+            .frame(width: 44, height: 44)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(.bar)
+    }
+
+    private func tabButton(tab: AppTab, icon: String, label: String) -> some View {
+        Button {
+            selectedTab = tab
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                Text(label)
+                    .font(.caption2)
+            }
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
+        }
+        .buttonStyle(.plain)
     }
 
     /// タスク一覧リストのViewを返します。
@@ -440,12 +498,17 @@ struct TaskRowView: View {
 
 #Preview {
     struct PreviewWrapper: View {
+        @State private var tab = AppTab.tasks
         @State private var filter = TaskFilter.all
         @State private var showingAddTask = false
 
         var body: some View {
-            TaskListView(selectedFilter: $filter, showingAddTask: $showingAddTask)
-                .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
+            TaskListView(
+                selectedTab: $tab,
+                selectedFilter: $filter,
+                showingAddTask: $showingAddTask
+            )
+            .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
         }
     }
     return PreviewWrapper()

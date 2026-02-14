@@ -2,13 +2,17 @@ import SwiftData
 import SwiftUI
 
 struct ActivityView: View {
+    /// 選択中のタブ（タブ切り替え用）
+    @Binding var selectedTab: AppTab
+
     private let daysWindow: Int
     private let windowStart: Date
 
     @Query private var completedSteps: [TaskStep]
     @State private var dailyActivities: [DailyActivity] = []
 
-    init(daysWindow: Int = 90) {
+    init(selectedTab: Binding<AppTab>, daysWindow: Int = 90) {
+        _selectedTab = selectedTab
         self.daysWindow = daysWindow
 
         let calendar = Calendar.current
@@ -49,7 +53,36 @@ struct ActivityView: View {
                 _ = newSteps  // 明示的に依存関係を残す
                 recalculateDailyActivities()
             }
+            .safeAreaInset(edge: .bottom) {
+                activityBottomBar
+            }
         }
+    }
+
+    /// アクティビティ用ボトムバー：タブのみ。
+    private var activityBottomBar: some View {
+        HStack(spacing: 0) {
+            tabButton(tab: .tasks, icon: "list.bullet", label: "タスク")
+            tabButton(tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(.bar)
+    }
+
+    private func tabButton(tab: AppTab, icon: String, label: String) -> some View {
+        Button {
+            selectedTab = tab
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                Text(label)
+                    .font(.caption2)
+            }
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(selectedTab == tab ? Color.accentColor : Color.secondary)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Private Methods
