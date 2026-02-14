@@ -53,18 +53,18 @@ struct TaskListView: View {
             .navigationTitle("BabySteps")
             .searchable(text: $searchText, prompt: "タスクを検索")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddTask = true }) {
-                        Image(systemName: "plus")
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Picker("フィルター", selection: $selectedFilter) {
                         ForEach(TaskFilter.allCases, id: \.self) { filter in
                             Text(filter.rawValue).tag(filter)
                         }
                     }
                     .pickerStyle(.menu)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showingAddTask = true }) {
+                        Image(systemName: "plus")
+                    }
                 }
             }
             .sheet(isPresented: $showingAddTask) {
