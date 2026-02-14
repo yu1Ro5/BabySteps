@@ -154,6 +154,7 @@ markdownlintの設定は `.markdownlint.json` ファイルでカスタマイズ�
 - `default: true`: デフォルトルールを有効化
 - `MD013: false`: 行の長さ制限を無効化
 - `MD033: false`: HTMLタグの使用を許可
+- `MD060: true`: テーブルの区切り行にスペースを必須（例: `| --- | --- |`）
 
 ## CI/CD
 
