@@ -2,13 +2,15 @@ import Foundation
 import SwiftData
 
 @Model
-final class Task {
+final class Task: Identifiable {
     /// タスクの一意識別子
     var id: UUID
     /// タスクのタイトル
     var title: String
     /// タスクの作成日時
     var createdAt: Date
+    /// 表示順序（0から開始、小さいほど上に表示）
+    var order: Int
     /// タスクに紐づくステップの配列
     var steps: [TaskStep]
 
@@ -16,6 +18,7 @@ final class Task {
         self.id = UUID()
         self.title = title
         self.createdAt = Date()
+        self.order = 0
         self.steps = []
     }
 
