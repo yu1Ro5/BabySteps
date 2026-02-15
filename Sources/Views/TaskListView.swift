@@ -49,6 +49,26 @@ struct TaskListView: View {
             .sheet(item: $selectedTask) { task in
                 addStepSheet(for: task)
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("フィルター", selection: $selectedFilter) {
+                            ForEach(TaskFilter.allCases, id: \.self) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingAddTask = true
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+            }
             .onAppear {
                 // ModelContextを使用してViewModelを作成
                 viewModel = TaskViewModel(modelContext: modelContext)
@@ -59,40 +79,7 @@ struct TaskListView: View {
                     initializeCompletedSteps()
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                taskBottomBar
-            }
         }
-    }
-
-    /// タスクタブ用ボトムバー：左下フィルター、右下新規追加（ネイティブタブバーの直上に表示）
-    private var taskBottomBar: some View {
-        HStack {
-            Menu {
-                Picker("フィルター", selection: $selectedFilter) {
-                    ForEach(TaskFilter.allCases, id: \.self) { filter in
-                        Text(filter.rawValue).tag(filter)
-                    }
-                }
-            } label: {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .font(.title2)
-            }
-            .frame(width: 44, height: 44)
-
-            Spacer()
-
-            Button {
-                showingAddTask = true
-            } label: {
-                Image(systemName: "square.and.pencil")
-                    .font(.title2)
-            }
-            .frame(width: 44, height: 44)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
-        .background(.bar)
     }
 
     /// タスク一覧リストのViewを返します。
