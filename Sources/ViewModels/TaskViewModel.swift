@@ -14,7 +14,11 @@ class TaskViewModel {
 
     // 指定された数のステップを持つタスクを作成
     func createTaskWithSteps(title: String, stepCount: Int) -> Task {
+        let tasks = (try? fetchTasks()) ?? []
+        let maxOrder = tasks.map(\.order).max() ?? -1
+
         let task = Task(title: title)
+        task.order = maxOrder + 1
         modelContext.insert(task)
 
         // 指定された数のステップを作成
@@ -63,6 +67,31 @@ class TaskViewModel {
     // ステップの完了状態を切り替え
     func toggleStepCompletion(_ step: TaskStep) {
         step.toggleCompletion()
+        try? modelContext.save()
+    }
+
+    // MARK: - Reorder
+
+    /// タスクの順序を変更する（filteredTasks のインデックスベース）
+    func moveTasks(_ tasks: [Task], from source: IndexSet, to destination: Int) {
+        var reordered = tasks
+        reordered.move(fromOffsets: source, toOffset: destination)
+
+        for (index, task) in reordered.enumerated() {
+            task.order = index
+        }
+        try? modelContext.save()
+    }
+
+    /// タスク内のステップの順序を変更する
+    func reorderSteps(in task: Task, from source: IndexSet, to destination: Int) {
+        let sortedSteps = task.steps.sorted { $0.order < $1.order }
+        var reordered = sortedSteps
+        reordered.move(fromOffsets: source, toOffset: destination)
+
+        for (index, step) in reordered.enumerated() {
+            step.order = index
+        }
         try? modelContext.save()
     }
 
