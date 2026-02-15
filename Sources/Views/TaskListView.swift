@@ -5,6 +5,8 @@ import SwiftUI
 struct TaskListView: View {
     /// フィルター種別
     @Binding var selectedFilter: TaskFilter
+    /// タスク追加シートの表示状態
+    @State private var showingAddTask = false
 
     /// データ操作のためのSwiftDataモデルコンテキストです。
     @Environment(\.modelContext) private var modelContext
@@ -41,6 +43,29 @@ struct TaskListView: View {
                 taskList
             }
             .navigationTitle("BabySteps")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("フィルター", selection: $selectedFilter) {
+                            ForEach(TaskFilter.allCases, id: \.self) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingAddTask = true
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingAddTask) {
+                AddTaskSheetView(isPresented: $showingAddTask)
+            }
             .sheet(item: $selectedTask) { task in
                 addStepSheet(for: task)
             }
