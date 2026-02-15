@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// 新規タスク追加用のシートビュー。MainView から表示し、どのタブからでも利用可能。
+/// 新規タスク追加用のシートビュー。TaskListView から表示し、タスクタブのみで利用可能。
 struct AddTaskSheetView: View {
     @Environment(\.modelContext) private var modelContext
     @Binding var isPresented: Bool
