@@ -3,14 +3,19 @@ import SwiftUI
 
 /// タスク一覧とタスク管理機能を提供する画面のビュー構造体です。
 struct TaskListView: View {
+    /// 選択中のタブ（タブ切り替え用）
+    @Binding var selectedTab: AppTab
+    /// フィルター種別
+    @Binding var selectedFilter: TaskFilter
+    /// タスク追加シートの表示状態
+    @Binding var showingAddTask: Bool
+
     /// データ操作のためのSwiftDataモデルコンテキストです。
     @Environment(\.modelContext) private var modelContext
     /// SwiftDataストアから取得されたすべてのタスクです。
     @Query(sort: \Task.createdAt, order: .reverse) private var tasks: [Task]
     /// タスクやステップを管理するビューモデルです。
     @State private var viewModel: TaskViewModel?
-    /// タスク追加シートの表示状態を管理します。
-    @State private var showingAddTask = false
     /// 新しいタスクのタイトル入力を保持します。
     @State private var newTaskTitle = ""
     /// ステップ追加対象として選択中のタスクです。
@@ -21,17 +26,10 @@ struct TaskListView: View {
     @State private var addStepCount = 1
     /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
     @State private var didBackfillCompletedAt = false
-    /// 検索語
-    @State private var searchText = ""
-    /// フィルター種別
-    @State private var selectedFilter: TaskFilter = .all
 
-    /// 検索・フィルター適用後のタスク一覧
+    /// フィルター適用後のタスク一覧
     private var filteredTasks: [Task] {
         var result = tasks
-        if !searchText.isEmpty {
-            result = result.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
-        }
         switch selectedFilter {
         case .all:
             break
@@ -51,22 +49,6 @@ struct TaskListView: View {
                 taskList
             }
             .navigationTitle("BabySteps")
-            .searchable(text: $searchText, prompt: "タスクを検索")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddTask = true }) {
-                        Image(systemName: "plus")
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Picker("フィルター", selection: $selectedFilter) {
-                        ForEach(TaskFilter.allCases, id: \.self) { filter in
-                            Text(filter.rawValue).tag(filter)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                }
-            }
             .sheet(isPresented: $showingAddTask) {
                 addTaskSheet
             }
@@ -83,7 +65,48 @@ struct TaskListView: View {
                     initializeCompletedSteps()
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                taskListBottomBar
+            }
         }
+    }
+
+    /// タスクリスト用ボトムバー：左下フィルター、中央タブ、右下プラス。
+    private var taskListBottomBar: some View {
+        HStack(spacing: 0) {
+            // 左下：フィルター
+            Menu {
+                Picker("フィルター", selection: $selectedFilter) {
+                    ForEach(TaskFilter.allCases, id: \.self) { filter in
+                        Text(filter.rawValue).tag(filter)
+                    }
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .font(.title2)
+            }
+            .frame(width: 44, height: 44)
+
+            Spacer()
+
+            // 中央：タブ切り替え
+            HStack(spacing: 0) {
+                TabBarButton(selectedTab: $selectedTab, tab: .tasks, icon: "list.bullet", label: "タスク")
+                TabBarButton(selectedTab: $selectedTab, tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
+            }
+
+            Spacer()
+
+            // 右下：プラスボタン
+            Button(action: { showingAddTask = true }) {
+                Image(systemName: "square.and.pencil")
+                    .font(.title2)
+            }
+            .frame(width: 44, height: 44)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(.bar)
     }
 
     /// タスク一覧リストのViewを返します。
@@ -111,12 +134,12 @@ struct TaskListView: View {
         }
     }
 
-    /// 空状態時の説明文（検索・フィルターで0件か、タスクが全くないかで分岐）
+    /// 空状態時の説明文（フィルターで0件か、タスクが全くないかで分岐）
     private var emptyStateDescription: String {
         if tasks.isEmpty {
             return "タスクを追加してください"
         }
-        return "検索語やフィルターを変えてみてください"
+        return "フィルターを変えてみてください"
     }
 
     /// 新しいタスク追加用のシートViewを返します。
@@ -459,6 +482,19 @@ struct TaskRowView: View {
 }
 
 #Preview {
-    TaskListView()
-        .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
+    struct PreviewWrapper: View {
+        @State private var tab = AppTab.tasks
+        @State private var filter = TaskFilter.all
+        @State private var showingAddTask = false
+
+        var body: some View {
+            TaskListView(
+                selectedTab: $tab,
+                selectedFilter: $filter,
+                showingAddTask: $showingAddTask
+            )
+            .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
+        }
+    }
+    return PreviewWrapper()
 }
