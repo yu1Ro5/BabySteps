@@ -54,13 +54,4 @@ final class TaskViewModelTests: XCTestCase {
         XCTAssertEqual(sorted.map(\.title), ["B", "C", "A"])
     }
 
-    func testReorderSteps() throws {
-        let task = viewModel.createTaskWithSteps(title: "Steps", stepCount: 3)
-        let steps = task.steps.sorted { $0.order < $1.order }
-        viewModel.reorderSteps(in: task, from: IndexSet(integer: 0), to: 3)
-        let reordered = task.steps.sorted { $0.order < $1.order }
-        XCTAssertEqual(reordered[0].id, steps[1].id)
-        XCTAssertEqual(reordered[1].id, steps[2].id)
-        XCTAssertEqual(reordered[2].id, steps[0].id)
-    }
 }

@@ -83,18 +83,6 @@ class TaskViewModel {
         try? modelContext.save()
     }
 
-    /// タスク内のステップの順序を変更する
-    func reorderSteps(in task: Task, from source: IndexSet, to destination: Int) {
-        let sortedSteps = task.steps.sorted { $0.order < $1.order }
-        var reordered = sortedSteps
-        reordered.move(fromOffsets: source, toOffset: destination)
-
-        for (index, step) in reordered.enumerated() {
-            step.order = index
-        }
-        try? modelContext.save()
-    }
-
     // MARK: - Data Queries
 
     // 全タスクを取得

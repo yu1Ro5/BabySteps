@@ -22,9 +22,6 @@ struct TaskListView: View {
     @State private var didBackfillCompletedAt = false
     /// 既存タスクの order バックフィルを1回だけ実行するためのフラグです。
     @State private var didBackfillOrder = false
-    /// ステップ並び替えシートの表示対象タスクです。
-    @State private var stepReorderTask: Task?
-
     /// フィルター適用後のタスク一覧
     private var filteredTasks: [Task] {
         var result = tasks
@@ -52,9 +49,6 @@ struct TaskListView: View {
             }
             .sheet(item: $selectedTask) { task in
                 addStepSheet(for: task)
-            }
-            .sheet(item: $stepReorderTask) { task in
-                StepReorderSheet(task: task, viewModel: viewModel)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -116,8 +110,7 @@ struct TaskListView: View {
                         TaskRowView(
                             task: task,
                             viewModel: viewModel,
-                            onAddStep: { selectedTask = task },
-                            onReorderStep: { stepReorderTask = task }
+                            onAddStep: { selectedTask = task }
                         )
                     }
                     .onDelete(perform: deleteTasks)
@@ -262,39 +255,6 @@ struct TaskListView: View {
     }
 }
 
-// MARK: - Step Reorder Sheet
-
-/// ステップの並び替えを行うシートビューです。
-struct StepReorderSheet: View {
-    let task: Task
-    let viewModel: TaskViewModel?
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                ForEach(task.steps.sorted(by: { $0.order < $1.order }), id: \.id) { step in
-                    HStack {
-                        Image(systemName: step.isCompleted ? "checkmark.square.fill" : "square")
-                            .foregroundColor(step.isCompleted ? .green : .gray)
-                        Text("ステップ \(step.order + 1)")
-                    }
-                }
-                .onMove { source, destination in
-                    viewModel?.reorderSteps(in: task, from: source, to: destination)
-                }
-            }
-            .navigationTitle("ステップの並び替え")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("完了") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - Task Row View
 
 /// 1つのタスク情報とそのステップ進捗を表示するためのビュー構造体です。
@@ -305,8 +265,6 @@ struct TaskRowView: View {
     let viewModel: TaskViewModel?
     /// ＋ボタンがタップされた際に呼ばれるクロージャ。
     let onAddStep: () -> Void
-    /// ステップ並び替えボタンがタップされた際に呼ばれるクロージャ。
-    let onReorderStep: () -> Void
 
     /// タスク名編集モードの状態
     @State private var isEditing = false
@@ -360,13 +318,6 @@ struct TaskRowView: View {
                 }
 
                 Spacer()
-
-                if !task.steps.isEmpty {
-                    Button(action: onReorderStep) {
-                        Image(systemName: "line.3.horizontal")
-                            .foregroundColor(.secondary)
-                    }
-                }
 
                 Button(action: onAddStep) {
                     Image(systemName: "plus.circle")
