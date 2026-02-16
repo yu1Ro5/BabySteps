@@ -12,7 +12,7 @@ Cannot use staged migration with an unknown model version.
 
 ### エラー 1 の対策
 
-SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。
+SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。論理的には V1 は order なし（nil）だが、マイグレーション用に定義する。
 
 ---
 

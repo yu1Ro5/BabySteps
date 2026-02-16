@@ -25,11 +25,13 @@ CI でマイグレーションをテストするための計画。
 
 ## 3. 実装方針
 
-### 3.1 シナリオ A
+### 3.1 シナリオ A（in-memory）
 
-既存の `TestHelpers.makeInMemoryContainer()` が該当。in-memory は空ストアとして V2 で作成される。
+既存の `TestHelpers.makeInMemoryContainer()` が該当。in-memory は空ストアとして V2 で作成される。**マイグレーションは発生しない**。新規インストール時の動作を検証する。
 
-### 3.2 シナリオ B（実装済み）
+### 3.2 シナリオ B（ファイルベース・必須）
+
+マイグレーションは**ファイルベースのストア**でのみ発生する。in-memory では閉じたストアを再オープンできないため、**MigrationPlanTests はファイルベースで実装する**。効果: V1→V2 の実際のマイグレーション経路を検証できる。
 
 1. `TestHelpers.makeV1Store(at:)` で V1 のみの ModelContainer を作成（MigrationPlan なし）
 2. SchemaV1.Task を挿入し、`order = nil` を設定して保存
@@ -40,6 +42,10 @@ CI でマイグレーションをテストするための計画。
 ### 3.3 V1 ストアの作成
 
 `ModelContainer(for: Schema(versionedSchema: SchemaV1.self), configurations: [config])` で MigrationPlan なしの単一スキーマコンテナを作成。これにより V1 バージョン識別子付きのストアが作成される。
+
+### 3.4 SchemaV1 の order
+
+SchemaV1.Task は `order: Int?` (nil) を保持。論理的には「order なし」だが、V2→コピー時に必須属性を満たすため、willMigrate で付与してからコピーする。
 
 ---
 

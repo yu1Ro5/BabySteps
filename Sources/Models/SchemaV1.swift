@@ -15,7 +15,7 @@ extension SchemaV1 {
         var id: UUID
         var title: String
         var createdAt: Date
-        /// 表示順序（既存ストアは Int? で作成されているため、V1 で一致させる）
+        /// V1 では order なし（nil）。willMigrate で付与してから V2 へコピー。
         var order: Int?
         var steps: [TaskStep]
 
@@ -23,7 +23,7 @@ extension SchemaV1 {
             self.id = UUID()
             self.title = title
             self.createdAt = Date()
-            self.order = 0
+            self.order = nil
             self.steps = []
         }
 

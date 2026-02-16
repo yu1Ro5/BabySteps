@@ -45,6 +45,7 @@ jobs:
                    -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Debug \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    build \
@@ -58,6 +59,7 @@ jobs:
                    -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Release \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    build \
@@ -72,6 +74,7 @@ jobs:
                    -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
                    -derivedDataPath build \
                    -configuration Debug \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    test \
@@ -85,6 +88,7 @@ jobs:
                    -destination 'generic/platform=iOS' \
                    -derivedDataPath build \
                    -configuration Release \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    archive \
