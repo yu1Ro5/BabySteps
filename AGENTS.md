@@ -69,7 +69,7 @@ xcodebuild -project BabySteps.xcodeproj \
 Notes:
 
 - If simulator device names or iOS runtime versions change, update the `-destination` values (and keep CI in sync).
-- The CI workflow currently tolerates test failures due to simulator flakiness; for product changes, prefer making tests reliable rather than skipping.
+- The CI workflow fails the job when tests fail; ensure tests are reliable before merging.
 
 ## Formatting
 

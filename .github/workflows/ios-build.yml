@@ -63,10 +63,9 @@ jobs:
                    build \
                    -verbose
 
-    - name: Run Tests (Skip if simulator issues)
+    - name: Run Tests
       timeout-minutes: 15
       run: |
-        # Try to run tests, but don't fail the build if tests fail
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
@@ -76,7 +75,7 @@ jobs:
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    test \
-                   -verbose || echo "Tests failed, but continuing with build"
+                   -verbose
 
     - name: Archive App (unsigned)
       run: |
