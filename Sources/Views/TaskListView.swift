@@ -20,8 +20,6 @@ struct TaskListView: View {
     @State private var addStepCount = 1
     /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
     @State private var didBackfillCompletedAt = false
-    /// 既存タスクの order バックフィルを1回だけ実行するためのフラグです。
-    @State private var didBackfillOrder = false
     /// フィルター適用後のタスク一覧
     private var filteredTasks: [Task] {
         var result = tasks
@@ -85,11 +83,8 @@ struct TaskListView: View {
                     initializeCompletedSteps()
                 }
 
-                // 既存タスクに order が未設定の場合のバックフィル
-                if !didBackfillOrder {
-                    didBackfillOrder = true
-                    backfillTaskOrder()
-                }
+                // 既存タスクに order が未設定の場合のバックフィル（アプリ全体で1回のみ）
+                backfillTaskOrderIfNeeded()
             }
         }
     }
@@ -237,13 +232,23 @@ struct TaskListView: View {
     }
 
     /// 既存タスクに order をバックフィルします（createdAt 順で付与）。
-    private func backfillTaskOrder() {
+    /// UserDefaults で永続化し、アプリ全体で1回のみ実行。ユーザーのドラッグ並び替えを上書きしない。
+    private func backfillTaskOrderIfNeeded() {
+        enum MigrationKey {
+            static let taskOrderCompleted = "taskOrderMigrationCompleted"
+        }
+        if UserDefaults.standard.bool(forKey: MigrationKey.taskOrderCompleted) {
+            return
+        }
+
         let descriptor = FetchDescriptor<Task>(
             sortBy: [SortDescriptor(\.createdAt, order: .forward)]
         )
         guard let allTasks = try? modelContext.fetch(descriptor), !allTasks.isEmpty else {
+            UserDefaults.standard.set(true, forKey: MigrationKey.taskOrderCompleted)
             return
         }
+
         var needsSave = false
         for (index, task) in allTasks.enumerated() {
             if task.order != index {
@@ -252,6 +257,7 @@ struct TaskListView: View {
             }
         }
         if needsSave { try? modelContext.save() }
+        UserDefaults.standard.set(true, forKey: MigrationKey.taskOrderCompleted)
     }
 }
 
