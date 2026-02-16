@@ -48,14 +48,13 @@ BabySteps/
 │   │   ├── Activity.swift    # アクティビティ関連
 │   │   └── ActivityLevel.swift
 │   ├── Views/            # SwiftUIビュー
+│   │   ├── AddTaskSheetView.swift  # 新規タスク追加シート
 │   │   ├── MainView.swift        # タブ・状態管理のルートビュー
 │   │   ├── TaskListView.swift   # タスク一覧画面
-│   │   ├── Activity/             # アクティビティ関連ビュー
-│   │   │   ├── ActivityView.swift
-│   │   │   ├── CalendarGridView.swift
-│   │   │   └── DayDetailView.swift
-│   │   └── Components/           # 共通UIコンポーネント
-│   │       └── TabBarButton.swift
+│   │   └── Activity/             # アクティビティ関連ビュー
+│   │       ├── ActivityView.swift
+│   │       ├── CalendarGridView.swift
+│   │       └── DayDetailView.swift
 │   ├── ViewModels/       # ビューモデル
 │   │   └── TaskViewModel.swift   # タスク管理ロジック
 │   ├── Assets.xcassets/  # アセット

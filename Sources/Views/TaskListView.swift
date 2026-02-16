@@ -3,12 +3,10 @@ import SwiftUI
 
 /// タスク一覧とタスク管理機能を提供する画面のビュー構造体です。
 struct TaskListView: View {
-    /// 選択中のタブ（タブ切り替え用）
-    @Binding var selectedTab: AppTab
     /// フィルター種別
     @Binding var selectedFilter: TaskFilter
     /// タスク追加シートの表示状態
-    @Binding var showingAddTask: Bool
+    @State private var showingAddTask = false
 
     /// データ操作のためのSwiftDataモデルコンテキストです。
     @Environment(\.modelContext) private var modelContext
@@ -16,12 +14,8 @@ struct TaskListView: View {
     @Query(sort: \Task.order, order: .forward) private var tasks: [Task]
     /// タスクやステップを管理するビューモデルです。
     @State private var viewModel: TaskViewModel?
-    /// 新しいタスクのタイトル入力を保持します。
-    @State private var newTaskTitle = ""
     /// ステップ追加対象として選択中のタスクです。
     @State private var selectedTask: Task?
-    /// 新しいタスク作成時のチェックボックス（ステップ）数（デフォルト: 5）。
-    @State private var stepCount = 5
     /// ステップ追加時のステップ数（デフォルト: 1）。
     @State private var addStepCount = 1
     /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
@@ -53,19 +47,39 @@ struct TaskListView: View {
                 taskList
             }
             .navigationTitle("BabySteps")
-            .toolbar {
-                if selectedFilter == .all {
-                    EditButton()
-                }
-            }
             .sheet(isPresented: $showingAddTask) {
-                addTaskSheet
+                AddTaskSheetView(isPresented: $showingAddTask)
             }
             .sheet(item: $selectedTask) { task in
                 addStepSheet(for: task)
             }
             .sheet(item: $stepReorderTask) { task in
                 StepReorderSheet(task: task, viewModel: viewModel)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("フィルター", selection: $selectedFilter) {
+                            ForEach(TaskFilter.allCases, id: \.self) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+                if selectedFilter == .all {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingAddTask = true
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
             }
             .onAppear {
                 // ModelContextを使用してViewModelを作成
@@ -83,48 +97,7 @@ struct TaskListView: View {
                     backfillTaskOrder()
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                taskListBottomBar
-            }
         }
-    }
-
-    /// タスクリスト用ボトムバー：左下フィルター、中央タブ、右下プラス。
-    private var taskListBottomBar: some View {
-        HStack(spacing: 0) {
-            // 左下：フィルター
-            Menu {
-                Picker("フィルター", selection: $selectedFilter) {
-                    ForEach(TaskFilter.allCases, id: \.self) { filter in
-                        Text(filter.rawValue).tag(filter)
-                    }
-                }
-            } label: {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .font(.title2)
-            }
-            .frame(width: 44, height: 44)
-
-            Spacer()
-
-            // 中央：タブ切り替え
-            HStack(spacing: 0) {
-                TabBarButton(selectedTab: $selectedTab, tab: .tasks, icon: "list.bullet", label: "タスク")
-                TabBarButton(selectedTab: $selectedTab, tab: .activity, icon: "chart.bar.fill", label: "アクティビティ")
-            }
-
-            Spacer()
-
-            // 右下：プラスボタン
-            Button(action: { showingAddTask = true }) {
-                Image(systemName: "square.and.pencil")
-                    .font(.title2)
-            }
-            .frame(width: 44, height: 44)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
-        .background(.bar)
     }
 
     /// タスク一覧リストのViewを返します。
@@ -163,86 +136,6 @@ struct TaskListView: View {
             return "タスクを追加してください"
         }
         return "フィルターを変えてみてください"
-    }
-
-    /// 新しいタスク追加用のシートViewを返します。
-    private var addTaskSheet: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                Text("新しいタスクを作成")
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                TextField("タスクのタイトル", text: $newTaskTitle)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
-
-                // ステップ数選択UI
-                VStack(spacing: 12) {
-                    Text("チェックボックスの数")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            if stepCount > 1 {
-                                stepCount -= 1
-                            }
-                        }) {
-                            Image(systemName: "minus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.red)
-                        }
-                        .disabled(stepCount <= 1)
-
-                        Text("\(stepCount)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .frame(minWidth: 60)
-
-                        Button(action: {
-                            stepCount += 1
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
-                        }
-                    }
-
-                    Text("\(stepCount)個のチェックボックスが作成されます")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-
-                Button("作成") {
-                    if !newTaskTitle.isEmpty {
-                        _ = viewModel?.createTaskWithSteps(title: newTaskTitle, stepCount: stepCount)
-                        newTaskTitle = ""
-                        stepCount = 5  // リセット
-                        showingAddTask = false
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(newTaskTitle.isEmpty)
-
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("タスク追加")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("キャンセル") {
-                        showingAddTask = false
-                        newTaskTitle = ""
-                        stepCount = 5  // リセット
-                    }
-                }
-            }
-        }
     }
 
     /// ステップ追加用のシートViewを返します。
@@ -566,17 +459,11 @@ struct TaskRowView: View {
 
 #Preview {
     struct PreviewWrapper: View {
-        @State private var tab = AppTab.tasks
         @State private var filter = TaskFilter.all
-        @State private var showingAddTask = false
 
         var body: some View {
-            TaskListView(
-                selectedTab: $tab,
-                selectedFilter: $filter,
-                showingAddTask: $showingAddTask
-            )
-            .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
+            TaskListView(selectedFilter: $filter)
+                .modelContainer(for: [Task.self, TaskStep.self], inMemory: true)
         }
     }
     return PreviewWrapper()
