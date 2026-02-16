@@ -1,18 +1,15 @@
 import SwiftData
 import SwiftUI
 
-/// タブ切り替えを管理し、各ビューにボトムバーを委譲する。
+/// ネイティブ TabView でタブ切り替えを管理する。
 struct MainView: View {
     @State private var selectedTab: AppTab = .tasks
     @State private var selectedFilter: TaskFilter = .all
-    @State private var showingAddTask = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
             TaskListView(
-                selectedTab: $selectedTab,
-                selectedFilter: $selectedFilter,
-                showingAddTask: $showingAddTask
+                selectedFilter: $selectedFilter
             )
             .tabItem {
                 Image(systemName: "list.bullet")
@@ -20,20 +17,12 @@ struct MainView: View {
             }
             .tag(AppTab.tasks)
 
-            Group {
-                if selectedTab == .activity {
-                    ActivityView(selectedTab: $selectedTab)
+            ActivityView()
+                .tabItem {
+                    Image(systemName: "chart.bar.fill")
+                    Text("アクティビティ")
                 }
-                else {
-                    Color.clear
-                }
-            }
-            .tabItem {
-                Image(systemName: "chart.bar.fill")
-                Text("アクティビティ")
-            }
-            .tag(AppTab.activity)
+                .tag(AppTab.activity)
         }
-        .toolbar(.hidden, for: .tabBar)
     }
 }
