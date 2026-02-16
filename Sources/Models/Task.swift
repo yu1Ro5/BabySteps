@@ -10,7 +10,7 @@ final class Task: Identifiable {
     /// タスクの作成日時
     var createdAt: Date
     /// 表示順序（0から開始、小さいほど上に表示）
-    var order: Int
+    var order: Int?
     /// タスクに紐づくステップの配列
     var steps: [TaskStep]
 
@@ -50,4 +50,15 @@ final class Task: Identifiable {
             step.task = nil
         }
     }
+
+    static func migrateOrderIfNeeded(modelContext: ModelContext) {
+        let descriptor = FetchDescriptor<Task>(predicate: #Predicate<Task> { $0.order == nil })
+        if let tasksNeedingOrder = try? modelContext.fetch(descriptor), !tasksNeedingOrder.isEmpty {
+            for task in tasksNeedingOrder { task.order = 0 }
+            try? modelContext.save()
+        }
+    }
 }
+
+/// This migration pattern allows safe updating of the optional `order` property 
+/// for existing Task objects in code-based SwiftData setups.
