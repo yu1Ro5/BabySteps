@@ -1,28 +1,56 @@
-# 「Unknown model version」エラーの原因と対策
+# SwiftData マイグレーションエラーの原因と対策
 
-## エラー
+## エラー 1: Unknown model version
 
 ```
 Cannot use staged migration with an unknown model version.
 ```
 
-## 原因
+### 原因
+
+既存ストアのバージョンが `SchemaMigrationPlan` のいずれとも一致しない。
+
+### 対策
+
+SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。
+
+---
+
+## エラー 2: Missing attribute values on mandatory destination attribute
+
+```
+Validation error missing attribute values on mandatory destination attribute
+entity=Task, attribute=order
+```
+
+### 原因
 
 | 要因 | 説明 |
 | --- | --- |
-| **既存ストア** | デバイスに以前のバージョンのアプリで作成された SwiftData ストアが存在する |
-| **バージョン不一致** | そのストアは `SchemaMigrationPlan` 導入前に作成され、暗黙のスキーマでバージョンが付与されている |
-| **計画との不整合** | `SchemaMigrationPlan` の SchemaV1 / SchemaV2 のいずれとも、既存ストアのバージョンが一致しない |
+| **コピー順序** | マイグレーションは V1 → V2 のデータコピーを **didMigrate より前** に実行する |
+| **nil の扱い** | V1 の Task で `order == nil` のレコードがある |
+| **必須属性** | V2 の Task は `order: Int`（必須）のため、nil をコピーできない |
 
-## 実施した対策
+### 対策
 
-### SchemaV1 を既存ストアに合わせる
+**willMigrate** で、マイグレーション実行前に V1 の全 Task に `order` を付与する。
 
-既存ストアは `Task.order: Int?` で作成されているため、SchemaV1 の Task にも `order: Int?` を追加した。
+```swift
+willMigrate: { context in
+    let descriptor = FetchDescriptor<SchemaV1.Task>(
+        sortBy: [SortDescriptor(\.createdAt, order: .forward)]
+    )
+    let tasks = try context.fetch(descriptor)
+    for (index, task) in tasks.enumerated() {
+        task.order = index
+    }
+    try context.save()
+}
+```
 
-- **SchemaV1**: `order: Int?`（既存ストアと一致）
-- **SchemaV2**: `order: Int`（必須）
-- **マイグレーション**: `didMigrate` で `createdAt` 順に `order` を付与
+これにより、V1 → V2 のコピー時点で全タスクに `order` が入り、検証エラーを防ぐ。
+
+---
 
 ## それでも解消しない場合
 
