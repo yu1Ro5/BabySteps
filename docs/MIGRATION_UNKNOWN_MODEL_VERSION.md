@@ -2,15 +2,15 @@
 
 ## エラー 1: Unknown model version
 
-```
+```text
 Cannot use staged migration with an unknown model version.
 ```
 
-### 原因
+### エラー 1 の原因
 
 既存ストアのバージョンが `SchemaMigrationPlan` のいずれとも一致しない。
 
-### 対策
+### エラー 1 の対策
 
 SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。
 
@@ -18,12 +18,12 @@ SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。
 
 ## エラー 2: Missing attribute values on mandatory destination attribute
 
-```
+```text
 Validation error missing attribute values on mandatory destination attribute
 entity=Task, attribute=order
 ```
 
-### 原因
+### エラー 2 の原因
 
 | 要因 | 説明 |
 | --- | --- |
@@ -31,7 +31,7 @@ entity=Task, attribute=order
 | **nil の扱い** | V1 の Task で `order == nil` のレコードがある |
 | **必須属性** | V2 の Task は `order: Int`（必須）のため、nil をコピーできない |
 
-### 対策
+### エラー 2 の対策
 
 **willMigrate** で、マイグレーション実行前に V1 の全 Task に `order` を付与する。
 
