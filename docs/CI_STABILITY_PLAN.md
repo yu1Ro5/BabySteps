@@ -83,7 +83,7 @@ private var isRunningTests: Bool {
 | --- | --- | --- | --- |
 | 1 | パフォーマンステスト削除（`testPerformanceExample`） | 高 | 小 |
 | 2 | テスト時メモリ内 ModelContainer の適用 | 高 | 中 |
-| 3 | ワークフローの `|| echo` 削除（テスト失敗を検知） | 中 | 小 |
+| 3 | ワークフローの失敗マスキング削除（テスト失敗を検知） | 中 | 小 |
 
 ---
 
