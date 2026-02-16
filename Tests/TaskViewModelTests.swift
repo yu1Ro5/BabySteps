@@ -51,7 +51,7 @@ final class TaskViewModelTests: XCTestCase {
         let tasks = [t1, t2, t3]
         viewModel.moveTasks(tasks, from: IndexSet(integer: 0), to: 3)
         let sorted = tasks.sorted { $0.order < $1.order }
-        XCTAssertEqual(sorted.map(\.title), ["B", "C", "A"])
+        XCTAssertEqual(sorted.map { $0.title }, ["B", "C", "A"])
     }
 
 }
