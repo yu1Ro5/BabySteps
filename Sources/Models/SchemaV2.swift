@@ -5,7 +5,7 @@ enum SchemaV2: VersionedSchema {
     static var versionIdentifier = Schema.Version(2, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        [Task.self, TaskStep.self]
+        [SchemaV2.Task.self, SchemaV2.TaskStep.self]
     }
 }
 

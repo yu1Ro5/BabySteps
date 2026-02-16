@@ -5,7 +5,7 @@ enum SchemaV1: VersionedSchema {
     static var versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        [Task.self, TaskStep.self]
+        [SchemaV1.Task.self, SchemaV1.TaskStep.self]
     }
 }
 
@@ -15,12 +15,15 @@ extension SchemaV1 {
         var id: UUID
         var title: String
         var createdAt: Date
+        /// 表示順序（既存ストアは Int? で作成されているため、V1 で一致させる）
+        var order: Int?
         var steps: [TaskStep]
 
         init(title: String) {
             self.id = UUID()
             self.title = title
             self.createdAt = Date()
+            self.order = 0
             self.steps = []
         }
 
