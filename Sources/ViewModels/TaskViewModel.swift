@@ -15,8 +15,7 @@ class TaskViewModel {
     // 指定された数のステップを持つタスクを作成
     func createTaskWithSteps(title: String, stepCount: Int) -> Task {
         let tasks = (try? fetchTasks()) ?? []
-        // Handle optional order values safely when computing the max
-        let maxOrder = tasks.compactMap { $0.order }.max() ?? -1
+        let maxOrder = tasks.map(\.order).max() ?? -1
 
         let task = Task(title: title)
         task.order = maxOrder + 1

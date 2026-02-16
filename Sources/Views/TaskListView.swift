@@ -82,9 +82,6 @@ struct TaskListView: View {
                     didBackfillCompletedAt = true
                     initializeCompletedSteps()
                 }
-
-                // 既存タスクに order が未設定の場合のバックフィル（アプリ全体で1回のみ）
-                backfillTaskOrderIfNeeded()
             }
         }
     }
@@ -231,34 +228,6 @@ struct TaskListView: View {
         try? modelContext.save()
     }
 
-    /// 既存タスクに order をバックフィルします（createdAt 順で付与）。
-    /// UserDefaults で永続化し、アプリ全体で1回のみ実行。ユーザーのドラッグ並び替えを上書きしない。
-    private func backfillTaskOrderIfNeeded() {
-        enum MigrationKey {
-            static let taskOrderCompleted = "taskOrderMigrationCompleted"
-        }
-        if UserDefaults.standard.bool(forKey: MigrationKey.taskOrderCompleted) {
-            return
-        }
-
-        let descriptor = FetchDescriptor<Task>(
-            sortBy: [SortDescriptor(\.createdAt, order: .forward)]
-        )
-        guard let allTasks = try? modelContext.fetch(descriptor), !allTasks.isEmpty else {
-            UserDefaults.standard.set(true, forKey: MigrationKey.taskOrderCompleted)
-            return
-        }
-
-        var needsSave = false
-        for (index, task) in allTasks.enumerated() {
-            if task.order != index {
-                task.order = index
-                needsSave = true
-            }
-        }
-        if needsSave { try? modelContext.save() }
-        UserDefaults.standard.set(true, forKey: MigrationKey.taskOrderCompleted)
-    }
 }
 
 // MARK: - Task Row View

@@ -4,10 +4,12 @@ import SwiftData
 
 enum TestHelpers {
     static func makeInMemoryContainer() throws -> ModelContainer {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let schema = Schema(versionedSchema: SchemaLatest.self)
+        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(
-            for: Task.self, TaskStep.self,
-            configurations: config
+            for: schema,
+            migrationPlan: BabyStepsMigrationPlan.self,
+            configurations: [config]
         )
     }
 }
