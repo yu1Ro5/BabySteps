@@ -11,7 +11,7 @@ struct TaskListView: View {
     /// データ操作のためのSwiftDataモデルコンテキストです。
     @Environment(\.modelContext) private var modelContext
     /// SwiftDataストアから取得されたすべてのタスクです。
-    @Query(sort: \Task.createdAt, order: .reverse) private var tasks: [Task]
+    @Query(sort: \Task.order, order: .forward) private var tasks: [Task]
     /// タスクやステップを管理するビューモデルです。
     @State private var viewModel: TaskViewModel?
     /// ステップ追加対象として選択中のタスクです。
@@ -20,7 +20,6 @@ struct TaskListView: View {
     @State private var addStepCount = 1
     /// 既存データの軽量マイグレーションを1回だけ実行するためのフラグです。
     @State private var didBackfillCompletedAt = false
-
     /// フィルター適用後のタスク一覧
     private var filteredTasks: [Task] {
         var result = tasks
@@ -59,6 +58,11 @@ struct TaskListView: View {
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+                if selectedFilter == .all {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -102,6 +106,10 @@ struct TaskListView: View {
                         )
                     }
                     .onDelete(perform: deleteTasks)
+                    .onMove { source, destination in
+                        guard selectedFilter == .all else { return }
+                        viewModel?.moveTasks(filteredTasks, from: source, to: destination)
+                    }
                 }
             }
         }
@@ -219,6 +227,7 @@ struct TaskListView: View {
         }
         try? modelContext.save()
     }
+
 }
 
 // MARK: - Task Row View

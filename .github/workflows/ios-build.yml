@@ -42,9 +42,10 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34,OS=26.2,arch=arm64' \
                    -derivedDataPath build \
                    -configuration Debug \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    build \
@@ -55,28 +56,29 @@ jobs:
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34,OS=26.2,arch=arm64' \
                    -derivedDataPath build \
                    -configuration Release \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    build \
                    -verbose
 
-    - name: Run Tests (Skip if simulator issues)
+    - name: Run Tests
       timeout-minutes: 15
       run: |
-        # Try to run tests, but don't fail the build if tests fail
         xcodebuild -project BabySteps.xcodeproj \
                    -scheme BabySteps \
                    -sdk iphonesimulator \
-                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34' \
+                   -destination 'platform=iOS Simulator,id=9EBC5E9F-3781-48D5-BC91-A533EAF48C34,OS=26.2,arch=arm64' \
                    -derivedDataPath build \
                    -configuration Debug \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    test \
-                   -verbose || echo "Tests failed, but continuing with build"
+                   -verbose
 
     - name: Archive App (unsigned)
       run: |
@@ -86,6 +88,7 @@ jobs:
                    -destination 'generic/platform=iOS' \
                    -derivedDataPath build \
                    -configuration Release \
+                   ARCHS=arm64 \
                    CODE_SIGN_STYLE=Automatic \
                    CODE_SIGNING_ALLOWED=NO \
                    archive \

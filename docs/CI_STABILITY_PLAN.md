@@ -99,4 +99,4 @@ private var isRunningTests: Bool {
 
 - [SwiftData ModelContainer](https://developer.apple.com/documentation/swiftdata/modelcontainer)
 - [XCTest Performance Testing](https://developer.apple.com/documentation/xctest/performance_tests)
-- AGENTS.md: "The CI workflow currently tolerates test failures due to simulator flakiness; for product changes, prefer making tests reliable rather than skipping."
+- AGENTS.md: "The CI workflow fails the job when tests fail; ensure tests are reliable before merging."
