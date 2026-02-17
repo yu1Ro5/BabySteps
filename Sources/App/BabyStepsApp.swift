@@ -39,8 +39,8 @@ struct BabyStepsApp: App {
                     configurations: [config]
                 )
             }
-            catch retryError {
-                fatalError("Could not create ModelContainer: \(retryError)")
+            catch let err {
+                fatalError("Could not create ModelContainer: \(err)")
             }
         }
     }()
