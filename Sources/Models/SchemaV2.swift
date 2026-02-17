@@ -16,7 +16,7 @@ extension SchemaV2 {
         var title: String
         var createdAt: Date
         /// 表示順序（0から開始、小さいほど上に表示）。マイグレーション時はデフォルト 0 を使用。
-        @Attribute(.defaultValue(0)) var order: Int
+        var order: Int
         var steps: [TaskStep]
 
         init(title: String) {
