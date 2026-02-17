@@ -45,7 +45,7 @@ CI でマイグレーションをテストするための計画。
 
 ### 3.4 SchemaV1 の order
 
-SchemaV1.Task は `order: Int?` (nil) を保持。論理的には「order なし」だが、V2→コピー時に必須属性を満たすため、willMigrate で付与してからコピーする。
+SchemaV1.Task は `order` を持たない（App Store 版 0.0.4-4 以前と一致）。SchemaV2.order に `@Attribute(.defaultValue(0))` を設定し、didMigrate で createdAt 順に付与する。
 
 ---
 

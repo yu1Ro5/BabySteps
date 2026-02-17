@@ -12,7 +12,7 @@ Cannot use staged migration with an unknown model version.
 
 ### エラー 1 の対策
 
-SchemaV1 に `order: Int?` を追加し、既存ストアと一致させる。論理的には V1 は order なし（nil）だが、マイグレーション用に定義する。
+SchemaV1 から `order` を削除し、App Store 版（0.0.4-4 以前）のストア構造に一致させる。
 
 ---
 
@@ -33,22 +33,8 @@ entity=Task, attribute=order
 
 ### エラー 2 の対策
 
-**willMigrate** で、マイグレーション実行前に V1 の全 Task に `order` を付与する。
-
-```swift
-willMigrate: { context in
-    let descriptor = FetchDescriptor<SchemaV1.Task>(
-        sortBy: [SortDescriptor(\.createdAt, order: .forward)]
-    )
-    let tasks = try context.fetch(descriptor)
-    for (index, task) in tasks.enumerated() {
-        task.order = index
-    }
-    try context.save()
-}
-```
-
-これにより、V1 → V2 のコピー時点で全タスクに `order` が入り、検証エラーを防ぐ。
+1. **SchemaV2.order** に `@Attribute(.defaultValue(0))` を設定し、コピー時にデフォルトを使用
+2. **didMigrate** で、コピー後に V2 の全 Task に `createdAt` 順で `order` を付与する
 
 ---
 

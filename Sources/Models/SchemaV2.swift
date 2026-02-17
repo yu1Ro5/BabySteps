@@ -15,8 +15,8 @@ extension SchemaV2 {
         var id: UUID
         var title: String
         var createdAt: Date
-        /// 表示順序（0から開始、小さいほど上に表示）
-        var order: Int
+        /// 表示順序（0から開始、小さいほど上に表示）。マイグレーション時はデフォルト 0 を使用。
+        @Attribute(.defaultValue(0)) var order: Int
         var steps: [TaskStep]
 
         init(title: String) {

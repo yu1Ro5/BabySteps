@@ -14,14 +14,12 @@ final class MigrationPlanTests: XCTestCase {
 
         let storeURL = tempDir.appendingPathComponent("default.store")
 
-        // 1. Create V1 store and insert tasks with order = nil
+        // 1. Create V1 store and insert tasks (V1 has no order)
         do {
             let v1Container = try TestHelpers.makeV1Store(at: storeURL)
             let ctx = ModelContext(v1Container)
             let t1 = SchemaV1.Task(title: "A")
             let t2 = SchemaV1.Task(title: "B")
-            t1.order = nil
-            t2.order = nil
             ctx.insert(t1)
             ctx.insert(t2)
             try ctx.save()

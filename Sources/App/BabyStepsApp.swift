@@ -27,7 +27,9 @@ struct BabyStepsApp: App {
             )
         }
         catch {
-            // マイグレーション失敗時: ストアを削除して再試行（データは失われる）
+            // 最終手段: マイグレーション失敗時にストアを削除して再試行。
+            // データは失われるが、クラッシュは防ぐ。通常は SchemaV1（order なし）と
+            // SchemaV2（order デフォルト）でマイグレーションが成功する想定。
             guard !Self.isRunningTests else {
                 fatalError("Could not create ModelContainer: \(error)")
             }

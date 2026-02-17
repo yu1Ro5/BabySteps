@@ -15,15 +15,12 @@ extension SchemaV1 {
         var id: UUID
         var title: String
         var createdAt: Date
-        /// V1 では order なし（nil）。willMigrate で付与してから V2 へコピー。
-        var order: Int?
         var steps: [TaskStep]
 
         init(title: String) {
             self.id = UUID()
             self.title = title
             self.createdAt = Date()
-            self.order = nil
             self.steps = []
         }
 

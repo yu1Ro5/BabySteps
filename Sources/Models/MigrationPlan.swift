@@ -13,10 +13,11 @@ enum BabyStepsMigrationPlan: SchemaMigrationPlan {
     static let migrateV1toV2 = MigrationStage.custom(
         fromVersion: SchemaV1.self,
         toVersion: SchemaV2.self,
-        willMigrate: { context in
-            // マイグレーション前に V1 の全 Task に order を付与する。
-            // order が nil のまま V2（必須）にコピーすると検証エラーになるため。
-            let descriptor = FetchDescriptor<SchemaV1.Task>(
+        willMigrate: { _ in },
+        didMigrate: { context in
+            // V1 に order がないため、コピー後に V2 の全 Task に createdAt 順で order を付与する。
+            // SchemaV2.order のデフォルト 0 でコピーは成功するが、正しい並び順にするため。
+            let descriptor = FetchDescriptor<SchemaV2.Task>(
                 sortBy: [SortDescriptor(\.createdAt, order: .forward)]
             )
             let tasks = try context.fetch(descriptor)
@@ -24,7 +25,6 @@ enum BabyStepsMigrationPlan: SchemaMigrationPlan {
                 task.order = index
             }
             try context.save()
-        },
-        didMigrate: { _ in }
+        }
     )
 }
