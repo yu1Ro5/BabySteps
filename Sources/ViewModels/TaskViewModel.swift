@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import WidgetKit
 
 @Observable
 class TaskViewModel {
@@ -30,6 +31,8 @@ class TaskViewModel {
         }
 
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
         return task
     }
 
@@ -37,12 +40,16 @@ class TaskViewModel {
     func deleteTask(_ task: Task) {
         modelContext.delete(task)
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // タスクのタイトルを更新
     func updateTaskTitle(_ task: Task, newTitle: String) {
         task.title = newTitle
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: - Step Management
@@ -55,6 +62,8 @@ class TaskViewModel {
         task.addStep(step)
         modelContext.insert(step)
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // ステップを削除
@@ -62,12 +71,16 @@ class TaskViewModel {
         task.removeStep(step)
         modelContext.delete(step)
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // ステップの完了状態を切り替え
     func toggleStepCompletion(_ step: TaskStep) {
         step.toggleCompletion()
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: - Reorder
@@ -81,6 +94,16 @@ class TaskViewModel {
             task.order = index
         }
         try? modelContext.save()
+        syncProgressToWidget()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    // MARK: - Widget Sync
+
+    /// 進捗を UserDefaults（App Group）に同期。containerURL が nil のウィジェット向けフォールバック用。
+    private func syncProgressToWidget() {
+        let entry = WidgetDataProvider.fetchProgress(context: modelContext, referenceDate: Date())
+        WidgetDataSync.writeToUserDefaults(entry: entry)
     }
 
     // MARK: - Data Queries
