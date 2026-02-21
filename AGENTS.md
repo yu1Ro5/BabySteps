@@ -91,6 +91,8 @@ npm install -g markdownlint-cli
 markdownlint '**/*.md' '**/*.mdc' --fix
 ```
 
+**Before pushing**: Run `markdownlint '**/*.md' '**/*.mdc'` and ensure it passes with no errors. Fix any reported issues before committing and pushing.
+
 ## CI workflows (what to keep in mind)
 
 Workflows live in `.github/workflows/`:

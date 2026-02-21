@@ -26,7 +26,7 @@
 
 ### 2.1 構成図
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  App Group Container (group.com.yu1Ro5.BabySteps)                │
 │  ┌─────────────────────────────────────────────────────────────┐│
@@ -101,6 +101,7 @@
 ### 4.2 SwiftData ストアの移行
 
 **現状**:
+
 ```swift
 // BabyStepsApp.swift
 let storeURL = FileManager.default
@@ -109,6 +110,7 @@ let storeURL = FileManager.default
 ```
 
 **移行後**:
+
 ```swift
 // App Group コンテナを優先、フォールバックで既存パス
 let containerURL = FileManager.default
@@ -118,6 +120,7 @@ let storeURL = containerURL.appendingPathComponent("default.store")
 ```
 
 **初回起動時のデータ移行**:
+
 - 既存の `Application Support/default.store` が存在する場合、App Group コンテナへコピー
 - コピー成功後に旧ストアを削除（オプション: バックアップとして残す）
 
@@ -162,7 +165,7 @@ let storeURL = containerURL.appendingPathComponent("default.store")
 
 ### 6.1 追加ファイル
 
-```
+```text
 Sources/
 ├── Widget/
 │   ├── BabyStepsWidget.swift      # Widget 拡張エントリ
@@ -197,20 +200,18 @@ Sources/
 
 ### Phase 2: ウィジェット拡張（1〜2 日）
 
-3. **進捗サマリーの完成**
-   - Medium サイズ対応
-   - ロック画面ウィジェット対応（iOS 16+）
-
-4. **データ変更時のリロード**
-   - `TaskViewModel` に `WidgetCenter.reloadAllTimelines()` を組み込み
+- **進捗サマリーの完成**
+  - Medium サイズ対応
+  - ロック画面ウィジェット対応（iOS 16+）
+- **データ変更時のリロード**
+  - `TaskViewModel` に `WidgetCenter.reloadAllTimelines()` を組み込み
 
 ### Phase 3: 追加ウィジェット（オプション、1 日）
 
-5. **アクティビティミニ**
-   - 直近 7 日分のドット表示
-
-6. **次のステップ**
-   - 進行中タスクの表示
+- **アクティビティミニ**
+  - 直近 7 日分のドット表示
+- **次のステップ**
+  - 進行中タスクの表示
 
 ---
 
