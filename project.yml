@@ -8,7 +8,7 @@ options:
   groupSortPosition: top
 
 settings:
-  MARKETING_VERSION: "0.0.4"
+  MARKETING_VERSION: "0.1.0"
   CURRENT_PROJECT_VERSION: "1"
   DEVELOPMENT_TEAM: "58Y7Q3D4A7"
   CODE_SIGN_STYLE: "Automatic"
@@ -21,11 +21,16 @@ targets:
     sources:
       - path: Sources
         type: group
+        excludes:
+          - "Widget/**"
     resources:
       - path: Sources/Assets.xcassets
         type: folder
       - path: Sources/PrivacyInfo.xcprivacy
         type: file
+    dependencies:
+      - target: BabyStepsWidget
+        embed: true
     settings:
       PRODUCT_NAME: "BabySteps"
       INFOPLIST_FILE: "Sources/Info.plist"
@@ -34,6 +39,24 @@ targets:
       ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: "AccentColor"
       SWIFT_EMIT_LOC_STRINGS: "YES"
       PRIVACY_MANIFEST_PATH: "Sources/PrivacyInfo.xcprivacy"
+      CODE_SIGN_ENTITLEMENTS: "Sources/BabySteps.entitlements"
+
+  BabyStepsWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Sources/Widget
+        type: group
+      - path: Sources/Models
+        type: group
+    settings:
+      PRODUCT_NAME: "BabyStepsWidget"
+      PRODUCT_BUNDLE_IDENTIFIER: "com.yu1Ro5.BabySteps.BabyStepsWidget"
+      INFOPLIST_FILE: "Sources/Widget/Info.plist"
+      GENERATE_INFOPLIST_FILE: "NO"
+      CODE_SIGN_ENTITLEMENTS: "Sources/Widget/BabyStepsWidget.entitlements"
+      SKIP_INSTALL: "YES"
 
   BabyStepsTests:
     type: bundle.unit-test

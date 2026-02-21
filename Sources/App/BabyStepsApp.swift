@@ -8,16 +8,39 @@ enum AppTab: Hashable {
     case activity
 }
 
+private let appGroupID = "group.com.yu1Ro5.BabySteps"
+private let storeFileName = "default.store"
+
 @main
 struct BabyStepsApp: App {
     private let modelContainer: ModelContainer = {
         let schema = Schema(versionedSchema: SchemaLatest.self)
-        let storeURL = FileManager.default
+
+        if Self.isRunningTests {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            do {
+                return try ModelContainer(
+                    for: schema,
+                    migrationPlan: BabyStepsMigrationPlan.self,
+                    configurations: [config]
+                )
+            }
+            catch {
+                fatalError("Could not create test ModelContainer: \(error)")
+            }
+        }
+
+        let appSupportURL = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-            .appendingPathComponent("default.store")
-        let config: ModelConfiguration = Self.isRunningTests
-            ? ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            : ModelConfiguration(schema: schema, url: storeURL)
+        let legacyURL = appSupportURL.appendingPathComponent(storeFileName)
+        let appGroupContainer = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
+        let targetURL = appGroupContainer?
+            .appendingPathComponent(storeFileName) ?? legacyURL
+
+        Self.migrateStoreIfNeeded(from: legacyURL, to: targetURL, appGroupContainer: appGroupContainer)
+
+        let config = ModelConfiguration(schema: schema, url: targetURL)
 
         do {
             return try ModelContainer(
@@ -27,13 +50,7 @@ struct BabyStepsApp: App {
             )
         }
         catch {
-            // 最終手段: マイグレーション失敗時にストアを削除して再試行。
-            // データは失われるが、クラッシュは防ぐ。通常は SchemaV1（order なし）と
-            // SchemaV2（order デフォルト）でマイグレーションが成功する想定。
-            guard !Self.isRunningTests else {
-                fatalError("Could not create ModelContainer: \(error)")
-            }
-            Self.removeStoreFiles(at: storeURL)
+            Self.removeStoreFiles(at: targetURL)
             do {
                 return try ModelContainer(
                     for: schema,
@@ -46,6 +63,24 @@ struct BabyStepsApp: App {
             }
         }
     }()
+
+    /// 既存の Application Support ストアを App Group コンテナへ移行する（初回のみ）
+    private static func migrateStoreIfNeeded(from legacyURL: URL, to targetURL: URL, appGroupContainer: URL?) {
+        guard let container = appGroupContainer else { return }
+        guard legacyURL != targetURL else { return }
+
+        let targetStore = container.appendingPathComponent(storeFileName)
+        let legacyExists = FileManager.default.fileExists(atPath: legacyURL.path)
+        let targetExists = FileManager.default.fileExists(atPath: targetStore.path)
+
+        if legacyExists, !targetExists {
+            try? FileManager.default.createDirectory(at: container, withIntermediateDirectories: true)
+            try? FileManager.default.copyItem(at: legacyURL, to: targetStore)
+            try? FileManager.default.copyItem(atPath: legacyURL.path + "-wal", toPath: targetStore.path + "-wal")
+            try? FileManager.default.copyItem(atPath: legacyURL.path + "-shm", toPath: targetStore.path + "-shm")
+            removeStoreFiles(at: legacyURL)
+        }
+    }
 
     /// ストアファイル（.store, .store-wal, .store-shm）を削除する
     private static func removeStoreFiles(at url: URL) {
