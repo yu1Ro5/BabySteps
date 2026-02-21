@@ -2,16 +2,6 @@ import SwiftData
 import SwiftUI
 import WidgetKit
 
-// MARK: - Timeline Entry
-
-struct ProgressEntry: TimelineEntry {
-    let date: Date
-    let todayCompletedCount: Int
-    let todayTotalCount: Int
-    let completedTasksCount: Int
-    let totalTasksCount: Int
-}
-
 // MARK: - Timeline Provider
 
 struct ProgressTimelineProvider: TimelineProvider {
@@ -63,36 +53,7 @@ struct ProgressTimelineProvider: TimelineProvider {
         }
 
         let context = ModelContext(container)
-        let calendar = Calendar.current
-
-        // 今日完了したステップ数（completedAt != nil のものを取得し、日付でフィルタ）
-        let completedStepsDescriptor = FetchDescriptor<SchemaV2.TaskStep>(
-            predicate: #Predicate<SchemaV2.TaskStep> { step in
-                step.isCompleted && step.completedAt != nil
-            }
-        )
-        let allCompletedSteps = (try? context.fetch(completedStepsDescriptor)) ?? []
-        let todayCompletedSteps = allCompletedSteps.filter { step in
-            guard let completedAt = step.completedAt else { return false }
-            return calendar.isDate(completedAt, inSameDayAs: Date())
-        }
-
-        // 全タスク
-        let tasksDescriptor = FetchDescriptor<SchemaV2.Task>(
-            sortBy: [SortDescriptor(\.order, order: .forward)]
-        )
-        let tasks = (try? context.fetch(tasksDescriptor)) ?? []
-
-        let totalSteps = tasks.flatMap(\.steps).count
-        let completedTasks = tasks.filter { $0.isCompleted }.count
-
-        return ProgressEntry(
-            date: Date(),
-            todayCompletedCount: todayCompletedSteps.count,
-            todayTotalCount: totalSteps,
-            completedTasksCount: completedTasks,
-            totalTasksCount: tasks.count
-        )
+        return WidgetDataProvider.fetchProgress(context: context, referenceDate: Date())
     }
 }
 

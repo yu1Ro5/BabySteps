@@ -48,6 +48,8 @@ targets:
     sources:
       - path: Sources/Widget
         type: group
+      - path: Sources/WidgetSupport
+        type: group
       - path: Sources/Models
         type: group
     settings:
