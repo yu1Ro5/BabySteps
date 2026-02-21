@@ -82,6 +82,10 @@ struct TaskListView: View {
                     didBackfillCompletedAt = true
                     initializeCompletedSteps()
                 }
+
+                // ウィジェット用 UserDefaults フォールバックに初回同期
+                let entry = WidgetDataProvider.fetchProgress(context: modelContext, referenceDate: Date())
+                WidgetDataSync.writeToUserDefaults(entry: entry)
             }
         }
     }

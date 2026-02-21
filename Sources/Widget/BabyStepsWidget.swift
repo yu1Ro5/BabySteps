@@ -42,18 +42,24 @@ struct ProgressTimelineProvider: TimelineProvider {
     }
 
     private func fetchEntry() -> ProgressEntry {
-        guard let container = modelContainer else {
-            return ProgressEntry(
-                date: Date(),
-                todayCompletedCount: 0,
-                todayTotalCount: 0,
-                completedTasksCount: 0,
-                totalTasksCount: 0
-            )
+        if let container = modelContainer {
+            let context = ModelContext(container)
+            return WidgetDataProvider.fetchProgress(context: context, referenceDate: Date())
         }
 
-        let context = ModelContext(container)
-        return WidgetDataProvider.fetchProgress(context: context, referenceDate: Date())
+        // SwiftData ストアにアクセスできない場合、UserDefaults フォールバックを試す
+        // （containerURL が nil でも UserDefaults(suiteName:) は動作することがある）
+        if let entry = WidgetDataSync.readFromUserDefaults(referenceDate: Date()) {
+            return entry
+        }
+
+        return ProgressEntry(
+            date: Date(),
+            todayCompletedCount: 0,
+            todayTotalCount: 0,
+            completedTasksCount: 0,
+            totalTasksCount: 0
+        )
     }
 }
 
