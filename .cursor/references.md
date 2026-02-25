@@ -36,6 +36,8 @@
   Xcodeに内蔵されたSwift Formatの使用方法について
 - **2025-08-16**: [swift-format の Configuration](https://zenn.dev/kyome/articles/a2dad672c0a65c) -
   Swift Formatの設定方法について
+- **2025-08-16**: [Zenn記事のタイトル](https://zenn.dev/kabewall/articles/b8eed0438546d9) -
+  Zenn記事の内容について
 
 ---
 
